@@ -1,0 +1,36 @@
+---
+name: portfolio-check
+description: "내 투자 스펙(part2/spec)대로 계좌를 점검해 매수/매도 신호를 보고한다. '포트폴리오 점검', '리밸런싱 확인', '내 종목 점검해줘' 요청 시 사용."
+version: 1.0.0
+platforms: [linux, macos, windows]
+metadata:
+  hermes:
+    tags: [portfolio, rebalancing, 점검, 리밸런싱, 포트폴리오, kis]
+    related_skills: []
+---
+
+# 포트폴리오 점검 (ai-trading-lab)
+
+사용자가 "포트폴리오 점검해줘 / 리밸런싱 확인 / 내 종목 어때"라고 하면, 이 저장소의
+점검 스크립트를 실행하고 그 결과를 그대로 보고한다.
+
+## 실행 방법
+터미널 도구로 아래를 실행한다. `REPO` 는 사용자의 저장소 절대경로다(모르면 물어본다).
+
+```bash
+python REPO/part2/agent.py
+```
+
+- 이 스크립트는 `REPO/part2/spec/` 의 마크다운(목표 비중·규칙·한도)을 읽어, KIS(기본
+  mock)로 현재 계좌와 비교해 "무엇을 얼마나 사고팔지"를 계산해 출력한다.
+- **출력 텍스트를 그대로 사용자에게 전달**한다. 별도 해석을 덧붙이려면 초보자 눈높이로
+  한두 줄만 요약한다.
+
+## 지켜야 할 선
+- 이 점검은 **조회·보고까지만**. 실제 매수/매도 주문을 넣지 않는다.
+- 수익을 단정하지 않는다. 예제 규칙은 학습용이다.
+
+## 정기 실행으로 바꾸려면
+"매주 월요일 아침에 자동으로 점검해서 여기로 보내줘"라고 하면, cron 잡으로 등록한다
+(가능하면 no-agent 모드 + `~/.hermes/scripts/portfolio-check.sh`). 자세한 절차는
+저장소 `hermes/README.md` 참고.

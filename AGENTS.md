@@ -4,7 +4,7 @@
 AI 코딩 도구(Claude Code, Codex, Cursor, Gemini 등)는 아래를 따르세요.
 
 ## 먼저 읽을 것
-- **학습 튜터 스킬**: [`skill/tutor.md`](skill/tutor.md) — 학생을 단계별로 돕는 규칙.
+- **학습 튜터 스킬**: [`skill/assistant/SKILL.md`](skill/assistant/SKILL.md) — 학생을 단계별로 돕는 규칙.
   학생이 "도와줘 / 다음 단계 / 막혔어"라고 하면 이 스킬대로 안내하세요.
 - 전체 흐름: [`README.md`](README.md), 환경 세팅: [`SETUP.md`](SETUP.md)
 

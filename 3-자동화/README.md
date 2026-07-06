@@ -50,30 +50,34 @@ hermes --tui             # 기본 채팅부터 확인
 hermes gateway setup      # Discord 선택 → 봇 연결 (Connected Platforms: discord)
 ```
 
-### B2. 자동 점검 예약 — no-agent (LLM 안 씀, 결정적)
-hermes 는 `~/.hermes/scripts/` 아래 스크립트만 실행합니다. 그리로 복사하고 경로만 바꾸세요.
+### B2. 스크립트를 hermes 에 넣기 (한 번만)
+hermes 는 `~/.hermes/scripts/` 아래 스크립트를 실행합니다. 그리로 복사하고 경로만 바꾸세요.
 ```bash
 mkdir -p ~/.hermes/scripts
 cp 3-자동화/scripts/portfolio-check.py ~/.hermes/scripts/
 # ~/.hermes/scripts/portfolio-check.py 를 열어 REPO 를 내 저장소 절대경로로 수정
 ```
-매주 월요일 아침 점검 등록(출력이 그대로 디스코드로):
-```bash
-hermes cron create "0 8 * * 1" \
-  --name "weekly-portfolio-check" \
-  --no-agent \
-  --script portfolio-check.py \
-  --deliver discord
-```
-- `"0 8 * * 1"` = 매주 월 08:00 (`"every 1d at 09:00"` 같은 자연어도 됨)
-- `--no-agent` = LLM 없이 stdout 을 그대로 배달 → 무료·결정적. 확인: `hermes cron list`
 
-### B3. (선택) 채팅으로 부르기 — 스킬 주입
+### B3. 예약은 hermes 에게 '말로' 시키면 됩니다 (native)
+hermes 에는 예약(cron) 관리 기능이 내장돼 있어, **채팅에 자연어로 말하면 알아서 등록**합니다.
+CLI 명령을 외울 필요가 없습니다. hermes 채팅에 이렇게:
+```
+portfolio-check.py 를 매주 월요일 아침 8시에 no-agent 로 실행해서 디스코드로 보내줘.
+```
+- hermes 가 스스로 예약 잡을 만들어 줍니다. "지금 예약 목록 보여줘", "이 예약 지워줘"도
+  전부 말로 하면 됩니다.
+- `no-agent` = LLM 없이 스크립트 출력을 그대로 디스코드로 → 무료·결정적.
+
+> (참고) 같은 걸 CLI 로 직접 하려면:
+> `hermes cron create "0 8 * * 1" --name weekly-portfolio-check --no-agent --script portfolio-check.py --deliver discord`
+> 하지만 **자연어로 시키는 게 정석**입니다.
+
+### B4. (선택) 채팅에서 즉석 점검 — 스킬 주입
+정기 예약 말고, 채팅에서 "내 포트폴리오 점검해줘"로 즉석 실행하고 싶으면 스킬을 넣으세요.
 ```bash
 hermes skills install ./3-자동화/skill/portfolio-check
 ```
-설치되면 `~/.hermes/skills/portfolio-check/` 에 들어갑니다. 이후 채팅에서 "내 포트폴리오
-점검해줘"라고 하면 hermes 가 `2-에이전트/agent.py` 를 실행해 보고합니다.
+이후 채팅에서 "내 포트폴리오 점검해줘"라고 하면 hermes 가 `2-에이전트/agent.py` 를 실행해 보고합니다.
 
 ## 안전
 - 점검·보고까지만. hermes 가 실제 주문을 넣게 하지 않습니다.

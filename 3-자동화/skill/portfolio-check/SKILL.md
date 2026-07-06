@@ -31,6 +31,8 @@ python REPO/2-에이전트/agent.py
 - 수익을 단정하지 않는다. 예제 규칙은 학습용이다.
 
 ## 정기 실행으로 바꾸려면
-"매주 월요일 아침에 자동으로 점검해서 여기로 보내줘"라고 하면, cron 잡으로 등록한다
-(가능하면 no-agent 모드 + `~/.hermes/scripts/portfolio-check.py`). 자세한 절차는
-저장소 `3-자동화/README.md` 참고.
+사용자가 "매주 아침 자동으로 점검해서 보내줘"라고 하면, hermes 내장 cronjob 기능으로
+예약을 등록한다. 가능하면 **no_agent=True + `~/.hermes/scripts/portfolio-check.py`**
+(LLM 없이 스크립트 출력을 그대로 디스코드로 배달 → 무료·결정적). 스크립트가 아직
+`~/.hermes/scripts/` 에 없으면 먼저 복사·경로수정하도록 안내한다. 자세한 절차는 저장소
+`3-자동화/README.md` 참고.

@@ -44,7 +44,7 @@ description: >
 학생이 "매주 자동으로 돌리고 싶어 / 자는 동안 알아서 / hermes 연동"을 물으면,
 `3-자동화/README.md` 로 안내한다. 요지:
 - hermes 는 무료(Nous Portal 로그인)로 세우고, 디스코드를 연결한다.
-- 완성한 `2-에이전트/agent.py` 점검을 hermes cron 의 **no-agent 모드**(`--script
+- 완성한 `2-에이전트/agent.py` 점검을 hermes 에게 자연어로 예약을 시키면 된다(내장 cronjob, no-agent 모드). CLI 로는 (`--script
   portfolio-check.py --no-agent --deliver discord`)로 예약하면 LLM 없이 무료로
   정해진 시각에 돌아 디스코드로 보고가 온다. 스크립트는 `.py`라 OS 를 안 가린다.
 - **hermes 가 코드를 고치는 게 아니다.** 코드 수정은 Claude Code/Codex 로 하고,

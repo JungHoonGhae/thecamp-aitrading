@@ -62,6 +62,11 @@ def main() -> None:
              f"총 자산: {total:,}원 (현금 {bal['cash']:,}원)", ""]
     warnings = []
 
+    # 목표 비중 합이 100인지 확인 (스펙을 잘못 고치면 계산 기준이 틀어짐)
+    target_sum = sum(item["target"] for item in portfolio)
+    if abs(target_sum - 100) > 0.5:
+        warnings.append(f"목표 비중 합이 {target_sum:.0f}%입니다 (portfolio.md 에서 100%로 맞추세요)")
+
     for item in portfolio:
         cur_amt = held.get(item["code"], {}).get("eval_amt", 0)
         cur_w = cur_amt / total * 100

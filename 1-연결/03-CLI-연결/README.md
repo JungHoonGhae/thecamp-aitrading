@@ -6,14 +6,14 @@
 
 ## 📋 복사용 프롬프트
 ```
-part1/03-CLI-연결/code/kisctl.py 로 삼성전자(005930)와 SK하이닉스(000660)
+1-연결/03-CLI-연결/code/kisctl.py 로 삼성전자(005930)와 SK하이닉스(000660)
 현재가를 한 번에 조회하고, 내 계좌 잔고도 보여줘.
 ```
 
 ## 직접 실행하고 싶다면
 ```
-python part1/03-CLI-연결/code/kisctl.py price 005930 000660
-python part1/03-CLI-연결/code/kisctl.py balance
+python 1-연결/03-CLI-연결/code/kisctl.py price 005930 000660
+python 1-연결/03-CLI-연결/code/kisctl.py balance
 ```
 
 ## 기대 결과
@@ -31,4 +31,4 @@ python part1/03-CLI-연결/code/kisctl.py balance
 - 정답은 상황마다 다르다. 여기서는 두 방식을 나란히 놓고 감을 잡는다.
 
 ## 다음 단계
-→ [`part2`](../../part2/) : 마크다운 몇 개로 나만의 AI 투자 에이전트 만들기
+→ [`part2`](../../2-에이전트/) : 마크다운 몇 개로 나만의 AI 투자 에이전트 만들기

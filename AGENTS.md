@@ -17,5 +17,5 @@ AI 코딩 도구(Claude Code, Codex, Cursor, Gemini 등)는 아래를 따르세�
 
 ## 구조
 - `common/` — KIS 클라이언트(mock/live), fixtures, 디스코드 헬퍼
-- `part1/` — 연결(직접 호출·MCP·CLI) / `part2/` — 스펙 기반 투자 에이전트
+- `1-연결/` — 연결(직접 호출·MCP·CLI) / `2-에이전트/` — 스펙 기반 투자 에이전트
 - 각 모듈 폴더의 `README.md` 에 복사용 프롬프트가 있습니다.

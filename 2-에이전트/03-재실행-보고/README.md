@@ -6,19 +6,19 @@
 
 ## 📋 복사용 프롬프트
 ```
-part2/agent.py 를 다시 실행해서, 내가 바꾼 원칙대로 점검 결과가
+2-에이전트/agent.py 를 다시 실행해서, 내가 바꾼 원칙대로 점검 결과가
 달라졌는지 이전과 비교해서 설명해줘.
 ```
 
 ## 직접 실행하고 싶다면
 ```
-python part2/agent.py
+python 2-에이전트/agent.py
 ```
 
 ## (선택) 디스코드로 보고 받기
 디스코드 채널의 웹훅 URL을 환경변수로 넣으면 화면 대신 디스코드로 갑니다.
 ```
-DISCORD_WEBHOOK="https://discord.com/api/webhooks/..." python part2/agent.py
+DISCORD_WEBHOOK="https://discord.com/api/webhooks/..." python 2-에이전트/agent.py
 ```
 웹훅 만드는 법은 강의 중에 함께 진행합니다.
 
@@ -28,7 +28,7 @@ DISCORD_WEBHOOK="https://discord.com/api/webhooks/..." python part2/agent.py
 ```
 내 KIS 모의투자 키로 실제로 돌려보고 싶어. .env.example 을 복사해 .env 를 만들고
 KIS_MODE=live 와 내 앱키·시크릿·모의계좌번호를 넣는 걸 도와줘. 그다음
-`KIS_MODE=live python part2/agent.py` 로 실제 계좌 기준 점검이 되는지 확인해줘.
+`KIS_MODE=live python 2-에이전트/agent.py` 로 실제 계좌 기준 점검이 되는지 확인해줘.
 .env 는 절대 공유하지 말라고 알려줘.
 ```
 > 주의: 토요일 등 휴장일엔 실시간 조회가 제한됩니다. 그럴 땐 mock 으로 실습하세요.
@@ -38,7 +38,7 @@ KIS_MODE=live 와 내 앱키·시크릿·모의계좌번호를 넣는 걸 도와
 "매주 월요일 아침"처럼 정해진 시각에 이 점검을 자동 실행하고 디스코드로 받고 싶다면,
 완성한 이 점검을 **내 hermes-agent 에 주입**하면 됩니다. hermes 는 무료(Nous 로그인)로
 세우고, 점검은 LLM 없이 도는 no-agent 모드로 예약합니다. OS(mac/Win)를 안 가립니다.
-→ 자세한 주입 절차: [`hermes/README.md`](../../hermes/README.md)
+→ 자세한 주입 절차: [`3-자동화/README.md`](../../3-자동화/README.md)
 
 > hermes 가 코드를 고치는 게 아닙니다. 코드 수정은 Claude Code/Codex 로,
 > hermes 는 "이미 만든 걸 예약해서 굴리는" 역할만 합니다.

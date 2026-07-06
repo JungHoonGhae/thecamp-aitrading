@@ -3,3 +3,6 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+
+# 강사 전용 (학생 배포 제외)
+teacher/

@@ -22,7 +22,7 @@
    ```
 3. 실행할 때 live 로 돈다:
    ```
-   KIS_MODE=live python part2/agent.py
+   KIS_MODE=live python 2-에이전트/agent.py
    ```
 
 ## 주의

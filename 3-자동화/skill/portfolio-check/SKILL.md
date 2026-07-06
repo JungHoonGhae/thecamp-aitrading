@@ -1,6 +1,6 @@
 ---
 name: portfolio-check
-description: "내 투자 스펙(part2/spec)대로 계좌를 점검해 매수/매도 신호를 보고한다. '포트폴리오 점검', '리밸런싱 확인', '내 종목 점검해줘' 요청 시 사용."
+description: "내 투자 스펙(2-에이전트/spec)대로 계좌를 점검해 매수/매도 신호를 보고한다. '포트폴리오 점검', '리밸런싱 확인', '내 종목 점검해줘' 요청 시 사용."
 version: 1.0.0
 platforms: [linux, macos, windows]
 metadata:
@@ -18,10 +18,10 @@ metadata:
 터미널 도구로 아래를 실행한다. `REPO` 는 사용자의 저장소 절대경로다(모르면 물어본다).
 
 ```bash
-python REPO/part2/agent.py
+python REPO/2-에이전트/agent.py
 ```
 
-- 이 스크립트는 `REPO/part2/spec/` 의 마크다운(목표 비중·규칙·한도)을 읽어, KIS(기본
+- 이 스크립트는 `REPO/2-에이전트/spec/` 의 마크다운(목표 비중·규칙·한도)을 읽어, KIS(기본
   mock)로 현재 계좌와 비교해 "무엇을 얼마나 사고팔지"를 계산해 출력한다.
 - **출력 텍스트를 그대로 사용자에게 전달**한다. 별도 해석을 덧붙이려면 초보자 눈높이로
   한두 줄만 요약한다.
@@ -32,5 +32,5 @@ python REPO/part2/agent.py
 
 ## 정기 실행으로 바꾸려면
 "매주 월요일 아침에 자동으로 점검해서 여기로 보내줘"라고 하면, cron 잡으로 등록한다
-(가능하면 no-agent 모드 + `~/.hermes/scripts/portfolio-check.sh`). 자세한 절차는
-저장소 `hermes/README.md` 참고.
+(가능하면 no-agent 모드 + `~/.hermes/scripts/portfolio-check.py`). 자세한 절차는
+저장소 `3-자동화/README.md` 참고.

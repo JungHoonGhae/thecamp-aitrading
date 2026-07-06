@@ -15,6 +15,6 @@ from pathlib import Path
 
 REPO = r"__여기에_저장소_절대경로__"  # 예: /Users/나/workspace/projects/edu-fastcampus-ai-trading-lab
 
-agent = Path(REPO) / "part2" / "agent.py"
+agent = Path(REPO) / "2-에이전트" / "agent.py"
 sys.argv = [str(agent)]
 runpy.run_path(str(agent), run_name="__main__")

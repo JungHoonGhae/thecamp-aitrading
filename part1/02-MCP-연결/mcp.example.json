@@ -1,0 +1,15 @@
+{
+  "_설명": "KIS 공식 MCP 등록 예시. 실제 경로/키는 AI가 등록을 도와줍니다.",
+  "mcpServers": {
+    "kis-trading": {
+      "command": "python",
+      "args": ["-m", "kis_trading_mcp"],
+      "env": {
+        "KIS_APP_KEY": "여기에_모의투자_앱키",
+        "KIS_APP_SECRET": "여기에_모의투자_시크릿",
+        "KIS_ACCOUNT": "모의계좌_앞8자리",
+        "KIS_ENV": "vps"
+      }
+    }
+  }
+}

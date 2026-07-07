@@ -11,13 +11,13 @@
 ## 이 프로젝트에 쓰기
 복사한 URL을 실행할 때 넣으면 화면 대신 디스코드로 갑니다.
 ```
-DISCORD_WEBHOOK="복사한_URL" python 2-에이전트/agent.py
+DISCORD_WEBHOOK="복사한_URL" python 2부-나만의-에이전트/agent.py
 ```
 Windows(PowerShell):
 ```
-$env:DISCORD_WEBHOOK="복사한_URL"; python 2-에이전트/agent.py
+$env:DISCORD_WEBHOOK="복사한_URL"; python 2부-나만의-에이전트/agent.py
 ```
 
 ## 주의
 - 웹훅 URL은 그 채널에 글을 쓸 수 있는 열쇠입니다. **공유·업로드 금지.**
-- hermes 로 자동화할 땐 웹훅 대신 hermes 의 디스코드 연결을 씁니다(`3-자동화/README.md`).
+- hermes 로 자동화할 땐 웹훅 대신 hermes 의 디스코드 연결을 씁니다(`2부-나만의-에이전트/4-자동화-hermes-예약.md`).

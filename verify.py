@@ -32,9 +32,9 @@ def run(desc: str, args: list[str], expect: str) -> bool:
 def main() -> None:
     print("ai-trading-lab 자가 점검 (mock 모드)\n")
     checks = [
-        ("1-연결/01 직접 호출", ["1-연결/01-직접-호출/code/quote.py", "005930"], "현재가"),
-        ("2-에이전트 미리보기", ["2-에이전트/agent.py"], "리밸런싱 미리보기"),
-        ("2-에이전트 모의주문(--execute)", ["2-에이전트/agent.py", "--execute"], "주문 전송"),
+        ("1부-연결 직접 호출", ["1부-연결/quote.py", "005930"], "현재가"),
+        ("2부 에이전트 미리보기", ["2부-나만의-에이전트/agent.py"], "리밸런싱 미리보기"),
+        ("2부 에이전트 모의주문(--execute)", ["2부-나만의-에이전트/agent.py", "--execute"], "주문 전송"),
     ]
     results = [run(d, a, e) for d, a, e in checks]
     passed, total = sum(results), len(results)
@@ -42,7 +42,7 @@ def main() -> None:
     if passed == total:
         print("모두 정상입니다. README 순서대로 실습을 시작하세요.")
     else:
-        print("일부 실패. SETUP.md 로 환경을 다시 확인하거나 강사/조교에게 문의하세요.")
+        print("일부 실패. 0-시작/1-환경-세팅.md 로 환경을 다시 확인하거나 강사/조교에게 문의하세요.")
         sys.exit(1)
 
 

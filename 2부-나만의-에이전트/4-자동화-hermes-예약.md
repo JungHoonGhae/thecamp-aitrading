@@ -1,6 +1,6 @@
-# 3단계 — 정해진 시각에 자동으로 (자는 동안 AI가 시장을 지켜본다)
+# 2부 · 4 — 자동화: 정해진 시각에 (자는 동안 AI가 시장을 지켜본다)
 
-여기까지 오면 완성한 점검(`2-에이전트/agent.py`)을 **손 안 대고 정해진 시각에 자동 실행 →
+여기까지 오면 완성한 점검(`2부-나만의-에이전트/agent.py`)을 **손 안 대고 정해진 시각에 자동 실행 →
 디스코드로 보고**받게 만듭니다. 이게 이 실습의 목적지입니다.
 
 방법은 두 가지 — 편한 걸 고르세요.
@@ -15,15 +15,15 @@
 
 ## A. OS 스케줄러로 (가장 간단)
 
-디스코드로 받고 싶으면 웹훅 URL을 먼저 만드세요 → `docs/discord-웹훅-가이드.md`.
+디스코드로 받고 싶으면 웹훅 URL을 먼저 만드세요 → `참고/discord-웹훅-가이드.md`.
 
 **mac / Linux** — 터미널에 `crontab -e` 후 한 줄 추가(매주 월 08:00):
 ```
-0 8 * * 1 DISCORD_WEBHOOK="웹훅URL" python /내/저장소/절대경로/2-에이전트/agent.py
+0 8 * * 1 DISCORD_WEBHOOK="웹훅URL" python /내/저장소/절대경로/2부-나만의-에이전트/agent.py
 ```
 
 **Windows** — "작업 스케줄러"에서 새 작업 → 트리거(매주 월 08:00) → 동작:
-`python C:\내\저장소\경로\2-에이전트\agent.py` (환경변수에 DISCORD_WEBHOOK 설정)
+`python C:\내\저장소\경로\2부-나만의-에이전트\agent.py` (환경변수에 DISCORD_WEBHOOK 설정)
 
 이게 "자는 동안 자동 실행"의 가장 단순한 형태입니다.
 
@@ -54,7 +54,7 @@ hermes gateway setup      # Discord 선택 → 봇 연결 (Connected Platforms: 
 hermes 는 `~/.hermes/scripts/` 아래 스크립트를 실행합니다. 그리로 복사하고 경로만 바꾸세요.
 ```bash
 mkdir -p ~/.hermes/scripts
-cp 3-자동화/scripts/portfolio-check.py ~/.hermes/scripts/
+cp 2부-나만의-에이전트/scripts/portfolio-check.py ~/.hermes/scripts/
 # ~/.hermes/scripts/portfolio-check.py 를 열어 REPO 를 내 저장소 절대경로로 수정
 ```
 
@@ -75,10 +75,13 @@ portfolio-check.py 를 매주 월요일 아침 8시에 no-agent 로 실행해서
 ### B4. (선택) 채팅에서 즉석 점검 — 스킬 주입
 정기 예약 말고, 채팅에서 "내 포트폴리오 점검해줘"로 즉석 실행하고 싶으면 스킬을 넣으세요.
 ```bash
-hermes skills install ./3-자동화/skill/portfolio-check
+hermes skills install ./2부-나만의-에이전트/skill/portfolio-check
 ```
-이후 채팅에서 "내 포트폴리오 점검해줘"라고 하면 hermes 가 `2-에이전트/agent.py` 를 실행해 보고합니다.
+이후 채팅에서 "내 포트폴리오 점검해줘"라고 하면 hermes 가 `2부-나만의-에이전트/agent.py` 를 실행해 보고합니다.
 
 ## 안전
 - 점검·보고까지만. hermes 가 실제 주문을 넣게 하지 않습니다.
 - 무료 티어 품질·한도는 시점마다 다르니 시연/자동화 전 리허설.
+
+---
+◀ [이전: 3-재실행-리밸런싱](3-재실행-리밸런싱.md) · 다음 ▶ [**마무리 · 신뢰 게이트**](../9-마무리/README.md)

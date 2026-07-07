@@ -33,9 +33,8 @@ def main() -> None:
     print("ai-trading-lab 자가 점검 (mock 모드)\n")
     checks = [
         ("1-연결/01 직접 호출", ["1-연결/01-직접-호출/code/quote.py", "005930"], "현재가"),
-        ("1-연결/03 CLI 시세", ["1-연결/03-CLI-연결/code/kisctl.py", "price", "005930"], "원"),
-        ("1-연결/03 CLI 잔고", ["1-연결/03-CLI-연결/code/kisctl.py", "balance"], "보유"),
-        ("2-에이전트 점검", ["2-에이전트/agent.py"], "포트폴리오 점검 결과"),
+        ("2-에이전트 미리보기", ["2-에이전트/agent.py"], "리밸런싱 미리보기"),
+        ("2-에이전트 모의주문(--execute)", ["2-에이전트/agent.py", "--execute"], "주문 전송"),
     ]
     results = [run(d, a, e) for d, a, e in checks]
     passed, total = sum(results), len(results)

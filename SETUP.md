@@ -33,6 +33,16 @@ AI가 알아서 설치합니다.
 
 > 이미 저장소 폴더를 받은 상태라면 위 4번(clone)은 건너뛰어도 됩니다.
 
+## Docker Desktop (2회차 MCP 실습용 — 미리 설치 권장)
+2회차에서 KIS 공식 **Trading MCP**를 붙여 AI가 실제 모의계좌를 조회합니다. 이 MCP는
+**Docker 컨테이너**로 도는 구조라 Docker Desktop이 필요합니다.
+- mac / Windows: 공식 Docker Desktop 설치(로그인까지). Windows는 WSL2 권장.
+- 왜 Docker? 노트북이 제각각이어도 컨테이너 안은 **누구에게나 똑같이** 동작(환경 통일).
+- **Docker가 안 돼도 실습은 계속됩니다** — `mock 폴백`으로 동일하게 진행하고 나중에 붙입니다.
+```
+내 OS에 맞는 Docker Desktop 설치 방법을 알려주고, 설치가 됐는지 확인하는 것까지 도와줘.
+```
+
 ## 세팅이 끝났다면
 [`README.md`](README.md) 의 순서대로 `1-연결/01-직접-호출/` 부터 시작하세요.
 막히면: `skill/assistant/SKILL.md 대로 도와줘` 라고 부탁하면 단계별로 안내합니다.

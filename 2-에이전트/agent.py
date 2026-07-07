@@ -3,13 +3,16 @@
 하는 일:
   1) spec/ 의 마크다운(목표 포트폴리오·규칙·가드레일)을 읽는다.
   2) KIS(mock/live)로 현재 계좌 상태를 조회한다.
-  3) 목표 비중과 현재 비중을 비교해 "무엇을 얼마나 사고팔지" 계산한다.
-  4) 가드레일을 점검하고, 결과를 디스코드(또는 화면)로 보고한다.
+  3) 목표 비중과 현재 비중을 비교해 "무엇을 얼마나 사고팔지" 계산한다(미리보기).
+  4) 가드레일을 점검한다. 위반이 있으면 주문을 "차단"한다.
+  5) --execute 를 붙이면, 가드레일을 통과한 주문만 모의투자로 실행한다.
+  6) 결과를 디스코드(또는 화면)로 보고한다.
 
-실제 매수/매도 주문은 넣지 않는다. 점검·보고까지만.
+신뢰 게이트: 기본은 미리보기(주문 없음) → --execute 로 확인 실행 → 가드레일이 최종 차단.
 
-실행:  python agent.py            # mock 모드 (기본)
-       KIS_MODE=live python agent.py   # 실제 모의투자 키로
+실행:  python agent.py                     # 미리보기만 (mock, 기본)
+       python agent.py --execute           # 가드레일 통과분 모의주문 (mock=시뮬레이션)
+       KIS_MODE=live python agent.py --execute   # 실제 모의투자 주문 (장중에만 체결)
 """
 from __future__ import annotations
 
@@ -60,12 +63,14 @@ def main() -> None:
 
     lines = [f"[{'모의데이터' if kis.mode == 'mock' else '실계좌'}] 포트폴리오 점검 결과",
              f"총 자산: {total:,}원 (현금 {bal['cash']:,}원)", ""]
-    warnings = []
+    warnings = []   # 참고용 경고 (실행은 막지 않음)
+    blocks = []     # 하드 가드레일 위반 → 실제 주문 차단
+    plan = []       # 리밸런싱 주문 계획 [{code,name,side,qty,price}]
 
     # 목표 비중 합이 100인지 확인 (스펙을 잘못 고치면 계산 기준이 틀어짐)
     target_sum = sum(item["target"] for item in portfolio)
     if abs(target_sum - 100) > 0.5:
-        warnings.append(f"목표 비중 합이 {target_sum:.0f}%입니다 (portfolio.md 에서 100%로 맞추세요)")
+        blocks.append(f"목표 비중 합이 {target_sum:.0f}%입니다 (100%가 아니면 리밸런싱 기준이 틀어짐)")
 
     for item in portfolio:
         cur_amt = held.get(item["code"], {}).get("eval_amt", 0)
@@ -80,15 +85,48 @@ def main() -> None:
             f"- {item['name']}({item['code']}): 목표 {item['target']:.0f}% / "
             f"현재 {cur_w:.1f}% → {action} 약 {qty}주{flag}")
         if item["target"] > max_weight:
-            warnings.append(f"{item['name']} 목표비중 {item['target']:.0f}% > 한도 {max_weight:.0f}%")
+            blocks.append(f"{item['name']} 목표비중 {item['target']:.0f}% > 한도 {max_weight:.0f}% (이 종목 주문 차단)")
+        elif action in ("매수", "매도") and qty > 0 and abs(gap) >= tolerance:
+            plan.append({"code": item["code"], "name": item["name"],
+                         "side": "buy" if gap > 0 else "sell", "qty": qty, "price": price})
 
     cash_w = bal["cash"] / total * 100
     if cash_w < min_cash:
         warnings.append(f"현금 비중 {cash_w:.1f}% < 최소 {min_cash:.0f}%")
 
+    if blocks:
+        lines += ["", "⛔ 가드레일 위반 (주문 차단):"] + [f"- {b}" for b in blocks]
     if warnings:
         lines += ["", "가드레일 경고:"] + [f"- {w}" for w in warnings]
-    lines += ["", "※ 이 에이전트는 점검·보고만 합니다. 실제 주문은 넣지 않습니다."]
+
+    # 리밸런싱 미리보기
+    if plan:
+        lines += ["", "리밸런싱 미리보기:"]
+        for p in plan:
+            verb = "매수" if p["side"] == "buy" else "매도"
+            lines.append(f"- {p['name']}: {verb} {p['qty']}주 (약 {p['qty']*p['price']:,}원)")
+    else:
+        lines += ["", "리밸런싱할 주문이 없습니다 (허용 오차 이내)."]
+
+    # 신뢰 게이트: 기본은 미리보기, --execute 일 때만 실행, 가드레일이 최종 차단
+    execute = "--execute" in sys.argv
+    if not execute:
+        lines += ["", "※ 미리보기입니다. 실제 주문하려면 --execute 를 붙이세요.",
+                  "  (가드레일 위반이 있으면 --execute 여도 차단됩니다.)"]
+    elif blocks:
+        lines += ["", "⛔ 가드레일 위반이 있어 실제 주문을 실행하지 않았습니다. 스펙을 고쳐 다시 시도하세요."]
+    elif not plan:
+        lines += ["", "실행할 주문이 없습니다."]
+    else:
+        kind = "시뮬레이션" if kis.mode == "mock" else "실계좌 모의투자"
+        lines += ["", f"[실행] 가드레일 통과분을 {kind}로 주문 전송…"]
+        for p in plan:
+            r = kis.place_order(p["code"], p["side"], p["qty"])
+            verb = "매수" if p["side"] == "buy" else "매도"
+            mark = "✅" if r["ok"] else "❌"
+            lines.append(f"  {mark} {p['name']} {verb} {p['qty']}주 — {r.get('msg', '')}")
+
+    lines += ["", "※ 신뢰는 한 단계씩. 실전(실계좌) 매매는 이 실습 범위 밖입니다."]
     report("\n".join(lines))
 
 

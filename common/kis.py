@@ -64,6 +64,30 @@ class KISClient:
         ]
         return {"cash": int(summary.get("dnca_tot_amt", 0)), "holdings": holdings}
 
+    def place_order(self, code: str, side: str, qty: int) -> dict:
+        """모의투자 시장가 주문. side='buy'|'sell'. {'ok','code','side','qty', ...} 반환.
+
+        mock 모드: 실제로 넣지 않고 시뮬레이션 결과를 돌려준다(휴장·키 무관).
+        live 모드: KIS 모의투자 서버에 실제 주문을 전송한다(장중에만 체결).
+        """
+        if qty <= 0:
+            return {"ok": False, "code": code, "side": side, "qty": qty,
+                    "msg": "수량 0 — 주문 생략"}
+        if self.mode == "mock":
+            return {"ok": True, "code": code, "side": side, "qty": qty,
+                    "simulated": True, "msg": "모의 시뮬레이션(실주문 아님)"}
+        tr_id = "VTTC0802U" if side == "buy" else "VTTC0801U"  # 모의 매수/매도
+        body = {
+            "CANO": self.account, "ACNT_PRDT_CD": "01", "PDNO": code,
+            "ORD_DVSN": "01",  # 시장가
+            "ORD_QTY": str(qty), "ORD_UNPR": "0",
+        }
+        res = self._post("/uapi/domestic-stock/v1/trading/order-cash", tr_id, body)
+        ok = res.get("rt_cd") == "0"
+        return {"ok": ok, "code": code, "side": side, "qty": qty,
+                "simulated": False, "msg": res.get("msg1", ""),
+                "order_no": (res.get("output") or {}).get("ODNO", "")}
+
     # ---- 내부 ----
     def _fixture(self, name: str) -> dict:
         return json.loads((FIXTURES / name).read_text(encoding="utf-8"))

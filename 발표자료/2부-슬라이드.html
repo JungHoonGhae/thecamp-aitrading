@@ -114,6 +114,15 @@
     <p class="ghlink">실습 저장소 <code>github.com/__GITHUB_ID__/ai-trading-lab</code></p>
   </section>
 
+  <!-- 1.5 · 이 수업의 진짜 목표 -->
+  <section class="slide" data-where="이 수업의 목표">
+    <span class="badge talk">이 수업의 목표</span>
+    <h2>우리가 진짜 만드는 건 <span class="em">‘신뢰할 수 있는’</span> 시스템</h2>
+    <p class="sub">돈 버는 마법을 파는 수업이 아닙니다. AI에게 매매를 조금씩 맡기되,
+    믿을 수 있는 만큼만 권한을 여는 — 그 <span class="mark">단계별 신뢰</span>를 설계하는 게 목적입니다.</p>
+    <p class="sub" style="margin-top:1rem">그래서 오늘의 주인공은 전략이 아니라 <b>가드레일</b>입니다.</p>
+  </section>
+
   <!-- 2 · AGENDA -->
   <section class="slide" data-where="목차">
     <p class="kicker"><span class="rule"></span>오늘의 흐름 · 120분</p>
@@ -140,6 +149,33 @@
     </div>
     <div class="arch-back">에이전트 → 미리보기 · 가드레일 · 모의주문 → 디스코드 보고 (＋ hermes 정기 실행)</div>
     <p class="sub" style="margin-top:1.3rem">규칙은 <span class="mark">사람이 선언</span>, 점검·실행은 <span class="mark">에이전트가</span>.</p>
+  </section>
+
+  <!-- 3.2 · 필수 원칙: 2세대 UI vs 완전자동화 -->
+  <section class="slide" data-where="필수 원칙">
+    <span class="badge talk">필수 원칙</span>
+    <h2>2세대는 ‘사람이 확인’했지만, <span class="em">자동화는 다릅니다</span></h2>
+    <div class="cols">
+      <div class="panel"><h3>2세대 MTS / HTS</h3><p>화면으로 인터랙티브. 위험한 주문엔 “정말
+      실행할까요?” 팝업이 뜨고, <b>사람이 눈으로 보고 누릅니다.</b></p></div>
+      <div class="panel hi"><h3>AI 완전 자동화</h3><p>누를 사람이 없습니다. 그 ‘확인’을
+      <b>코드와 가드레일로 미리 설계</b>해야 합니다.</p></div>
+    </div>
+    <p class="sub" style="margin-top:1rem">게다가 이걸 <span class="mark">어떻게 설계하는지 아직 정해진 표준이 없어요.</span>
+    그래서 우리가 원칙을 세워 하나씩 만들어가는 겁니다. 1부에서 말한 “WTS는 사람을 위해 만들어졌다”가 여기서 이어지죠.</p>
+  </section>
+
+  <!-- 3.3 · 필수 요소: API 선정 -->
+  <section class="slide" data-where="필수 요소 · API">
+    <span class="badge talk">필수 요소</span>
+    <h2>AI 트레이딩용 API, <span class="em">이건 꼭</span> 봅니다</h2>
+    <ul>
+      <li><span class="b">1</span><div><b>모의투자(paper) 지원</b> — 없으면 실습도 검증도 불가. 최우선 조건</div></li>
+      <li><span class="b">2</span><div><b>API가 자체로 주는 가드레일</b> — 주문 한도·거부 규칙 등 ‘그들이 막아주는 것’ 파악</div></li>
+      <li><span class="b">3</span><div><b>표준 접근(REST·Open API)</b> — 자동화와 재현에 유리</div></li>
+    </ul>
+    <p class="sub" style="margin-top:1.2rem">그런데 <span class="mark">공식 Open API와 모의투자를 제대로 다 주는 곳은 의외로 적습니다.</span></p>
+    <p class="sub" style="margin-top:.6rem;color:var(--faint);font-size:.9rem">국내는 한국투자증권이 2022년 국내 최초로 REST Open API를 열고 모의투자를 지원해 이 수업에서 씁니다. (해외는 Alpaca 등)</p>
   </section>
 
   <!-- 3.5 · 결과물 시연 -->
@@ -195,6 +231,20 @@
 (예: 삼성전자 30, SK하이닉스 20, 현대차 20, 나머지 현금) 바꾼 뒤 다시 실행해서
 이전과 뭐가 달라졌는지 비교해줘.</pre>
     </div>
+  </section>
+
+  <!-- 6.5 · 가드레일 필수 요소 -->
+  <section class="slide" data-where="필수 요소 · 가드레일">
+    <span class="badge talk">필수 요소</span>
+    <h2>우리가 <span class="em">코드로 고정할</span> 가드레일</h2>
+    <ul>
+      <li><span class="b">1</span><div><b>한 종목 최대 비중</b> — 몰빵 방지</div></li>
+      <li><span class="b">2</span><div><b>현금 최소 보유</b> — 전량 매수 방지</div></li>
+      <li><span class="b">3</span><div><b>비중 합 100 검증</b> — 계산 기준이 틀어지는 것 방지</div></li>
+      <li><span class="b">4</span><div><b>미리보기 → 확인 게이트</b> — 사람이 누르던 확인을 대신</div></li>
+    </ul>
+    <p class="sub" style="margin-top:1.2rem">원칙은 하나예요. <span class="mark">말(스펙)로는 다 못 막습니다.</span>
+    핵심은 코드로 하드하게 — 위반하면 주문 자체를 막습니다.</p>
   </section>
 
   <!-- 7 · 가드레일 체험 -->

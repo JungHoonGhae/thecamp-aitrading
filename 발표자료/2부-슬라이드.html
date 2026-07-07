@@ -1,4 +1,4 @@
-<title>AI 자동매매 시스템 제작 · 슬라이드</title>
+<title>2부 · 나만의 에이전트 — 슬라이드</title>
 <style>
   :root{
     --paper:#EDF0F2; --card:#FFFFFF; --ink:#14181F; --ink-soft:#55605C;
@@ -91,142 +91,6 @@
 
 <div class="bar" id="bar"></div>
 <div class="deck" id="deck">
-
-  <section class="slide">
-    <p class="eyebrow">패스트캠퍼스 · Part 1~2 <span class="n">/ 정훈</span></p>
-    <h1>AI 자동매매<br>시스템 제작</h1>
-    <p class="sub">AI를 국내 주식시장(KIS 모의투자)에 연결하고, 내 원칙을 스펙으로 선언해 <span class="em">스스로 점검·리밸런싱하는
-    나만의 에이전트</span>를 만든다.</p>
-  </section>
-
-  <section class="slide">
-    <p class="eyebrow">오늘의 약속</p>
-    <h2>코딩을 몰라도,<br>끝나면 <span class="em">동작하는 시스템</span>이 남는다</h2>
-    <ul>
-      <li>1회차 — AI가 내 <b>모의계좌를 실제로 조회</b>하게 연결</li>
-      <li>2회차 — 스펙을 선언하면 <b>가드레일 안에서 리밸런싱 + 디스코드 보고</b></li>
-      <li>실습은 "프롬프트 복사 → 붙여넣기"에서 시작</li>
-    </ul>
-  </section>
-
-  <section class="slide">
-    <p class="eyebrow">개념 <span class="n">/ 01</span></p>
-    <h2>정보는 <span class="em">양</span>이 아니라<br><span class="em">구조</span>로 전달한다</h2>
-    <p class="sub">발표를 토씨 하나까지 외우면 오히려 막힙니다. 잘하는 사람은 <b>핵심 키워드만</b>
-    쥐고, 나머지는 그 자리에서 <span class="em">추론해 연결</span>합니다.</p>
-  </section>
-
-  <section class="slide">
-    <p class="eyebrow">개념 <span class="n">/ 02</span></p>
-    <h2>“스타필드 안 <span class="em">A 레스토랑</span>으로 와”</h2>
-    <p class="sub">모든 골목을 안 읊어도 친구는 찾아옵니다 — 사람이니까요.
-    <b>AI 모델도 추론합니다.</b> 목적지와 길 찾는 능력만 주면 됩니다.</p>
-  </section>
-
-  <section class="slide">
-    <p class="eyebrow">개념 <span class="n">/ 02.5 · 생각의 흐름</span></p>
-    <h2>친구의 머릿속 = <span class="em">AI의 머릿속</span></h2>
-    <p class="sub">낯선 몰에서 친구는 <b>키오스크로 검색 → 몇 층인지 확인 → 찾아갑니다.</b>
-    AI도 도구 <b>3개</b>로 “내 잔고 얼마야?”의 길을 똑같이 냅니다.</p>
-    <div class="cols" style="margin-top:1.2rem">
-      <div class="box"><h3>친구 · 스타필드</h3><p>① 키오스크에서 “A 레스토랑” 검색<br>② 몇 층 몇 호·가는 길 확인<br>③ 그 층으로 가서 도착</p></div>
-      <div class="box yes"><h3>AI · MCP 도구 3개</h3><p>① <b>검색</b> — “잔고” 관련 API 찾기<br>② <b>상세보기</b> — 파라미터·필요조건 확인<br>③ <b>호출</b> — 실제 잔고 조회</p></div>
-    </div>
-  </section>
-
-  <section class="slide">
-    <p class="eyebrow">개념 <span class="n">/ 02.7 · 여러 갈래</span></p>
-    <h2>처음 보는 곳이어도<br><span class="em">길은 여러 갈래</span></h2>
-    <p class="sub">스타필드가 없던 시절 처음 가도 — “대형 몰이면 키오스크가 있겠지”,
-    없으면 “인포메이션에 물어보지”. 세부 지시가 없어도 <b>도달하는 길은 많습니다.</b></p>
-    <p class="big" style="margin-top:1.4rem; font-size:clamp(1.6rem,4vw,2.6rem)">그래서 정보를 <span class="bad">다 쏟으면</span><br>오히려 <span class="bad">헷갈립니다.</span></p>
-  </section>
-
-  <section class="slide">
-    <p class="eyebrow c2">개념 <span class="n">/ 03 · 문제</span></p>
-    <h2>문서 <span class="bad">330개</span>를 통째로 던지면?</h2>
-    <div class="cols">
-      <div class="box no"><h3>토큰 폭발</h3><p>수십만 토큰 → 비용도, 남는 공간도 없음</p></div>
-      <div class="box no"><h3>정확도 하락</h3><p>중요한 게 묻혀 <b>엉뚱한 값을 지어냄(환각)</b></p></div>
-      <div class="box no"><h3>문서 ≠ 실행</h3><p>인증·계좌 처리는 문서만으론 안 됨</p></div>
-      <div class="box no"><h3>금방 낡음</h3><p>복붙한 순간부터 원본과 어긋남</p></div>
-    </div>
-  </section>
-
-  <section class="slide">
-    <p class="eyebrow">개념 <span class="n">/ 04 · 해법</span></p>
-    <h2>MCP = <span class="em">필요할 때 필요한 것만</span><br>(catalog · 점진적 공개)</h2>
-    <div class="flow">
-      <span class="f hot">검색</span><span class="ar">→</span>
-      <span class="f hot">상세보기</span><span class="ar">→</span>
-      <span class="f hot">호출</span>
-      <span class="ar" style="margin:0 .3rem">···</span>
-      <span class="f">필요한 스펙만 그때 로드</span>
-    </div>
-    <p class="sub" style="margin-top:1.3rem">평소엔 도구 <b>3개</b>만. “잔고가 필요하네” 하면 그 스펙만 꺼냅니다.</p>
-  </section>
-
-  <section class="slide">
-    <p class="eyebrow">개념 <span class="n">/ 05 · 위계</span></p>
-    <h2>무엇이 <span class="em">위</span>에 있는 정보인가</h2>
-    <div class="stack">
-      <div class="lvl"><b>기반</b> 인증 · 계정 — 모든 것이 여기에 의존</div>
-      <div class="lvl"><b>그 위에</b> 계좌</div>
-      <div class="lvl"><b>그 위에</b> 종목</div>
-      <div class="lvl dim"><b>그때</b> 상세 파라미터 — 필요할 때만</div>
-    </div>
-    <p class="sub" style="margin-top:1.1rem">상위 정보를 먼저, 세부는 필요할 때. <b>이 감각이 실력입니다.</b></p>
-  </section>
-
-  <section class="slide">
-    <p class="eyebrow">개념 <span class="n">/ 06 · 재사용</span></p>
-    <h2>서버 하나, <span class="em">어디서든</span> — N×M → N+M</h2>
-    <p class="sub">같은 MCP를 Claude Code에도, hermes에도 붙입니다. 소스마다·도구마다 따로 잇던 걸,
-    <b>서버 하나로 모두가 재사용</b>합니다.</p>
-  </section>
-
-  <section class="slide">
-    <p class="eyebrow">개념 <span class="n">/ CLI vs MCP</span></p>
-    <h2>정해진 반복은 <span class="em">CLI</span>,<br>그때그때 판단은 <span class="em">MCP</span></h2>
-    <div class="cols">
-      <div class="box"><h3>CLI = 자판기</h3><p>정확한 버튼을 누르면 정해진 게 딱.
-      <b>매번 똑같은 일</b>엔 제일 빠르고 확실 — 대신 버튼에 없는 건 안 됨</p></div>
-      <div class="box yes"><h3>MCP = 점원</h3><p>“이런 게 필요해요” 하면 알아서 처리.
-      <b>뭐가 필요할지 모를 때</b>·여러 앱에서 재사용할 때 유리</p></div>
-    </div>
-    <p class="sub" style="margin-top:1rem; font-size:1rem">CLI는 강력한 만큼 위험(잘못 치면 파일이 지워질 수도)해서,
-    오늘은 “이런 것도 있다”만 짚고 넘어갑니다.</p>
-  </section>
-
-  <section class="slide">
-    <p class="eyebrow">1회차 <span class="n">/ 연결</span></p>
-    <h2>환경 세팅조차 <span class="em">AI가</span> 한다</h2>
-    <p class="sub">사전 준비만 손으로. 나머지는 프롬프트를 붙여넣으면 AI가 설치합니다.</p>
-    <div class="prompt">📋 “이 저장소를 실행할 수 있게 내 환경을 세팅해줘”</div>
-    <ul style="margin-top:1.2rem"><li><code>python verify.py</code> → <span class="em">mock 4/4</span> 확인</li></ul>
-  </section>
-
-  <section class="slide">
-    <p class="eyebrow">1회차 <span class="n">/ MCP 연결</span></p>
-    <h2>AI가 <span class="em">내 모의계좌</span>를 실제로 조회</h2>
-    <div class="prompt">📋 “모의투자로 삼성전자 현재가 알려줘”</div>
-    <p class="sub" style="margin-top:1.2rem">KIS 공식 Trading MCP를 붙이면, AI가 국내 주식(KIS 모의투자) 데이터를 가져옵니다.</p>
-  </section>
-
-  <section class="slide">
-    <p class="eyebrow">1회차 <span class="n">/ 왜 Docker</span></p>
-    <h2>노트북이 <span class="em">다 달라도</span> 똑같이 돈다</h2>
-    <p class="sub">MCP를 컨테이너(Docker)로 주는 이유 = <b>환경 통일</b>. 누구 컴퓨터에서든 같은 결과.
-    <br>Docker가 안 되면? <span class="em">mock 폴백</span>으로 동일하게 경험합니다.</p>
-  </section>
-
-  <section class="slide">
-    <p class="eyebrow">1회차 <span class="n">/ 유지보수</span></p>
-    <h2>도구가 깨지면, <span class="em">AI가 고친다</span></h2>
-    <p class="sub">라이브러리가 바뀌면 공식 도구도 깨집니다. 예전엔 사람이 밤새 고쳤죠.
-    이제는 AI가 <b>증상을 보고 원인을 찾아 수리</b>합니다 — 유지보수의 자동화.</p>
-  </section>
-
   <section class="slide">
     <p class="eyebrow">Part 2</p>
     <h1>나만의 AI<br>투자 에이전트</h1>
@@ -286,6 +150,7 @@
     <p class="sub">실전 매매·심화는 3~4회차로 이어집니다. 오늘 만든 연결과 에이전트가 그 출발점입니다.</p>
   </section>
 
+</div>
 </div>
 
 <div class="hud">

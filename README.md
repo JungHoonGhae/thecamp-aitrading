@@ -1,5 +1,12 @@
 # AI 자동매매 시스템 제작 — 실습 저장소 (ai-trading-lab)
 
+<a href="https://fastcampus.co.kr/event_online_aitrading">
+  <img src="assets/seminar-og.webp" alt="[무료 세미나] 나만의 투자 전략에 AI를 더하는 똑똑한 자동매매 첫걸음" width="100%">
+</a>
+
+> **[무료 세미나] 나만의 투자 전략에 AI를 더하는 똑똑한 자동매매 첫걸음** — 7/16(목) 저녁 8시 ·
+> [신청하기](https://fastcampus.co.kr/event_online_aitrading)
+
 패스트캠퍼스 오프라인 강의(정훈 · Part 1~2)의 실습 저장소입니다.
 코딩을 몰라도, **프롬프트를 복사해 붙여넣으며** 따라오면 끝에는 동작하는 시스템이 남습니다.
 

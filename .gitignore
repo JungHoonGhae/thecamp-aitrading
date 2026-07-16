@@ -13,3 +13,4 @@ ops/
 
 # 로컬 전용 (공개 제외)
 CLAUDE.md
+.gstack/

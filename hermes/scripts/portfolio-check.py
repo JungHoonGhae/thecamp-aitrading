@@ -7,13 +7,13 @@ hermes 는 ~/.hermes/scripts/ 아래 스크립트를 실행하는데, `.sh` 는 
 설치:
   1) 이 파일을 ~/.hermes/scripts/ 로 복사
   2) 아래 REPO 를 내 저장소 절대경로로 수정
-     (Windows 예: r"C:\\Users\\나\\...\\edu-fastcampus-thecamp-aitrading")
+     (Windows 예: r"C:\\Users\\나\\...\\lecture-thecamp-aitrading")
 """
 import runpy
 import sys
 from pathlib import Path
 
-REPO = r"__여기에_저장소_절대경로__"  # 예: /Users/나/workspace/projects/edu-fastcampus-thecamp-aitrading
+REPO = r"__여기에_저장소_절대경로__"  # 예: /Users/나/workspace/projects/lecture-thecamp-aitrading
 
 agent = Path(REPO) / "agent" / "agent.py"
 sys.argv = [str(agent)]

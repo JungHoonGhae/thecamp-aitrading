@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import os
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -113,6 +114,25 @@ class KISClient:
     def _fixture(self, name: str) -> dict:
         return json.loads((FIXTURES / name).read_text(encoding="utf-8"))
 
+    def _open(self, req: urllib.request.Request) -> dict:
+        """공통 호출 래퍼 — 실패를 학생이 이해할 수 있는 메시지로 바꿔준다.
+
+        특히 토큰 발급(oauth2/tokenP)은 앱키당 1분에 1회 제한이라, 에러 직후
+        바로 재실행하면 같은 이유로 또 실패한다(자격증명 문제로 착각하기 쉬움).
+        """
+        try:
+            return json.load(urllib.request.urlopen(req, timeout=10))
+        except urllib.error.HTTPError as e:
+            detail = e.read().decode(errors="ignore")[:200]
+            raise RuntimeError(
+                "KIS API 호출 실패.\n"
+                "- 방금 실행했다면: 토큰 발급은 1분에 1회만 가능합니다 — 1분 기다렸다가 다시 실행하세요.\n"
+                "- 방금이 아니라면: .env 의 KIS_APP_KEY/KIS_APP_SECRET/KIS_ACCOUNT 를 확인하세요.\n"
+                f"(서버 응답: {detail})"
+            ) from e
+        except urllib.error.URLError as e:
+            raise RuntimeError(f"KIS 서버에 연결할 수 없습니다 — 네트워크 상태를 확인하세요. ({e})") from e
+
     def _get_token(self) -> str:
         if self._token:
             return self._token
@@ -120,7 +140,7 @@ class KISClient:
                            "appkey": self.app_key, "appsecret": self.app_secret}).encode()
         req = urllib.request.Request(f"{self.base}/oauth2/tokenP", data=body,
                                      headers={"Content-Type": "application/json"})
-        self._token = json.load(urllib.request.urlopen(req, timeout=10))["access_token"]
+        self._token = self._open(req)["access_token"]
         return self._token
 
     def _post(self, path: str, tr_id: str, body: dict) -> dict:
@@ -133,7 +153,7 @@ class KISClient:
                      "Content-Type": "application/json"},
         )
         time.sleep(0.5)
-        return json.load(urllib.request.urlopen(req, timeout=10))
+        return self._open(req)
 
     def _call(self, path: str, tr_id: str, params: dict) -> dict:
         q = urllib.parse.urlencode(params)
@@ -144,4 +164,4 @@ class KISClient:
                      "tr_id": tr_id, "custtype": "P"},
         )
         time.sleep(0.5)  # 모의투자 초당 호출 제한 회피
-        return json.load(urllib.request.urlopen(req, timeout=10))
+        return self._open(req)

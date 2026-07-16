@@ -38,6 +38,14 @@ description: >
   실습 전체는 mock 만으로 완주 가능하다.
 - **확인**: `python examples/quote.py 005930` 이 mock 데이터로 정상 출력.
 
+### 4-1. live 모드에서 "KIS API 호출 실패" (`src/common/kis.py` 자체 클라이언트)
+- **원인**: 십중팔구 **토큰 발급(oauth2/tokenP) 1분당 1회 제한**. 에러 보고 바로
+  재실행하면 자격증명 문제로 착각하기 쉽지만 실은 rate limit이다. (KIS MCP 컨테이너와
+  동일한 함정 — `lessons/참고/kis-mcp-연동-가이드.md` 참고)
+- **수정**: 1분 기다렸다가 한 번만 재실행. 그래도 안 되면 `.env` 의
+  `KIS_APP_KEY`/`KIS_APP_SECRET`/`KIS_ACCOUNT` 값을 확인.
+- **확인**: `KIS_MODE=live python examples/quote.py 005930` 이 정상 시세로 응답.
+
 ## KIS Trading MCP 자가수리 (검증된 3가지 — 라이브러리 드리프트 대응)
 
 학생이 공식 Trading MCP를 직접 붙이다 막히면 아래로 안내한다.

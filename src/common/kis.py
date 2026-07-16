@@ -1,10 +1,14 @@
-"""KIS(한국투자증권) 모의투자 클라이언트 — mock / live 두 가지 모드.
+"""KIS(한국투자증권) 클라이언트 — mock / live 두 가지 모드 + paper / real 서버 스위치.
 
 - mock (기본): common/fixtures/*.json 을 읽어 응답한다. KIS 키가 없어도, 장이 닫힌
   토요일에도 항상 똑같이 동작한다. 강의 실습의 기본 모드.
-- live: .env 에 넣은 KIS 모의투자 키로 실제 API 를 호출한다. (원하는 학생만)
+- live: .env 에 넣은 KIS 키로 실제 API 를 호출한다. (원하는 학생만)
+  - KIS_ENV=paper (기본): 모의투자 서버. 수업은 여기까지만 쓴다.
+  - KIS_ENV=real: 실전(실계좌) 서버. **수업 범위 밖 — 졸업 스위치.**
+    실수로 켜지지 않도록 KIS_REAL_ACK=REAL-MONEY-OK 를 함께 요구한다(이중 확인).
+    같은 인터페이스 그대로 서버 주소와 거래 TR ID만 바뀐다 — 코드 수정 없이 전환된다.
 
-모드는 환경변수 KIS_MODE 또는 생성 인자로 정한다.
+모드는 환경변수 KIS_MODE / KIS_ENV 또는 생성 인자로 정한다.
 """
 from __future__ import annotations
 
@@ -16,17 +20,28 @@ import urllib.request
 from pathlib import Path
 
 FIXTURES = Path(__file__).parent / "fixtures"
-VPS = "https://openapivts.koreainvestment.com:29443"  # 모의투자 서버
+VPS = "https://openapivts.koreainvestment.com:29443"   # 모의투자(paper) 서버
+REAL = "https://openapi.koreainvestment.com:9443"      # 실전(real) 서버 — 졸업 스위치
 
 
 class KISClient:
-    def __init__(self, mode: str | None = None):
+    def __init__(self, mode: str | None = None, env: str | None = None):
         self.mode = (mode or os.getenv("KIS_MODE", "mock")).lower()
+        self.env = (env or os.getenv("KIS_ENV", "paper")).lower()  # paper | real
+        if self.env == "real" and os.getenv("KIS_REAL_ACK") != "REAL-MONEY-OK":
+            raise RuntimeError(
+                "실전(real) 전환은 이중 확인이 필요합니다: 환경변수 KIS_REAL_ACK=REAL-MONEY-OK 를 "
+                "직접 설정하세요. (실제 돈이 움직입니다 — lessons/9-마무리 '졸업 스위치' 참조)")
         if self.mode == "live":
             self.app_key = os.environ["KIS_APP_KEY"]
             self.app_secret = os.environ["KIS_APP_SECRET"]
-            self.account = os.environ["KIS_ACCOUNT"]  # 모의계좌 앞 8자리
+            self.account = os.environ["KIS_ACCOUNT"]  # 계좌 앞 8자리 (paper=모의, real=실계좌)
             self._token = None
+        self.base = REAL if self.env == "real" else VPS
+
+    def _tr(self, suffix: str) -> str:
+        """거래계 TR ID — 모의(V…)/실전(T…) 접두만 다르다. 예: _tr("TTC8434R")"""
+        return ("T" if self.env == "real" else "V") + suffix
 
     # ---- 공개 메서드 (mock/live 공통 인터페이스) ----
     def get_price(self, code: str) -> dict:
@@ -48,7 +63,7 @@ class KISClient:
         else:
             data = self._call(
                 "/uapi/domestic-stock/v1/trading/inquire-balance",
-                "VTTC8434R",
+                self._tr("TTC8434R"),
                 {
                     "CANO": self.account, "ACNT_PRDT_CD": "01", "AFHR_FLPR_YN": "N",
                     "OFL_YN": "", "INQR_DVSN": "02", "UNPR_DVSN": "01",
@@ -68,7 +83,8 @@ class KISClient:
         """모의투자 시장가 주문. side='buy'|'sell'. {'ok','code','side','qty', ...} 반환.
 
         mock 모드: 실제로 넣지 않고 시뮬레이션 결과를 돌려준다(휴장·키 무관).
-        live 모드: KIS 모의투자 서버에 실제 주문을 전송한다(장중에만 체결).
+        live 모드: KIS 서버에 실제 주문을 전송한다(장중에만 체결).
+          - KIS_ENV=paper(기본): 모의투자 주문. KIS_ENV=real: 실계좌 주문(이중 확인 필수).
         """
         if qty <= 0:
             return {"ok": False, "code": code, "side": side, "qty": qty,
@@ -76,7 +92,7 @@ class KISClient:
         if self.mode == "mock":
             return {"ok": True, "code": code, "side": side, "qty": qty,
                     "simulated": True, "msg": "모의 시뮬레이션(실주문 아님)"}
-        tr_id = "VTTC0802U" if side == "buy" else "VTTC0801U"  # 모의 매수/매도
+        tr_id = self._tr("TTC0802U") if side == "buy" else self._tr("TTC0801U")  # 매수/매도
         body = {
             "CANO": self.account, "ACNT_PRDT_CD": "01", "PDNO": code,
             "ORD_DVSN": "01",  # 시장가
@@ -97,15 +113,27 @@ class KISClient:
             return self._token
         body = json.dumps({"grant_type": "client_credentials",
                            "appkey": self.app_key, "appsecret": self.app_secret}).encode()
-        req = urllib.request.Request(f"{VPS}/oauth2/tokenP", data=body,
+        req = urllib.request.Request(f"{self.base}/oauth2/tokenP", data=body,
                                      headers={"Content-Type": "application/json"})
         self._token = json.load(urllib.request.urlopen(req, timeout=10))["access_token"]
         return self._token
 
+    def _post(self, path: str, tr_id: str, body: dict) -> dict:
+        """거래계 POST 호출 (주문 등). _call 과 같은 인증 헤더 + JSON 본문."""
+        req = urllib.request.Request(
+            f"{self.base}{path}", data=json.dumps(body).encode(),
+            headers={"authorization": f"Bearer {self._get_token()}",
+                     "appkey": self.app_key, "appsecret": self.app_secret,
+                     "tr_id": tr_id, "custtype": "P",
+                     "Content-Type": "application/json"},
+        )
+        time.sleep(0.5)
+        return json.load(urllib.request.urlopen(req, timeout=10))
+
     def _call(self, path: str, tr_id: str, params: dict) -> dict:
         q = urllib.parse.urlencode(params)
         req = urllib.request.Request(
-            f"{VPS}{path}?{q}",
+            f"{self.base}{path}?{q}",
             headers={"authorization": f"Bearer {self._get_token()}",
                      "appkey": self.app_key, "appsecret": self.app_secret,
                      "tr_id": tr_id, "custtype": "P"},

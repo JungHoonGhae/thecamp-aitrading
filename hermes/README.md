@@ -5,17 +5,18 @@
 
 ```
 hermes/
-├── scripts/portfolio-check.py     ← 예약(cron) 실행용 스크립트
-└── skills/portfolio-check/        ← 채팅에서 "포트폴리오 점검해줘"로 부르는 스킬
+├── scripts/portfolio-check.py       ← 예약용: 점검·제안 (미리보기, 주문 없음)
+├── scripts/portfolio-rebalance.py   ← 예약용: 점검·제안 + 모의 리밸런싱 실행 (완전체)
+└── skills/portfolio-check/          ← 채팅용: "점검해줘" / "리밸런싱 실행해줘"
 ```
 
 ## 설치 (한 번만)
 
 ```bash
-# 1) 예약용 스크립트 복사
+# 1) 예약용 스크립트 복사 (둘 다)
 mkdir -p ~/.hermes/scripts
-cp hermes/scripts/portfolio-check.py ~/.hermes/scripts/
-# 복사한 파일을 열어 REPO 를 내 저장소 절대경로로 수정
+cp hermes/scripts/portfolio-check.py hermes/scripts/portfolio-rebalance.py ~/.hermes/scripts/
+# 복사한 두 파일을 열어 REPO 를 내 저장소 절대경로로 수정
 
 # 2) (선택) 채팅용 스킬 설치
 hermes skills install ./hermes/skills/portfolio-check
@@ -23,8 +24,14 @@ hermes skills install ./hermes/skills/portfolio-check
 
 ## 예약 걸기 — hermes 채팅에 이 한 문장
 
+점검·제안만 (안전 기본값):
 ```
 portfolio-check.py 를 매주 월요일 아침 8시에 no-agent 로 실행해서 디스코드로 보내줘.
+```
+
+제안 + 모의 리밸런싱까지 (완전체 — 가드레일 통과분만 모의 주문):
+```
+portfolio-rebalance.py 를 매주 월요일 아침 8시에 no-agent 로 실행해서 디스코드로 보내줘.
 ```
 
 ## 내 스펙이 자동으로 반영됩니다

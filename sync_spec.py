@@ -9,7 +9,7 @@
        python sync_spec.py --check   # 반영하지 않고 파싱 결과만 확인
 
 종목 이름이 목록(src/common/stocks.py)에 없으면 "이름(코드)" 형태로 적으세요.
-반영 후에는 python verify.py 로 3/3 을 확인하세요.
+반영 후에는 python verify.py 로 4/4 를 확인하세요.
 """
 from __future__ import annotations
 
@@ -120,7 +120,7 @@ def main() -> None:
     p.write_text(s, encoding="utf-8")
 
     print("\n✓ agent/spec/ 3개 파일에 반영 완료")
-    print("다음: python verify.py 로 3/3 확인 → python agent/agent.py 로 새 스펙 점검")
+    print("다음: python verify.py 로 4/4 확인 → python agent/agent.py 로 새 스펙 점검")
 
 
 if __name__ == "__main__":

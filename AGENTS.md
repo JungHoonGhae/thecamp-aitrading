@@ -4,7 +4,7 @@
 AI 코딩 도구(Claude Code, Codex, Cursor, Gemini 등)는 아래를 따르세요.
 
 ## 먼저 읽을 것
-- **학습 진행 도우미(리밸이) 스킬**: [`.agents/skills/assistant/SKILL.md`](.agents/skills/assistant/SKILL.md) — 학생을 단계별로 돕는 규칙.
+- **학습 진행 도우미(집사) 스킬**: [`.agents/skills/assistant/SKILL.md`](.agents/skills/assistant/SKILL.md) — 학생을 단계별로 돕는 규칙.
   학생이 "도와줘 / 다음 단계"라고 하면 이 스킬대로 안내하세요.
 - **트러블슈팅 스킬**: [`.agents/skills/troubleshooting/SKILL.md`](.agents/skills/troubleshooting/SKILL.md) —
   에러·설치 실패·막힘은 이 스킬의 증상→원인→수정→확인 순서로 처리하세요.

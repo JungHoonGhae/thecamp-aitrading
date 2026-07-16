@@ -47,7 +47,12 @@ class KISClient:
     def get_price(self, code: str) -> dict:
         """종목 현재가. {'code','price'} 반환. (종목명은 응답에 없음)"""
         if self.mode == "mock":
-            data = self._fixture("prices.json")[code]
+            prices = self._fixture("prices.json")
+            if code not in prices:
+                # mock 시세에 없는 종목(ETF·기타)은 코드 기반 고정 가격으로 대체 —
+                # 값은 학습용 가짜지만 결정적이라, 어떤 스펙으로 바꿔도 실습 흐름이 안 끊긴다.
+                return {"code": code, "price": 10_000 + int(code) % 190_000}
+            data = prices[code]
         else:
             data = self._call(
                 "/uapi/domestic-stock/v1/quotations/inquire-price",

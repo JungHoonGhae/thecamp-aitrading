@@ -31,17 +31,27 @@ docker run -d --name kis-trade-mcp -p 3000:3000 \
   -e KIS_PAPER_STOCK="<모의계좌8자리>" \
   kis-trade-mcp
 ```
-그다음 AI 도구에 MCP 등록(SSE) — Claude Code라면 한 줄:
+그다음 **내가 쓰는 AI 도구**에 MCP 등록(SSE). 도구별로 한 줄씩:
+
 ```bash
+# Claude Code
 claude mcp add --transport sse kis-trade http://localhost:3000/sse
+
+# Codex CLI (mcp-remote 브리지로 SSE 연결)
+codex mcp add kis-trade -- npx -y mcp-remote http://localhost:3000/sse
 ```
-(설정 파일 방식은 `lessons/1부-연결/mcp.example.json` 참조)
+
+그 밖의 도구(Cursor, Gemini CLI 등 MCP 지원 에이전트)는 설정 파일에 아래 중 하나를 넣는다:
+- SSE를 직접 지원하면: `{ "type": "sse", "url": "http://localhost:3000/sse" }`
+- stdio만 지원하면(범용): `{ "command": "npx", "args": ["-y", "mcp-remote", "http://localhost:3000/sse"] }`
+
+(설정 파일 예시: `lessons/1부-연결/mcp.example.json`)
 
 확인: AI에게 "모의투자로 삼성전자 현재가 알려줘".
 
 > **컨테이너를 재시작했다면 AI 도구도 재연결** — 서버가 다시 뜨면 기존 MCP 세션이
 > 무효화돼 모든 도구 호출이 `Invalid request parameters`(-32602)로 즉시 실패합니다.
-> Claude Code에선 `/mcp` 에서 해당 서버 reconnect (또는 도구 재시작).
+> Claude Code는 `/mcp` 에서 해당 서버 reconnect, Codex 등 다른 도구는 세션 재시작.
 
 ## 3. 실전(원본) 연동 — 직접 고쳐 붙이기
 공식 원본은 현재(2026-07 기준) 최신 라이브러리와 **3곳이 어긋나** 그대로는 안 뜹니다.

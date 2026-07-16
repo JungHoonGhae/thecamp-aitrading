@@ -1,11 +1,17 @@
 {
-  "_설명": "KIS Trading MCP 등록 예시 (SSE). 컨테이너를 먼저 실행해야 합니다 — lessons/참고/kis-mcp-연동-가이드.md 참조.",
-  "_한줄등록": "claude mcp add --transport sse kis-trade http://localhost:3000/sse",
+  "_설명": "KIS Trading MCP 등록 예시. 컨테이너를 먼저 실행해야 합니다 — lessons/참고/kis-mcp-연동-가이드.md 참조.",
+  "_한줄등록_ClaudeCode": "claude mcp add --transport sse kis-trade http://localhost:3000/sse",
+  "_한줄등록_Codex": "codex mcp add kis-trade -- npx -y mcp-remote http://localhost:3000/sse",
   "mcpServers": {
     "kis-trade": {
       "type": "sse",
       "url": "http://localhost:3000/sse"
+    },
+    "_kis-trade-stdio만-지원하는-도구용": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "http://localhost:3000/sse"]
     }
   },
-  "_참고": "앱키·시크릿·모의계좌는 이 파일이 아니라 docker run 의 환경변수(KIS_PAPER_APP_KEY 등)로 컨테이너에 넣습니다. KIS_PROD_TYPE=01 을 잊지 마세요."
+  "_참고1": "SSE를 직접 지원하는 도구는 type/url 방식, stdio만 지원하는 도구는 mcp-remote 브리지 방식을 쓰세요 (둘 중 하나만 등록).",
+  "_참고2": "앱키·시크릿·모의계좌는 이 파일이 아니라 docker run 의 환경변수(KIS_PAPER_APP_KEY 등)로 컨테이너에 넣습니다. KIS_PROD_TYPE=01 을 잊지 마세요."
 }

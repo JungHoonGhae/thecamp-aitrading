@@ -79,7 +79,8 @@ description: >
 ### 10. 모든 MCP 도구 호출이 즉시 `Invalid request parameters` (-32602)
 - **원인**: MCP 서버(컨테이너)를 재시작해서 AI 도구 쪽 세션의 초기화 핸드셰이크가 무효화됨.
   파라미터 문제가 아니다 — 서버 로그엔 "Received request before initialization was complete".
-- **수정**: AI 도구에서 MCP 재연결 (Claude Code: `/mcp` → 해당 서버 reconnect, 또는 도구 재시작).
+- **수정**: AI 도구에서 MCP 재연결 — Claude Code: `/mcp` → 해당 서버 reconnect.
+  Codex 등 다른 도구: 세션(도구) 재시작.
 - **확인**: 아무 도구나 호출해 정상 응답.
 
 > 이 항목들은 "AI가 깨진 도구를 스스로 진단·수리한다"는 강의 서사의 실물 예시다.

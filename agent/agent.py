@@ -122,7 +122,7 @@ def main() -> None:
         lines += ["", "실행할 주문이 없습니다."]
     else:
         kind = "시뮬레이션" if kis.mode == "mock" else "실계좌 모의투자"
-        lines += ["", f"[실행] 가드레일 통과분을 {kind}로 주문 전송…"]
+        lines += ["", f"[실행] 가드레일 통과분 주문 전송 — {kind}…"]
         for p in plan:
             r = kis.place_order(p["code"], p["side"], p["qty"])
             verb = "매수" if p["side"] == "buy" else "매도"

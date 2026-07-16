@@ -152,7 +152,7 @@ class KISClient:
                      "tr_id": tr_id, "custtype": "P",
                      "Content-Type": "application/json"},
         )
-        time.sleep(0.5)
+        time.sleep(1.0)
         return self._open(req)
 
     def _call(self, path: str, tr_id: str, params: dict) -> dict:
@@ -163,5 +163,5 @@ class KISClient:
                      "appkey": self.app_key, "appsecret": self.app_secret,
                      "tr_id": tr_id, "custtype": "P"},
         )
-        time.sleep(0.5)  # 모의투자 초당 호출 제한 회피
+        time.sleep(1.0)  # 모의투자 초당 호출 제한 회피
         return self._open(req)

@@ -72,7 +72,7 @@ Python 3.10 이상이 있는지 확인하고, 없으면 내 OS에 맞게 설치�
 
 > ⛔ **어느 STEP에서든 막히면** — 두 문장만 기억하세요.
 > - 에러가 났다: `".agents/skills/troubleshooting/SKILL.md 대로 고쳐줘"` + 에러 화면
-> - 길을 잃었다: `"집사(.agents/skills/assistant/SKILL.md) 대로, 내가 어느 단계인지 진단하고 다음 행동 하나만 알려줘"`
+> - 길을 잃었다: `"초록이(.agents/skills/assistant/SKILL.md) 대로, 내가 어느 단계인지 진단하고 다음 행동 하나만 알려줘"`
 
 ## 🪜 신뢰 사다리 — 환경변수 한 줄로 한 칸씩
 

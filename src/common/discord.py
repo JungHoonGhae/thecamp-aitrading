@@ -10,111 +10,107 @@
   클릭하면 어차피 원본 크기로 열리므로 버튼 없이도 기능은 동일하다.
 - 없으면 보고 본문을 그대로 stdout 에 출력한다. (안내 문구는 stderr 로 분리해서,
   hermes cron 의 no-agent 모드가 stdout 만 디스코드로 배달할 때 깔끔하게 나가게 한다.)
+
+report()/build_payload() 는 agent.py 가 만든 문자열을 다시 파싱하지 않는다 — 둘 다
+common/report.py 의 구조화된 Report 를 받는다. (2026-07-17 아키텍처 리뷰: 예전엔
+agent.py 가 문자열로 뭉친 걸 이 파일이 regex 12개로 되짚어 파싱했고, 웹훅·슬래시봇
+양쪽에서 각각 드리프트 버그가 났다 — Report 를 seam 으로 삼아 원천 차단.)
 """
 from __future__ import annotations
 
 import json
 import os
-import re
 import sys
 import urllib.request
+
+from .report import Report, to_plain_text
 
 _TEXT_LIMIT = 3900  # Discord Text Display 컴포넌트 한도(4000)에 여유를 둔 값
 
 _CONTAINER, _TEXT, _MEDIA_GALLERY, _SEPARATOR = 17, 10, 12, 14
 
-# agent.py 가 만드는 고정 문구 패턴 → 마크다운 스타일. 매칭 안 되는 줄은 그대로 둔다
-# (agent.py 문구가 바뀌면 여기 패턴도 같이 손봐야 하지만, 안 맞아도 원문이 그대로
-# 나가니 안전하게 깨진다 — 이쁘게 안 나올 뿐 내용이 사라지지 않는다).
-_LINE_RULES: list[tuple[re.Pattern, str]] = [
-    (re.compile(r"^\[모의데이터\] (.+)$"), r"## 🧪 ai-trading-lab · \1"),
-    (re.compile(r"^\[실계좌\] (.+)$"), r"## 🏦 ai-trading-lab · \1"),
-    (re.compile(r"^총 자산: (.+?)원 \(현금 (.+?)원\)$"), r"**총 자산** \1원  ·  **현금** \2원"),
-    (
-        re.compile(r"^- (.+?)\((\d{6})\): 목표 (\d+)% / 현재 ([\d.]+)% → (매수|매도|유지) 약 (\d+)주\s*(.*)$"),
-        r"> **\1** `\3%→\4%` — \5 약 \6주 \7",
-    ),
-    (re.compile(r"^리밸런싱 미리보기:$"), r"**🔄 리밸런싱 미리보기**"),
-    (
-        re.compile(r"^- (.+?): (매수|매도) (\d+)주 \(약 ([\d,]+)원\)$"),
-        r"> **\1** \2 \3주 (약 \4원)",
-    ),
-    (re.compile(r"^리밸런싱할 주문이 없습니다(.*)$"), r"✅ 리밸런싱할 주문이 없습니다\1"),
-    (re.compile(r"^⛔ 가드레일 위반 \(주문 차단\):$"), r"**⛔ 가드레일 위반 (주문 차단)**"),
-    (re.compile(r"^가드레일 경고:$"), r"**⚠️ 가드레일 경고**"),
-    (re.compile(r"^\[실행\] (.+)$"), r"**▶️ \1**"),
-    (re.compile(r"^  (✅|❌) (.+)$"), r"> \1 \2"),
-    (re.compile(r"^※ (.+)$"), r"-# \1"),
-]
+
+def _chunk(text: str) -> list[str]:
+    """한 섹션이 예외적으로 _TEXT_LIMIT 을 넘으면(예: 종목 수가 아주 많은 스펙) 강제로 나눈다."""
+    return [text[i:i + _TEXT_LIMIT] for i in range(0, len(text), _TEXT_LIMIT)] or [text]
 
 
-def _prettify(text: str) -> str:
-    out_lines = []
-    for line in text.split("\n"):
-        for pat, repl in _LINE_RULES:
-            m = pat.match(line)
-            if m:
-                line = pat.sub(repl, line)
-                break
-        out_lines.append(line)
-    return "\n".join(out_lines)
+def _section_blocks(r: Report) -> list[str]:
+    """Report 의 각 섹션을 마크다운 텍스트 블록으로 렌더링한다. agent.py 문구를
+    regex 로 되짚지 않고, 타입이 이미 갖고 있는 필드를 그대로 서식만 입힌다."""
+    if r.mode_label is None:
+        return ["\n".join(r.notes)]
 
+    icon = "🧪" if r.mode_label == "모의데이터" else "🏦"
+    blocks = [
+        f"## {icon} ai-trading-lab · {r.title}\n"
+        f"**총 자산** {r.total_won:,}원  ·  **현금** {r.cash_won:,}원"
+    ]
 
-def _split_blocks(text: str) -> list[str]:
-    """문단(빈 줄) 단위로 묶어 _TEXT_LIMIT 이하 블록으로 나눈다."""
-    paragraphs = text.split("\n\n")
-    blocks: list[str] = []
-    cur = ""
-    for p in paragraphs:
-        # 문단 하나가 한도를 넘는 예외적인 경우 강제로 자른다
-        while len(p) > _TEXT_LIMIT:
-            blocks.append(p[:_TEXT_LIMIT])
-            p = p[_TEXT_LIMIT:]
-        candidate = f"{cur}\n\n{p}" if cur else p
-        if len(candidate) > _TEXT_LIMIT:
-            if cur:
-                blocks.append(cur)
-            cur = p
+    if r.comparison:
+        rows = []
+        for row in r.comparison:
+            flag = " ⚠️" if row.needs_adjust else ""
+            rows.append(f"> **{row.name}** `{row.target_pct:.0f}%→{row.current_pct:.1f}%` "
+                        f"— {row.action} 약 {row.qty}주{flag}")
+        blocks.append("\n".join(rows))
+
+    for c in r.callouts:
+        blocks.append(f"**{c.heading}**\n" + "\n".join(f"> {i}" for i in c.items))
+
+    if r.preview:
+        rows = [f"> **{p.name}** {p.verb} {p.qty}주 (약 {p.amount:,}원)" for p in r.preview]
+        blocks.append("**🔄 리밸런싱 미리보기**\n" + "\n".join(rows))
+    else:
+        blocks.append("✅ 리밸런싱할 주문이 없습니다 (허용 오차 이내)")
+
+    er = r.execute_result
+    if er:
+        if er.kind == "executed":
+            rows = []
+            for e in er.rows:
+                mark = "✅" if e.ok else "❌"
+                rows.append(f"> {mark} {e.name} {e.verb} {e.qty}주 — {e.msg}")
+            blocks.append(f"**▶️ 가드레일 통과분 주문 전송 — {er.execution_kind}**\n" + "\n".join(rows))
         else:
-            cur = candidate
-    if cur:
-        blocks.append(cur)
+            blocks.append("\n".join(er.lines))
+
+    if r.notes:
+        blocks.append("\n".join(f"-# {n}" for n in r.notes))
+
     return blocks
 
 
-def build_payload(text: str, image_url: str | None = None) -> dict:
-    """Components v2 페이로드를 만든다 — webhook 전송과 슬래시봇 팔로우업이 공유.
-
-    (두 입구가 각자 컴포넌트를 짜면 오늘 슬래시봇에서처럼 차트가 텍스트로 새는
-    버그가 또 생긴다. 빌더를 하나로 묶어 그 클래스의 실수를 원천 차단한다.)
-    """
+def build_payload(report: Report) -> dict:
+    """Components v2 페이로드 — webhook 전송과 (개인 테스트용) 슬래시봇 팔로우업이 공유."""
     inner: list[dict] = []
-    blocks = _split_blocks(_prettify(text))
-    for i, block in enumerate(blocks):
+    for i, block in enumerate(_section_blocks(report)):
         if i:
             inner.append({"type": _SEPARATOR, "divider": True, "spacing": 1})
-        inner.append({"type": _TEXT, "content": block})
-    if image_url:
+        for j, chunk in enumerate(_chunk(block)):
+            if j:
+                inner.append({"type": _SEPARATOR, "divider": True, "spacing": 1})
+            inner.append({"type": _TEXT, "content": chunk})
+    if report.chart_url:
         inner.append({"type": _SEPARATOR, "divider": True, "spacing": 1})
-        inner.append({"type": _MEDIA_GALLERY, "items": [{"media": {"url": image_url}}]})
+        inner.append({"type": _MEDIA_GALLERY, "items": [{"media": {"url": report.chart_url}}]})
     return {
         "flags": 1 << 15,  # IS_COMPONENTS_V2
         "components": [{"type": _CONTAINER, "accent_color": 0x35A46E, "components": inner}],
     }
 
 
-def report(text: str, image_url: str | None = None) -> None:
+def report(rep: Report) -> None:
     webhook = os.getenv("DISCORD_WEBHOOK", "").strip()
     if not webhook:
         print("[디스코드 미설정 → 화면 출력]", file=sys.stderr)
-        print(text)  # 본문은 stdout (hermes no-agent 가 이걸 디스코드로 배달)
-        if image_url:
+        print(to_plain_text(rep))  # stdout (hermes no-agent 가 이걸 디스코드로 배달, verify.py 도 이걸 grep)
+        if rep.chart_url:
             # 디스코드는 이미지 URL 을 그대로 받아도 미리보기를 펼쳐준다
-            # (hermes no-agent 경로에서도 차트가 보이도록 stdout 에 포함)
-            print(f"\n차트: {image_url}")
+            print(f"\n차트: {rep.chart_url}")
         return
 
-    body = json.dumps(build_payload(text, image_url)).encode()
+    body = json.dumps(build_payload(rep)).encode()
     req = urllib.request.Request(
         f"{webhook}?with_components=true", data=body,
         headers={"Content-Type": "application/json",

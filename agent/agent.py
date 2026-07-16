@@ -24,6 +24,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from common.kis import KISClient  # noqa: E402
 from common.discord import report  # noqa: E402
 from common.chart import portfolio_chart_url  # noqa: E402
+from common.report import (  # noqa: E402
+    Callout, ComparisonRow, ExecutionRow, ExecuteResult, PreviewRow, Report,
+)
 
 SPEC = Path(__file__).parent / "spec"
 
@@ -46,7 +49,12 @@ def load_number(filename: str, label: str, default: float) -> float:
     return float(m.group(1)) if m else default
 
 
-def main() -> None:
+def build_report(execute: bool) -> Report:
+    """계좌를 점검하고 (신뢰 게이트에 따라) 리밸런싱까지 실행한 뒤, 구조화된 Report 를 만든다.
+
+    KIS·discord 를 모르는 순수 계산이 아니라 여전히 I/O 를 포함하지만, 적어도 반환값이
+    Report 하나라 — main() 도, 개인 슬래시봇도 같은 함수를 그대로 불러 쓸 수 있다.
+    """
     kis = KISClient()
     portfolio = load_portfolio()
     tolerance = load_number("rules.md", "허용 오차", 5)
@@ -59,15 +67,15 @@ def main() -> None:
     # 총 자산 = 예수금 + 보유 종목 평가금액 합
     total = bal["cash"] + sum(h["eval_amt"] for h in bal["holdings"])
     if total == 0:
-        report("계좌가 비어 있습니다. 예수금/보유 종목을 확인하세요.")
-        return
+        return Report(notes=["계좌가 비어 있습니다. 예수금/보유 종목을 확인하세요."])
 
-    lines = [f"[{'모의데이터' if kis.mode == 'mock' else '실계좌'}] 포트폴리오 점검 결과",
-             f"총 자산: {total:,}원 (현금 {bal['cash']:,}원)", ""]
-    warnings = []   # 참고용 경고 (실행은 막지 않음)
-    blocks = []     # 하드 가드레일 위반 → 실제 주문 차단
-    plan = []       # 리밸런싱 주문 계획 [{code,name,side,qty,price}]
-    chart_rows = [] # 차트용 [{name,target,current}]
+    mode_label = "모의데이터" if kis.mode == "mock" else "실계좌"
+    comparison: list[ComparisonRow] = []
+    callouts: list[Callout] = []
+    warnings: list[str] = []   # 참고용 경고 (실행은 막지 않음)
+    blocks: list[str] = []     # 하드 가드레일 위반 → 실제 주문 차단
+    plan: list[dict] = []      # 리밸런싱 주문 계획 [{code,name,side,qty,price}]
+    chart_rows: list[dict] = []  # 차트용 [{name,target,current}]
 
     # 목표 비중 합이 100인지 확인 (스펙을 잘못 고치면 계산 기준이 틀어짐)
     target_sum = sum(item["target"] for item in portfolio)
@@ -83,13 +91,12 @@ def main() -> None:
         qty = abs(gap_amt) // price if price else 0
         chart_rows.append({"name": item["name"], "target": item["target"], "current": cur_w})
         action = "매수" if gap > 0 else ("매도" if gap < 0 else "유지")
-        flag = "  ⚠️조정필요" if abs(gap) >= tolerance else ""
-        lines.append(
-            f"- {item['name']}({item['code']}): 목표 {item['target']:.0f}% / "
-            f"현재 {cur_w:.1f}% → {action} 약 {qty}주{flag}")
+        needs_adjust = abs(gap) >= tolerance
+        comparison.append(ComparisonRow(item["name"], item["code"], item["target"],
+                                         cur_w, action, qty, needs_adjust))
         if item["target"] > max_weight:
             blocks.append(f"{item['name']} 목표비중 {item['target']:.0f}% > 한도 {max_weight:.0f}% (이 종목 주문 차단)")
-        elif action in ("매수", "매도") and qty > 0 and abs(gap) >= tolerance:
+        elif action in ("매수", "매도") and qty > 0 and needs_adjust:
             plan.append({"code": item["code"], "name": item["name"],
                          "side": "buy" if gap > 0 else "sell", "qty": qty, "price": price})
 
@@ -98,41 +105,55 @@ def main() -> None:
         warnings.append(f"현금 비중 {cash_w:.1f}% < 최소 {min_cash:.0f}%")
 
     if blocks:
-        lines += ["", "⛔ 가드레일 위반 (주문 차단):"] + [f"- {b}" for b in blocks]
+        callouts.append(Callout("⛔ 가드레일 위반 (주문 차단):", blocks))
     if warnings:
-        lines += ["", "가드레일 경고:"] + [f"- {w}" for w in warnings]
+        callouts.append(Callout("가드레일 경고:", warnings))
 
-    # 리밸런싱 미리보기
-    if plan:
-        lines += ["", "리밸런싱 미리보기:"]
-        for p in plan:
-            verb = "매수" if p["side"] == "buy" else "매도"
-            lines.append(f"- {p['name']}: {verb} {p['qty']}주 (약 {p['qty']*p['price']:,}원)")
-    else:
-        lines += ["", "리밸런싱할 주문이 없습니다 (허용 오차 이내)."]
+    preview = [
+        PreviewRow(p["name"], "매수" if p["side"] == "buy" else "매도", p["qty"], p["qty"] * p["price"])
+        for p in plan
+    ]
 
     # 신뢰 게이트: 기본은 미리보기, --execute 일 때만 실행, 가드레일이 최종 차단
-    execute = "--execute" in sys.argv
     if not execute:
-        lines += ["", "※ 미리보기입니다. 실제 주문하려면 --execute 를 붙이세요.",
-                  "  (가드레일 위반이 있으면 --execute 여도 차단됩니다.)"]
+        er = ExecuteResult("preview", lines=[
+            "※ 미리보기입니다. 실제 주문하려면 --execute 를 붙이세요.",
+            "  (가드레일 위반이 있으면 --execute 여도 차단됩니다.)",
+        ])
     elif blocks:
-        lines += ["", "⛔ 가드레일 위반이 있어 실제 주문을 실행하지 않았습니다. 스펙을 고쳐 다시 시도하세요."]
+        er = ExecuteResult("blocked", lines=[
+            "⛔ 가드레일 위반이 있어 실제 주문을 실행하지 않았습니다. 스펙을 고쳐 다시 시도하세요."])
     elif not plan:
-        lines += ["", "실행할 주문이 없습니다."]
+        er = ExecuteResult("no_orders", lines=["실행할 주문이 없습니다."])
     else:
         kind = "시뮬레이션" if kis.mode == "mock" else "실계좌 모의투자"
-        lines += ["", f"[실행] 가드레일 통과분 주문 전송 — {kind}…"]
+        rows = []
         for p in plan:
             r = kis.place_order(p["code"], p["side"], p["qty"])
             verb = "매수" if p["side"] == "buy" else "매도"
-            mark = "✅" if r["ok"] else "❌"
-            lines.append(f"  {mark} {p['name']} {verb} {p['qty']}주 — {r.get('msg', '')}")
+            rows.append(ExecutionRow(p["name"], verb, p["qty"], r["ok"], r.get("msg", "")))
+        er = ExecuteResult("executed", execution_kind=kind, rows=rows)
 
-    lines += ["", "※ 신뢰는 한 단계씩. 실전(실계좌) 매매는 이 실습 범위 밖입니다."]
     # 목표 vs 현재 비중을 차트 이미지로 함께 보고 (디스코드에서 그림으로 보임)
     chart = portfolio_chart_url(chart_rows, cash_w)
-    report("\n".join(lines), image_url=chart)
+
+    return Report(
+        mode_label=mode_label,
+        title="포트폴리오 점검 결과",
+        total_won=total,
+        cash_won=bal["cash"],
+        comparison=comparison,
+        callouts=callouts,
+        preview=preview,
+        execute_result=er,
+        notes=["※ 신뢰는 한 단계씩. 실전(실계좌) 매매는 이 실습 범위 밖입니다."],
+        chart_url=chart,
+    )
+
+
+def main() -> None:
+    execute = "--execute" in sys.argv
+    report(build_report(execute))
 
 
 if __name__ == "__main__":

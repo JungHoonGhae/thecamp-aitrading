@@ -32,6 +32,7 @@ def run(desc: str, args: list[str], expect: str) -> bool:
 def main() -> None:
     print("ai-trading-lab 자가 점검 (mock 모드)\n")
     checks = [
+        ("스펙 문서 파싱 (내-투자-스펙.md)", ["sync_spec.py", "--check"], "파싱 결과"),
         ("Part 1 직접 호출 (examples/quote.py)", ["examples/quote.py", "005930"], "현재가"),
         ("Part 2 에이전트 미리보기 (agent/agent.py)", ["agent/agent.py"], "리밸런싱 미리보기"),
         ("Part 2 에이전트 모의주문 (--execute)", ["agent/agent.py", "--execute"], "주문 전송"),

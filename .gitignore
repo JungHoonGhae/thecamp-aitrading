@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+src/common/fixtures/.ledger.json
 
 # 강사 전용·비공개 초안 (학생 배포 제외)
 teacher/

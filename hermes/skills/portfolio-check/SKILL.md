@@ -46,6 +46,7 @@ python REPO/agent/agent.py --execute
 - 점검만: **no_agent=True + `~/.hermes/scripts/portfolio-check.py`**
 - 리밸런싱까지(완전체): **no_agent=True + `~/.hermes/scripts/portfolio-rebalance.py`**
   (가드레일 통과분만 모의 주문 — 예약 등록 전에 이 점을 사용자에게 한 번 확인)
-둘 다 LLM 없이 스크립트 출력을 그대로 디스코드로 배달한다(무료·결정적). 스크립트가 아직
+둘 다 LLM 없이 스크립트만 실행한다(무료·결정적). 텔레그램 보고는 에이전트가 `.env` 의
+봇으로 직접 보낸다. 스크립트가 아직
 `~/.hermes/scripts/` 에 없으면 먼저 복사·경로수정하도록 안내한다. 자세한 절차는 저장소
 `lessons/2부-나만의-에이전트/4-자동화-hermes-예약.md` 참고.

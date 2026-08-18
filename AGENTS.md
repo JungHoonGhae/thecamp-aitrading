@@ -19,7 +19,7 @@ AI 코딩 도구(Claude Code, Codex, Cursor, Gemini 등)는 아래를 따르세�
 - 수익을 단정하지 마세요. 예제 전략은 학습용 예시입니다.
 - **`내-투자-스펙.md`(루트)는 학생의 스펙 선언문(단일 입력)**입니다. 학생이 "내 스펙을
   반영해줘"라고 하면 손으로 옮기지 말고 **`python sync_spec.py`** 를 실행하세요
-  (표 ①~④ → `agent/spec/` 3개 파일 결정적 반영). 반영 후 `python verify.py` 4/4 확인.
+  (표 ①~④ → `agent/spec/` 3개 파일 결정적 반영). 반영 후 `python verify.py` 5/5 확인.
   에이전트는 매 실행 때 spec/ 을 읽으므로, 스펙 변경은 sync 를 거쳐야 효력이 있습니다.
 - 각 실습 문서 끝의 **`☑️ 넘어가도 되는 신호`** 가 그 단계의 완료 판정입니다.
   학생이 다음으로 넘어가도 되는지 물으면 이 신호 기준으로 답하세요.
@@ -27,6 +27,6 @@ AI 코딩 도구(Claude Code, Codex, Cursor, Gemini 등)는 아래를 따르세�
 ## 구조
 - `lessons/` — 학습 문서(학생용): `0-시작/` → `1부-연결/` → `2부-나만의-에이전트/` → `9-마무리/` · 참고=`lessons/참고/`
 - `agent/` — 학생의 에이전트(agent.py)와 스펙(`agent/spec/` 3개 파일)
-- `src/common/` — KIS 클라이언트(mock/live), fixtures, 디스코드·차트 헬퍼
+- `src/common/` — KIS 클라이언트(mock/live), fixtures, 텔레그램·차트 헬퍼
 - `examples/` — 단계별 실행 스크립트(quote.py) · `hermes/` — 자동화 통합 패키지
 - 각 부의 `README.md`(파트 목표)와 번호 스텝 `.md`에 복사용 프롬프트가 있습니다.

@@ -55,6 +55,36 @@ description: >
   잠깐(수 초) 기다렸다가 재실행 — 토큰 문제(4-1)와 달리 1분씩 기다릴 필요는 없다.
 - **확인**: `KIS_MODE=live python agent/agent.py` 가 끝까지(리밸런싱 미리보기까지) 정상 출력.
 
+### 4-3. 텔레그램 보고가 안 온다 (`[텔레그램 전송 실패]` / 화면만 출력)
+- **원인**: 봇에게 `/start` 를 안 보냈거나, `TELEGRAM_CHANNEL_ID` 가 틀렸거나, 토큰이 잘렸다.
+- **수정**: `lessons/참고/telegram-봇-가이드.md` 순서대로 봇에게 `/start` → getUpdates 에서
+  chat id 를 다시 복사 → `.env` 의 `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHANNEL_ID` 확인.
+  없어도 실습은 된다 — 보고는 화면에 나온다.
+- **확인**: `python agent/agent.py` stderr 에 `[텔레그램으로 보고 전송 완료]`, 텔레그램에 같은 점검 보고.
+
+### 4-4. MCP 도구가 안 보인다 / `kis-lab` 연결 실패 (수업 경로)
+
+- **증상**: 등록했는데 도구 목록에 `search_api` 가 없다. 또는 서버가 바로 죽는다.
+- **가장 흔한 원인**: 등록은 됐는데 **AI 도구를 안 껐다 켰다.** 실행 중인 대화 세션에는
+  새로 등록한 MCP 가 안 붙는다. `claude mcp list` 에 `✔ Connected` 인데 도구가 안 보이면
+  거의 이것이다. → AI 도구를 재시작(또는 Claude Code `/mcp` 에서 재연결).
+- **그다음 원인**: 등록 명령의 경로가 **절대경로가 아니거나** 오타. 또는 `python3` 가 없음.
+- **수정**:
+  1. `python3 <저장소>/agent/mcp_server.py` 를 그냥 실행해 본다 — 아무 것도 안 뜨고
+     입력을 기다리면 **정상**이다(Ctrl+C 로 나온다). 에러가 뜨면 그 에러가 원인.
+  2. `python verify.py` 가 5/5 인지 본다. MCP 서버 점검이 거기 들어 있다.
+  3. 다시 등록: `claude mcp add kis-lab -- python3 <절대경로>/agent/mcp_server.py`
+     (`python3` 가 없으면 `python` 으로)
+- **확인**: `claude mcp list` 에 `kis-lab ... ✔ Connected`.
+
+---
+
+## 아래는 수업 중엔 안 씁니다 — 수업 후 심화(Docker) 전용
+
+> **조교/AI 안내**: 수업의 MCP 경로는 위 `kis-lab`(설치 없음) **하나**다.
+> 학생이 아래 증상을 들고 오면, 공식 Trading MCP를 스스로 붙이는 중인 것이다.
+> 수업 시간에는 이 트리로 들어가지 말고 `kis-lab` 으로 되돌린다.
+
 ## KIS Trading MCP 자가수리 (검증된 3가지 — 라이브러리 드리프트 대응)
 
 학생이 공식 Trading MCP를 직접 붙이다 막히면 아래로 안내한다.

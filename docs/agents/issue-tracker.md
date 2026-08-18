@@ -1,45 +1,66 @@
-# Issue tracker: GitHub
+# Issue tracker: Linear
 
-Issues and PRDs for this repo live as GitHub issues. Use the `gh` CLI for all operations.
+Issues and specs for this lecture live in Linear. Do not create GitHub issues, GitLab issues, or `.scratch/` tickets unless the user explicitly asks.
+
+| | |
+| --- | --- |
+| Workspace | [Remodule](https://linear.app/remodule) |
+| Team | ReModule (`REMOD`) |
+| Project | [EDU-Fastcampus-AI-Trading](https://linear.app/remodule/project/edu-fastcampus-ai-trading-f504f6889edf) |
+| Identifiers | `REMOD-123` |
+| MCP | Cursor server `user-linear` (`https://mcp.linear.app/mcp`) |
+
+This repo is the student lab (`edu-fastcampus-thecamp-aitrading`). Lecture ops live in `ops/` (private nested git). Both use this same Linear project.
+
+## Status workflow
+
+Use these **exact** ReModule status names:
+
+| Linear status | Type | Meaning |
+| ------------- | ---- | ------- |
+| `Backlog` | backlog | Captured, not scheduled |
+| `Todo` | unstarted | Ready to start |
+| `🚀 In Progress` | started | Someone (or an agent) is working it |
+| `🎉 Done` | completed | Complete |
+
+The team also has QA/review statuses (`🔍 PR Review Requested`, `🛠 Staging QA Testing`, …). Do not use those for lecture-prep tickets unless the user asks.
+
+Triage *roles* are **labels**, not statuses. See `docs/agents/triage-labels.md`. A ticket can be `Todo` and `ready-for-agent` at the same time.
+
+## How to talk to Linear
+
+Use the Linear MCP (`user-linear`). If it reports `needsAuth`, call `mcp_auth` then retry. If MCP is unavailable, draft the issue in chat and ask the user to create it — do not fall back to GitHub.
+
+Discover tool schemas with `GetMcpTools` before calling.
 
 ## Conventions
 
-- **Create an issue**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
-- **Read an issue**: `gh issue view <number> --comments`, filtering comments by `jq` and also fetching labels.
-- **List issues**: `gh issue list --state open --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'` with appropriate `--label` and `--state` filters.
-- **Comment on an issue**: `gh issue comment <number> --body "..."`
-- **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
-- **Close**: `gh issue close <number> --comment "..."`
-
-Infer the repo from `git remote -v` — `gh` does this automatically when run inside a clone.
+- **Create an issue**: `save_issue` with `team` = `ReModule`, `project` = `EDU-Fastcampus-AI-Trading`, `title`, `description`, `state` = `Backlog` unless the skill says otherwise, and triage `labels` from `docs/agents/triage-labels.md`.
+- **Read an issue**: `get_issue` with `id` = `REMOD-123` and `includeRelations` = true. Also `list_comments` for the thread.
+- **List issues**: `list_issues` filtered by `team` = `ReModule` and `project` = `EDU-Fastcampus-AI-Trading`, plus `state` / `label` as needed. Ask for `title`, `description`, `labels`, `status`, `url`, `assignee`, `parentId`.
+- **Comment**: `save_comment` with `issueId` and `body`. Do not overwrite the description unless the skill is updating the spec itself.
+- **Apply / remove labels**: `save_issue` `labels` **replaces the full set** — read current labels first, then send the new complete list.
+- **Close**: `save_issue` with `state` = `🎉 Done` and a comment explaining why.
 
 ## Pull requests as a triage surface
 
-**PRs as a request surface: no.** _(Set to `yes` if this repo treats external PRs as feature requests; `/triage` reads this flag.)_
-
-When set to `yes`, PRs run through the same labels and states as issues, using the `gh pr` equivalents:
-
-- **Read a PR**: `gh pr view <number> --comments` and `gh pr diff <number>` for the diff.
-- **List external PRs for triage**: `gh pr list --state open --json number,title,body,labels,author,authorAssociation,comments` then keep only `authorAssociation` of `CONTRIBUTOR`, `FIRST_TIME_CONTRIBUTOR`, or `NONE` (drop `OWNER`/`MEMBER`/`COLLABORATOR`).
-- **Comment / label / close**: `gh pr comment`, `gh pr edit --add-label`/`--remove-label`, `gh pr close`.
-
-GitHub shares one number space across issues and PRs, so a bare `#42` may be either — resolve with `gh pr view 42` and fall back to `gh issue view 42`.
+**PRs as a request surface: no.**
 
 ## When a skill says "publish to the issue tracker"
 
-Create a GitHub issue.
+Create a Linear issue on team ReModule in project EDU-Fastcampus-AI-Trading (`save_issue`).
 
 ## When a skill says "fetch the relevant ticket"
 
-Run `gh issue view <number> --comments`.
+`get_issue` by identifier (`REMOD-123` or a Linear URL) plus `list_comments`.
 
 ## Wayfinding operations
 
-Used by `/wayfinder`. The **map** is a single issue with **child** issues as tickets.
+Used by `/wayfinder`. The **map** is a single Linear issue whose **child** issues are tickets.
 
-- **Map**: a single issue labelled `wayfinder:map`, holding the Notes / Decisions-so-far / Fog body. `gh issue create --label wayfinder:map`.
-- **Child ticket**: an issue linked to the map as a GitHub sub-issue (`gh api` on the sub-issues endpoint). Where sub-issues aren't enabled, add the child to a task list in the map body and put `Part of #<map>` at the top of the child body. Labels: `wayfinder:<type>` (`research`/`prototype`/`grilling`/`task`). Once claimed, the ticket is assigned to the driving dev.
-- **Blocking**: GitHub's **native issue dependencies** — the canonical, UI-visible representation. Add an edge with `gh api --method POST repos/<owner>/<repo>/issues/<child>/dependencies/blocked_by -F issue_id=<blocker-db-id>`, where `<blocker-db-id>` is the blocker's numeric **database id** (`gh api repos/<owner>/<repo>/issues/<n> --jq .id`, _not_ the `#number` or `node_id`). GitHub reports `issue_dependencies_summary.blocked_by` (open blockers only — the live gate). Where dependencies aren't available, fall back to a `Blocked by: #<n>, #<n>` line at the top of the child body. A ticket is unblocked when every blocker is closed.
-- **Frontier query**: list the map's open children (`gh issue list --state open`, scoped to the map's sub-issues / task list), drop any with an open blocker (`issue_dependencies_summary.blocked_by > 0`, or an open issue in the `Blocked by` line) or an assignee; first in map order wins.
-- **Claim**: `gh issue edit <n> --add-assignee @me` — the session's first write.
-- **Resolve**: `gh issue comment <n> --body "<answer>"`, then `gh issue close <n>`, then append a context pointer (gist + link) to the map's Decisions-so-far.
+- **Map**: one issue labelled `wayfinder:map`, holding the Notes / Decisions-so-far / Fog body. Status `🚀 In Progress` while the effort is live. `save_issue` with `labels` including `wayfinder:map`, `project` = `EDU-Fastcampus-AI-Trading`.
+- **Child ticket**: a Linear sub-issue of the map (`parentId` = map identifier). Put the question in the description. Labels: `wayfinder:<type>` (`research` / `prototype` / `grilling` / `task`). Once claimed, assign the ticket to the driving person (`assignee`).
+- **Blocking**: Linear `blockedBy` / `blocks` on `save_issue`. A ticket is unblocked when every blocker is `🎉 Done`.
+- **Frontier query**: `list_issues` with `parentId` = map, drop status `🎉 Done`, drop any with an open blocker or an assignee; first in map order wins.
+- **Claim**: `save_issue` with `assignee` = `me` and `state` = `🚀 In Progress` — the session's first write.
+- **Resolve**: `save_comment` with the answer, `save_issue` `state` = `🎉 Done`, then append a context pointer (gist + link) to the map's Decisions-so-far.

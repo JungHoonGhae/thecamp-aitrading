@@ -1,91 +1,71 @@
-# 2부 · 4 — 자동화: 정해진 시각에 (자는 동안 AI가 시장을 지켜본다)
+# 2부 · 4 — 자동화: 자는 동안 (hermes)
 
-여기까지 오면 완성한 점검(`agent/agent.py`)을 **손 안 대고 정해진 시각에 자동 실행 →
-디스코드로 보고**받게 만듭니다. 이게 이 실습의 목적지입니다.
+여기까지 오면 완성한 점검(`agent/agent.py`)을 **손 안 대고 정해진 시각에** 돌립니다.
+이 강의에서 말한 **"자동화 에이전트"** 가 여기입니다. 도구 이름은 hermes-agent.
 
-방법은 두 가지 — 편한 걸 고르세요.
-- **A. OS 스케줄러** (누구나, 가장 간단) — mac/Linux `crontab`, Windows 작업 스케줄러.
-- **B. 내 hermes-agent** (무료, 자연어로 관리 + 디스코드 배달) — 더 똑똑하게.
+같은 실행은 `agent/agent.py` 한 줄입니다. 깨우는 방법만 두 가지입니다.
 
-> 어느 쪽이든 **점검·보고까지만** 합니다. 실제 매수/매도 주문은 넣지 않습니다.
-> 그리고 자동화는 코드를 새로 짜는 게 아니라, **이미 만든 걸 예약해 굴리는** 것뿐입니다.
-> (코드 수정이 필요하면 Claude Code / Codex 로.)
+- **B. hermes (본편)** — 말로 예약·즉석 점검. 무료 Nous 로그인.
+- **A. OS 예약 (폴백)** — hermes 설치가 막히면 crontab / 작업 스케줄러.
 
----
-
-## A. OS 스케줄러로 (가장 간단)
-
-디스코드로 받고 싶으면 웹훅 URL을 먼저 만드세요 → `lessons/참고/discord-웹훅-가이드.md`.
-
-**mac / Linux** — 터미널에 `crontab -e` 후 한 줄 추가(매주 월 08:00):
-```
-0 8 * * 1 DISCORD_WEBHOOK="웹훅URL" python /내/저장소/절대경로/agent/agent.py
-```
-
-**Windows** — "작업 스케줄러"에서 새 작업 → 트리거(매주 월 08:00) → 동작:
-`python C:\내\저장소\경로\2부-나만의-에이전트\agent.py` (환경변수에 DISCORD_WEBHOOK 설정)
-
-이게 "자는 동안 자동 실행"의 가장 단순한 형태입니다.
+> 자동화는 코드를 새로 짜는 게 아닙니다. 이미 만든 걸 깨우는 것뿐입니다.
+> 텔레그램은 에이전트가 `.env` 봇으로 직접 보냅니다.
 
 ---
 
-## B. 내 hermes-agent 에 주입 (무료, 자연어 관리)
+## B. 본편 — hermes-agent
 
-hermes 는 자연어로 예약을 걸고 디스코드로 배달해줘서 편합니다. **무료**로 세울 수 있습니다.
+패키지는 [`hermes/`](../../hermes/README.md) 에 있습니다.
 
-hermes 에 넣을 것은 [`hermes/`](../../hermes/README.md) **통합 패키지 폴더에 전부** 있습니다
-(hermes 홈과 같은 구조 — scripts/ 는 예약용, skills/ 는 채팅용):
-- `hermes/scripts/portfolio-check.py` — 예약 실행 스크립트(크로스플랫폼 `.py`)
-- `hermes/skills/portfolio-check/SKILL.md` — 채팅에서 "포트폴리오 점검해줘"로 부르는 스킬
-
-### B0. hermes 무료로 세우기 (한 번만)
-공식 원칙: **기본 채팅이 될 때까지 다른 기능을 붙이지 않는다.**
+### B0. 한 번만 세우기 (무료)
 ```bash
 curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash   # mac/Linux/WSL2
-hermes setup --portal    # Nous Portal 무료 로그인 + 무료 모델 (OAuth, 과금 없음)
-hermes --tui             # 기본 채팅부터 확인
+hermes setup --portal    # Nous Portal 무료 로그인 (추가 카드 없음)
+hermes --tui             # 채팅이 되면 성공
 ```
 
-### B1. 디스코드 연결
-```bash
-hermes gateway setup      # Discord 선택 → 봇 연결 (Connected Platforms: discord)
-```
+> 수업 경로는 **Nous Portal** 입니다. 이미 쓰는 Claude Code / Codex 를 hermes 에
+> 다시 붙일 필요 없습니다. (Claude Pro 로는 hermes Anthropic 로그인이 안 됩니다.)
 
-### B2. 스크립트를 hermes 에 넣기 (한 번만)
-hermes 는 `~/.hermes/scripts/` 아래 스크립트를 실행합니다. 그리로 복사하고 경로만 바꾸세요.
+### B1. 스크립트 넣기
 ```bash
 mkdir -p ~/.hermes/scripts
 cp hermes/scripts/portfolio-check.py ~/.hermes/scripts/
-# ~/.hermes/scripts/portfolio-check.py 를 열어 REPO 를 내 저장소 절대경로로 수정
+# 파일을 열어 REPO 를 내 저장소 절대경로로 수정
 ```
 
-### B3. 예약은 hermes 에게 '말로' 시키면 됩니다 (native)
-hermes 에는 예약(cron) 관리 기능이 내장돼 있어, **채팅에 자연어로 말하면 알아서 등록**합니다.
-CLI 명령을 외울 필요가 없습니다. hermes 채팅에 이렇게:
+### B2. 말로 예약
+hermes 채팅에:
 ```
-portfolio-check.py 를 매주 월요일 아침 8시에 no-agent 로 실행해서 디스코드로 보내줘.
+portfolio-check.py 를 매주 월요일 아침 8시에 no-agent 로 실행해줘.
 ```
-- hermes 가 스스로 예약 잡을 만들어 줍니다. "지금 예약 목록 보여줘", "이 예약 지워줘"도
-  전부 말로 하면 됩니다.
-- `no-agent` = LLM 없이 스크립트 출력을 그대로 디스코드로 → 무료·결정적.
+- `no-agent` = 숫자는 스크립트가 계산 (공짜·매번 같음). 텔레그램은 에이전트가 보냄.
+- "지금 점검해줘"는 스킬을 넣은 뒤 채팅으로도 됩니다:
+  `hermes skills install ./hermes/skills/portfolio-check`
 
-> (참고) 같은 걸 CLI 로 직접 하려면:
-> `hermes cron create "0 8 * * 1" --name weekly-portfolio-check --no-agent --script portfolio-check.py --deliver discord`
-> 하지만 **자연어로 시키는 게 정석**입니다.
+점검·보고만. hermes 가 주문을 넣게 하지 않습니다.
+(`portfolio-rebalance.py` 는 `--execute` 라서, 원할 때만 · 가드레일 통과분만.)
 
-### B4. (선택) 채팅에서 즉석 점검 — 스킬 주입
-정기 예약 말고, 채팅에서 "내 포트폴리오 점검해줘"로 즉석 실행하고 싶으면 스킬을 넣으세요.
-```bash
-hermes skills install ./hermes/skills/portfolio-check
+---
+
+## A. 폴백 — OS 예약
+
+hermes 가 안 되면 이것만으로도 자는 동안 돌아갑니다.
+봇: [`lessons/참고/telegram-봇-가이드.md`](../참고/telegram-봇-가이드.md)
+
+**mac / Linux** — `crontab -e`:
 ```
-이후 채팅에서 "내 포트폴리오 점검해줘"라고 하면 hermes 가 `agent/agent.py` 를 실행해 보고합니다.
+0 8 * * 1 python /내/저장소/절대경로/agent/agent.py
+```
+`python` 이 없으면 `python3`.
 
-## 안전
-- 점검·보고까지만. hermes 가 실제 주문을 넣게 하지 않습니다.
-- 무료 티어 품질·한도는 시점마다 다르니 시연/자동화 전 리허설.
+**Windows** — 작업 스케줄러 → 매주 월 08:00 → `python C:\내\저장소\경로\agent\agent.py`
+
+지금 확인: `python agent/agent.py` 한 번에 텔레그램이 오면 예약만 남은 겁니다.
 
 ## ☑️ 넘어가도 되는 신호
-- 예약이 등록됐고, 정해진 시각(또는 "점검해줘" 한마디)에 **디스코드로 점검 보고**가 도착했다.
+- hermes 채팅에서 예약이 등록됐거나, "점검해줘"에 보고가 왔다.
+  (막혔으면 A로 텔레그램 한 통 + crontab 한 줄이면 통과)
 
 > 🧭 **초록이(진행 도우미)에게** — 막혔으면 이 한 줄을 복붙하세요:
 > `.agents/skills/assistant/SKILL.md 대로, 내가 지금 어느 단계에서 막혔는지 진단하고 다음 행동을 하나만 알려줘.`

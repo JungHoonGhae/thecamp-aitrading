@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <style>
+      .t { font-family: "Apple SD Gothic Neo", "Nanum Gothic", sans-serif; }
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="#161616"/>
+  <rect x="0" y="0" width="8" height="900" fill="#279b69"/>
+
+  <text class="t" x="48" y="56" fill="#ffffff" font-size="28" font-weight="700">나만의 AI 투자 에이전트 — 구조</text>
+  <text class="t" x="48" y="88" fill="#86a495" font-size="16">Part 2 · 2회차 결과물. 표로 선언하고, 코드가 비교·차단·보고합니다.</text>
+
+  <text class="t" x="64" y="140" fill="#279b69" font-size="13" font-weight="700" letter-spacing="1">입력</text>
+
+  <rect x="48" y="156" width="320" height="100" rx="10" fill="#172d25" stroke="#237853" stroke-width="1"/>
+  <text class="t" x="208" y="198" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">내-투자-스펙.md</text>
+  <text class="t" x="208" y="226" text-anchor="middle" fill="#86a495" font-size="14">종목 · 비중 · 주기 · 금지</text>
+
+  <rect x="48" y="272" width="320" height="100" rx="10" fill="#172d25" stroke="#237853" stroke-width="1"/>
+  <text class="t" x="208" y="314" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">가드레일</text>
+  <text class="t" x="208" y="342" text-anchor="middle" fill="#86a495" font-size="14">한 종목 한도 · 현금 최소 · 차단</text>
+
+  <rect x="48" y="388" width="320" height="120" rx="10" fill="#172d25" stroke="#237853" stroke-width="1"/>
+  <text class="t" x="208" y="430" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">hermes 예약</text>
+  <text class="t" x="208" y="458" text-anchor="middle" fill="#86a495" font-size="14">같은 agent.py 를 깨움</text>
+  <text class="t" x="208" y="482" text-anchor="middle" fill="#86a495" font-size="13">막히면 crontab</text>
+
+  <polygon points="384,206 412,218 384,230" fill="#279b69"/>
+  <polygon points="384,322 412,334 384,346" fill="#279b69"/>
+  <polygon points="384,438 412,450 384,462" fill="#279b69"/>
+
+  <rect x="428" y="140" width="720" height="520" rx="14" fill="#121a16" stroke="#216f4d" stroke-width="1.5"/>
+  <text class="t" x="788" y="178" text-anchor="middle" fill="#279b69" font-size="13" font-weight="700" letter-spacing="1">agent.py</text>
+  <text class="t" x="788" y="206" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="700">AI 투자 에이전트</text>
+  <text class="t" x="788" y="232" text-anchor="middle" fill="#86a495" font-size="13">스펙은 sync_spec.py 로 agent/spec 에 반영됩니다</text>
+
+  <rect x="468" y="260" width="640" height="88" rx="10" fill="#172d25" stroke="#237853" stroke-width="1"/>
+  <text class="t" x="788" y="298" text-anchor="middle" fill="#ffffff" font-size="17" font-weight="700">비교</text>
+  <text class="t" x="788" y="326" text-anchor="middle" fill="#86a495" font-size="14">목표 비중 vs 실제 보유</text>
+
+  <rect x="468" y="368" width="640" height="88" rx="10" fill="#172d25" stroke="#237853" stroke-width="1"/>
+  <text class="t" x="788" y="406" text-anchor="middle" fill="#ffffff" font-size="17" font-weight="700">가드레일 검증</text>
+  <text class="t" x="788" y="434" text-anchor="middle" fill="#86a495" font-size="14">위반이면 주문 차단</text>
+
+  <rect x="468" y="476" width="300" height="144" rx="10" fill="#1a3a2c" stroke="#279b69" stroke-width="1.5"/>
+  <text class="t" x="618" y="528" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">미리보기</text>
+  <text class="t" x="618" y="556" text-anchor="middle" fill="#86a495" font-size="14">기본. 주문 없음</text>
+  <text class="t" x="618" y="582" text-anchor="middle" fill="#86a495" font-size="13">python agent/agent.py</text>
+
+  <rect x="808" y="476" width="300" height="144" rx="10" fill="#1a3a2c" stroke="#279b69" stroke-width="1.5"/>
+  <text class="t" x="958" y="528" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">--execute</text>
+  <text class="t" x="958" y="556" text-anchor="middle" fill="#86a495" font-size="14">가드레일 통과분만</text>
+  <text class="t" x="958" y="582" text-anchor="middle" fill="#86a495" font-size="13">연습 계좌 체결</text>
+
+  <rect x="428" y="684" width="720" height="120" rx="12" fill="#172d25" stroke="#237853" stroke-width="1"/>
+  <text class="t" x="788" y="724" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">kis.py</text>
+  <text class="t" x="788" y="752" text-anchor="middle" fill="#cfe8db" font-size="14">연습 계좌 (기본, 키 없음)  ·  KIS 모의투자 (KIS_MODE=live)</text>
+  <text class="t" x="788" y="778" text-anchor="middle" fill="#86a495" font-size="13">MCP가 아닙니다. 1회차 MCP는 연결 체험용입니다.</text>
+
+  <polygon points="1164,400 1192,412 1164,424" fill="#279b69"/>
+
+  <rect x="1208" y="260" width="344" height="200" rx="12" fill="#1a3a2c" stroke="#279b69" stroke-width="1.5"/>
+  <text class="t" x="1380" y="324" text-anchor="middle" fill="#ffffff" font-size="18" font-weight="700">텔레그램</text>
+  <text class="t" x="1380" y="356" text-anchor="middle" fill="#cfe8db" font-size="14">점검 · 차트 · 체결 결과</text>
+  <text class="t" x="1380" y="384" text-anchor="middle" fill="#86a495" font-size="13">telegram.py</text>
+  <text class="t" x="1380" y="412" text-anchor="middle" fill="#86a495" font-size="13">토큰 없으면 화면 출력</text>
+
+  <rect x="1208" y="488" width="344" height="132" rx="12" fill="#172d25" stroke="#237853" stroke-width="1"/>
+  <text class="t" x="1380" y="540" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">실전</text>
+  <text class="t" x="1380" y="568" text-anchor="middle" fill="#86a495" font-size="13">수업 밖. 졸업 스위치</text>
+  <text class="t" x="1380" y="590" text-anchor="middle" fill="#86a495" font-size="12">KIS_ENV=real + KIS_REAL_ACK</text>
+
+  <text class="t" x="48" y="860" fill="#6a7c74" font-size="13">패스트캠퍼스 「[4주 완성] 나만의 AI 자동매매 시스템 제작」 Part 2 · 계정훈</text>
+  <text class="t" x="48" y="880" fill="#6a7c74" font-size="13">실제 돈은 움직이지 않습니다. 예제는 학습용이며 수익을 보장하지 않습니다.</text>
+</svg>

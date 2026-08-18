@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <style>
+      .t { font-family: "Apple SD Gothic Neo", "Nanum Gothic", sans-serif; }
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="#161616"/>
+  <rect x="0" y="0" width="8" height="900" fill="#279b69"/>
+
+  <text class="t" x="48" y="58" fill="#ffffff" font-size="28" font-weight="700">1회차에 연결하고, 2회차에 완성합니다</text>
+  <text class="t" x="48" y="92" fill="#86a495" font-size="16">1회차는 AI가 시세·계좌를 읽게 연결하는 체험입니다. 2회차는 같은 종류의 데이터로 점검·체결·보고 에이전트를 만듭니다.</text>
+
+  <rect x="40" y="124" width="1520" height="300" rx="12" fill="#121a16" stroke="#216f4d" stroke-width="1.5"/>
+  <text class="t" x="64" y="162" fill="#279b69" font-size="13" font-weight="700" letter-spacing="1">PART 1 · 1회차 8/22 (토)</text>
+  <text class="t" x="64" y="192" fill="#ffffff" font-size="22" font-weight="700">AI를 시장에 연결</text>
+  <text class="t" x="64" y="218" fill="#86a495" font-size="14">직접 호출과 MCP를 비교합니다. 토요일이라 연습 계좌가 본편입니다.</text>
+
+  <rect x="64" y="248" width="280" height="140" rx="10" fill="#172d25" stroke="#237853" stroke-width="1"/>
+  <text class="t" x="204" y="300" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">AI 코딩 도구</text>
+  <text class="t" x="204" y="328" text-anchor="middle" fill="#86a495" font-size="14">Claude Code · Codex</text>
+  <text class="t" x="204" y="354" text-anchor="middle" fill="#86a495" font-size="13">글을 붙여 넣고 결과를 확인</text>
+
+  <polygon points="360,318 384,330 360,342" fill="#279b69"/>
+
+  <rect x="400" y="248" width="240" height="64" rx="10" fill="#172d25" stroke="#237853" stroke-width="1"/>
+  <text class="t" x="520" y="286" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">직접 호출</text>
+  <rect x="400" y="324" width="240" height="64" rx="10" fill="#172d25" stroke="#237853" stroke-width="1"/>
+  <text class="t" x="520" y="354" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">MCP (Docker)</text>
+  <text class="t" x="520" y="372" text-anchor="middle" fill="#86a495" font-size="12">안 되면 연습 계좌 폴백</text>
+
+  <polygon points="656,318 680,330 656,342" fill="#279b69"/>
+
+  <rect x="696" y="248" width="320" height="140" rx="10" fill="#1a3a2c" stroke="#279b69" stroke-width="1.5"/>
+  <text class="t" x="856" y="300" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">KIS 연습 계좌 · 모의투자</text>
+  <text class="t" x="856" y="328" text-anchor="middle" fill="#86a495" font-size="14">시세 · 잔고 조회</text>
+  <text class="t" x="856" y="354" text-anchor="middle" fill="#86a495" font-size="13">수업 당일은 연습 계좌가 정상</text>
+
+  <text class="t" x="1180" y="318" fill="#86a495" font-size="14">MCP는 여기서 끝.</text>
+  <text class="t" x="1180" y="342" fill="#86a495" font-size="14">2회차 에이전트는 코드를 씁니다.</text>
+
+  <rect x="40" y="448" width="1520" height="360" rx="12" fill="#121a16" stroke="#216f4d" stroke-width="1.5"/>
+  <text class="t" x="64" y="486" fill="#279b69" font-size="13" font-weight="700" letter-spacing="1">PART 2 · 2회차 8/29 (토)</text>
+  <text class="t" x="64" y="516" fill="#ffffff" font-size="22" font-weight="700">나만의 에이전트로 완성</text>
+  <text class="t" x="64" y="542" fill="#86a495" font-size="14">표로 원칙을 적고, 연습 계좌에서 비중이 움직이는지 본 다음, hermes로 예약을 겁니다.</text>
+
+  <rect x="64" y="568" width="220" height="100" rx="10" fill="#172d25" stroke="#237853" stroke-width="1"/>
+  <text class="t" x="174" y="610" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">내-투자-스펙.md</text>
+  <text class="t" x="174" y="638" text-anchor="middle" fill="#86a495" font-size="13">종목 · 비중 · 금지</text>
+
+  <rect x="64" y="684" width="220" height="84" rx="10" fill="#172d25" stroke="#237853" stroke-width="1"/>
+  <text class="t" x="174" y="722" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">가드레일</text>
+  <text class="t" x="174" y="746" text-anchor="middle" fill="#86a495" font-size="13">한도 · 위반 시 차단</text>
+
+  <polygon points="300,666 324,678 300,690" fill="#279b69"/>
+
+  <rect x="340" y="568" width="300" height="200" rx="10" fill="#1a3a2c" stroke="#279b69" stroke-width="1.5"/>
+  <text class="t" x="490" y="612" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">agent.py</text>
+  <text class="t" x="490" y="644" text-anchor="middle" fill="#cfe8db" font-size="14">목표 vs 보유 비교</text>
+  <text class="t" x="490" y="672" text-anchor="middle" fill="#cfe8db" font-size="14">가드레일 검증</text>
+  <text class="t" x="490" y="700" text-anchor="middle" fill="#cfe8db" font-size="14">미리보기 → --execute 연습 체결</text>
+  <text class="t" x="490" y="732" text-anchor="middle" fill="#86a495" font-size="13">kis.py (연습 계좌 기본)</text>
+
+  <polygon points="656,666 680,678 656,690" fill="#279b69"/>
+
+  <rect x="696" y="568" width="260" height="200" rx="10" fill="#172d25" stroke="#237853" stroke-width="1"/>
+  <text class="t" x="826" y="632" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">텔레그램</text>
+  <text class="t" x="826" y="664" text-anchor="middle" fill="#86a495" font-size="14">점검 · 차트 · 체결 결과</text>
+  <text class="t" x="826" y="692" text-anchor="middle" fill="#86a495" font-size="13">토큰 없으면 화면에 출력</text>
+
+  <rect x="1000" y="568" width="520" height="200" rx="10" fill="#172d25" stroke="#237853" stroke-width="1"/>
+  <text class="t" x="1260" y="620" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">hermes-agent</text>
+  <text class="t" x="1260" y="652" text-anchor="middle" fill="#cfe8db" font-size="14">같은 agent.py 를 정해진 시각에 깨움</text>
+  <text class="t" x="1260" y="680" text-anchor="middle" fill="#86a495" font-size="13">수업 로그인: hermes setup --portal (Nous 무료)</text>
+  <text class="t" x="1260" y="708" text-anchor="middle" fill="#86a495" font-size="13">막히면 crontab / 작업 스케줄러</text>
+  <text class="t" x="1260" y="736" text-anchor="middle" fill="#86a495" font-size="13">판단(인터뷰·리뷰)은 Claude Code</text>
+
+  <text class="t" x="48" y="860" fill="#6a7c74" font-size="13">패스트캠퍼스 「[4주 완성] 나만의 AI 자동매매 시스템 제작」 Part 1–2 · 계정훈. 실제 돈은 움직이지 않습니다.</text>
+  <text class="t" x="48" y="880" fill="#6a7c74" font-size="13">종목을 고르는 판단은 3–4회차입니다.</text>
+</svg>

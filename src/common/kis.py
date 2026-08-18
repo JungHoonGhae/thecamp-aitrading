@@ -1,14 +1,14 @@
 """KIS(한국투자증권) 클라이언트 — mock / live 두 가지 모드 + paper / real 서버 스위치.
 
-- mock (기본): common/fixtures/*.json 을 읽어 응답한다. KIS 키가 없어도, 장이 닫힌
-  토요일에도 항상 똑같이 동작한다. 강의 실습의 기본 모드.
-- live: .env 에 넣은 KIS 키로 실제 API 를 호출한다. (원하는 학생만)
-  - KIS_ENV=paper (기본): 모의투자 서버. 수업은 여기까지만 쓴다.
-  - KIS_ENV=real: 실전(실계좌) 서버. **수업 범위 밖 — 졸업 스위치.**
-    실수로 켜지지 않도록 KIS_REAL_ACK=REAL-MONEY-OK 를 함께 요구한다(이중 확인).
-    같은 인터페이스 그대로 서버 주소와 거래 TR ID만 바뀐다 — 코드 수정 없이 전환된다.
+- mock (기본, 수업 당일): fixtures 로 시세를 읽고, --execute 하면 연습 계좌 잔고가
+  실제로 바뀐다. 키가 없어도, 토요 휴장에도 같은 화면이 나온다.
+  처음 상태로: reset_mock_ledger() 또는 `python agent/agent.py --reset-mock`.
+- live: .env 의 KIS 키로 증권사 API 를 호출한다. (평일·키 있는 학생)
+  - KIS_ENV=paper (기본): 모의투자 서버. 수업 후 전환은 KIS_MODE=live 한 줄.
+  - KIS_ENV=real: 실전 서버. **수업 범위 밖 — 졸업 스위치.**
+    KIS_REAL_ACK=REAL-MONEY-OK 이중 확인. 코드 수정 없이 서버·TR ID 만 바뀐다.
 
-모드는 환경변수 KIS_MODE / KIS_ENV 또는 생성 인자로 정한다.
+모드는 .env 의 KIS_MODE / KIS_ENV 또는 생성 인자로 정한다.
 """
 from __future__ import annotations
 
@@ -20,13 +20,22 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+from .env import load_repo_env
+
 FIXTURES = Path(__file__).parent / "fixtures"
+LEDGER = FIXTURES / ".ledger.json"
 VPS = "https://openapivts.koreainvestment.com:29443"   # 모의투자(paper) 서버
 REAL = "https://openapi.koreainvestment.com:9443"      # 실전(real) 서버 — 졸업 스위치
 
 
+def reset_mock_ledger() -> None:
+    """수업용 연습 계좌를 fixtures 처음 상태로 되돌린다."""
+    LEDGER.unlink(missing_ok=True)
+
+
 class KISClient:
     def __init__(self, mode: str | None = None, env: str | None = None):
+        load_repo_env()
         self.mode = (mode or os.getenv("KIS_MODE", "mock")).lower()
         self.env = (env or os.getenv("KIS_ENV", "paper")).lower()  # paper | real
         if self.env == "real" and os.getenv("KIS_REAL_ACK") != "REAL-MONEY-OK":
@@ -34,11 +43,25 @@ class KISClient:
                 "실전(real) 전환은 이중 확인이 필요합니다: 환경변수 KIS_REAL_ACK=REAL-MONEY-OK 를 "
                 "직접 설정하세요. (실제 돈이 움직입니다 — lessons/9-마무리 '졸업 스위치' 참조)")
         if self.mode == "live":
-            self.app_key = os.environ["KIS_APP_KEY"]
-            self.app_secret = os.environ["KIS_APP_SECRET"]
-            self.account = os.environ["KIS_ACCOUNT"]  # 계좌 앞 8자리 (paper=모의, real=실계좌)
+            # 수업이 끝나고 평일에 혼자 live 로 바꾸는 순간이 이 코드가 가장 중요한 때다.
+            # 그때 옆에 강사가 없으므로, KeyError traceback 대신 할 일을 알려준다.
+            self.app_key = self._need("KIS_APP_KEY")
+            self.app_secret = self._need("KIS_APP_SECRET")
+            self.account = self._need("KIS_ACCOUNT")  # 계좌 앞 8자리 (paper=모의, real=실계좌)
             self._token = None
         self.base = REAL if self.env == "real" else VPS
+
+    @staticmethod
+    def _need(name: str) -> str:
+        """live 모드에 필요한 값을 읽는다. 없거나 예시 그대로면 무엇을 할지 알려준다."""
+        val = (os.getenv(name) or "").strip()
+        if not val or val.startswith("여기에") or val == "모의계좌_앞8자리":
+            raise RuntimeError(
+                f"live 모드인데 {name} 가 비어 있습니다.\n"
+                "- 수업 중(토요일)이라면: .env 의 KIS_MODE 를 mock 으로 되돌리세요. 연습 계좌가 정상 경로입니다.\n"
+                "- 평일에 증권사 모의투자로 붙이려면: .env 에 KIS_APP_KEY / KIS_APP_SECRET / KIS_ACCOUNT 를\n"
+                "  실제 값으로 채우세요. 발급 방법은 lessons/참고/kis-신청-가이드.md 에 있습니다.")
+        return val
 
     def _tr(self, suffix: str) -> str:
         """거래계 TR ID — 모의(V…)/실전(T…) 접두만 다르다. 예: _tr("TTC8434R")"""
@@ -65,7 +88,7 @@ class KISClient:
     def get_balance(self) -> dict:
         """계좌 잔고. {'cash', 'holdings':[{code,name,qty,eval_amt}]} 반환."""
         if self.mode == "mock":
-            data = self._fixture("balance.json")
+            return self._balance_from_ledger()
         else:
             data = self._call(
                 "/uapi/domestic-stock/v1/trading/inquire-balance",
@@ -85,19 +108,18 @@ class KISClient:
         ]
         return {"cash": int(summary.get("dnca_tot_amt", 0)), "holdings": holdings}
 
-    def place_order(self, code: str, side: str, qty: int) -> dict:
-        """모의투자 시장가 주문. side='buy'|'sell'. {'ok','code','side','qty', ...} 반환.
+    def place_order(self, code: str, side: str, qty: int, name: str = "") -> dict:
+        """시장가 주문. side='buy'|'sell'. {'ok','code','side','qty', ...} 반환.
 
-        mock 모드: 실제로 넣지 않고 시뮬레이션 결과를 돌려준다(휴장·키 무관).
-        live 모드: KIS 서버에 실제 주문을 전송한다(장중에만 체결).
-          - KIS_ENV=paper(기본): 모의투자 주문. KIS_ENV=real: 실계좌 주문(이중 확인 필수).
+        mock: 연습 계좌 잔고를 파일에 반영한다(주말·키 없이 다음 조회에 보임).
+        live: KIS 서버에 주문을 전송한다(장중에만 체결).
+          - KIS_ENV=paper(기본): 모의투자. KIS_ENV=real: 실전(이중 확인 필수).
         """
         if qty <= 0:
             return {"ok": False, "code": code, "side": side, "qty": qty,
                     "msg": "수량 0 — 주문 생략"}
         if self.mode == "mock":
-            return {"ok": True, "code": code, "side": side, "qty": qty,
-                    "simulated": True, "msg": "모의 시뮬레이션(실주문 아님)"}
+            return self._fill_mock(code, side, qty, name)
         tr_id = self._tr("TTC0802U") if side == "buy" else self._tr("TTC0801U")  # 매수/매도
         body = {
             "CANO": self.account, "ACNT_PRDT_CD": "01", "PDNO": code,
@@ -114,6 +136,67 @@ class KISClient:
     def _fixture(self, name: str) -> dict:
         return json.loads((FIXTURES / name).read_text(encoding="utf-8"))
 
+    def _ledger_from_fixture(self) -> dict:
+        data = self._fixture("balance.json")
+        holdings = {}
+        for h in data.get("output1", []):
+            qty = int(h["hldg_qty"])
+            if qty > 0:
+                holdings[h["pdno"]] = {"name": h["prdt_name"], "qty": qty}
+        cash = int((data.get("output2") or [{}])[0].get("dnca_tot_amt", 0))
+        return {"cash": cash, "holdings": holdings}
+
+    def _load_ledger(self) -> dict:
+        if LEDGER.is_file():
+            return json.loads(LEDGER.read_text(encoding="utf-8"))
+        return self._ledger_from_fixture()
+
+    def _save_ledger(self, ledger: dict) -> None:
+        LEDGER.write_text(json.dumps(ledger, ensure_ascii=False, indent=2) + "\n",
+                          encoding="utf-8")
+
+    def _balance_from_ledger(self) -> dict:
+        ledger = self._load_ledger()
+        holdings = []
+        for code, h in ledger.get("holdings", {}).items():
+            qty = int(h.get("qty", 0))
+            if qty <= 0:
+                continue
+            price = self.get_price(code)["price"]
+            holdings.append({
+                "code": code, "name": h.get("name") or code,
+                "qty": qty, "eval_amt": qty * price,
+            })
+        return {"cash": int(ledger.get("cash", 0)), "holdings": holdings}
+
+    def _fill_mock(self, code: str, side: str, qty: int, name: str) -> dict:
+        ledger = self._load_ledger()
+        price = self.get_price(code)["price"]
+        cost = qty * price
+        holdings = ledger.setdefault("holdings", {})
+        cur = holdings.get(code, {"name": name or code, "qty": 0})
+        if name:
+            cur["name"] = name
+        if side == "buy":
+            if int(ledger.get("cash", 0)) < cost:
+                return {"ok": False, "code": code, "side": side, "qty": qty,
+                        "simulated": True,
+                        "msg": f"예수금 부족 (필요 {cost:,}원)"}
+            cur["qty"] = int(cur.get("qty", 0)) + qty
+            ledger["cash"] = int(ledger.get("cash", 0)) - cost
+        else:
+            have = int(cur.get("qty", 0))
+            if have < qty:
+                return {"ok": False, "code": code, "side": side, "qty": qty,
+                        "simulated": True,
+                        "msg": f"보유 수량 부족 ({have}주)"}
+            cur["qty"] = have - qty
+            ledger["cash"] = int(ledger.get("cash", 0)) + cost
+        holdings[code] = cur
+        self._save_ledger(ledger)
+        return {"ok": True, "code": code, "side": side, "qty": qty,
+                "simulated": True, "msg": "연습 계좌 체결 (수업용 · 주말에도 동작)"}
+
     def _open(self, req: urllib.request.Request) -> dict:
         """공통 호출 래퍼 — 실패를 학생이 이해할 수 있는 메시지로 바꿔준다.
 
@@ -128,6 +211,7 @@ class KISClient:
                 "KIS API 호출 실패.\n"
                 "- 방금 실행했다면: 토큰 발급은 1분에 1회만 가능합니다 — 1분 기다렸다가 다시 실행하세요.\n"
                 "- 방금이 아니라면: .env 의 KIS_APP_KEY/KIS_APP_SECRET/KIS_ACCOUNT 를 확인하세요.\n"
+                "- 주말·공휴일이거나 장 시간이 아니면 증권사가 시세·주문을 받지 않습니다 — 평일 장중에 다시 해보세요.\n"
                 f"(서버 응답: {detail})"
             ) from e
         except urllib.error.URLError as e:

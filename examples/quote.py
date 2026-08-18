@@ -11,5 +11,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from common.kis import KISClient
 
 code = sys.argv[1] if len(sys.argv) > 1 else "005930"
-result = KISClient().get_price(code)
+try:
+    result = KISClient().get_price(code)
+except RuntimeError as e:   # 우리가 학생에게 하려던 말 — traceback 에 묻지 않는다
+    print(f"\n{e}\n", file=sys.stderr)
+    sys.exit(1)
 print(f"{result['code']} 현재가: {result['price']:,}원")

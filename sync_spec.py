@@ -9,7 +9,7 @@
        python sync_spec.py --check   # 반영하지 않고 파싱 결과만 확인
 
 종목 이름이 목록(src/common/stocks.py)에 없으면 "이름(코드)" 형태로 적으세요.
-반영 후에는 python verify.py 로 4/4 를 확인하세요.
+반영 후에는 python verify.py 로 5/5 를 확인하세요.
 """
 from __future__ import annotations
 
@@ -23,6 +23,14 @@ from common.stocks import NAME_TO_CODE  # noqa: E402
 
 SPEC_DOC = ROOT / "내-투자-스펙.md"
 SPEC_DIR = ROOT / "agent" / "spec"
+
+
+def _eun_neun(word: str) -> str:
+    """받침이 있으면 '은', 없으면 '는'. 학생이 읽는 문장이라 '은(는)' 을 쓰지 않는다."""
+    last = word.strip()[-1:]
+    if not ("가" <= last <= "힣"):
+        return "은(는)"          # 영문·숫자로 끝나면 판정하지 않는다
+    return "은" if (ord(last) - 0xAC00) % 28 else "는"
 
 
 def fail(msg: str) -> None:
@@ -114,13 +122,17 @@ def main() -> None:
     # ④ → guardrails.md ("하지 마" 소절 불릿만 교체, 한도·나머지 보존)
     p = SPEC_DIR / "guardrails.md"
     s = p.read_text(encoding="utf-8")
-    bullets = "\n".join(f"- **{f}** 은(는) 하지 않는다." for f in forbidden)
+    bullets = "\n".join(f"- **{f}**{_eun_neun(f)} 하지 않는다." for f in forbidden)
     bullets += "\n- **실계좌(실전) 주문**은 하지 않는다 — 이 실습은 모의투자까지다."
-    s = re.sub(r"(## 하지 마 \(금지\)\n\n)(?:- .*\n)+", r"\1" + bullets + "\n", s)
+    pattern = r"(## 하지 마 \(금지\)\n\n(?:>.*\n)*\n?)(?:- .*\n)+"
+    s, n = re.subn(pattern, lambda m: m.group(1) + bullets + "\n", s, count=1)
+    if n == 0:
+        fail("guardrails.md 의 「하지 마 (금지)」 소절을 찾지 못해 ④ 를 반영하지 못했습니다. "
+             "그 제목과 아래 목록을 지우지 마세요.")
     p.write_text(s, encoding="utf-8")
 
     print("\n✓ agent/spec/ 3개 파일에 반영 완료")
-    print("다음: python verify.py 로 4/4 확인 → python agent/agent.py 로 새 스펙 점검")
+    print("다음: python verify.py 로 5/5 확인 → python agent/agent.py 로 새 스펙 점검")
 
 
 if __name__ == "__main__":

@@ -9,6 +9,8 @@
 
 Part 1~2 (정훈) 실습 폴더입니다. 3·4회차는 [lecture-prism](https://github.com/dragon1086/lecture-prism) (문상록).
 
+아직 안 받으셨다면: [`git clone`](https://github.com/JungHoonGhae/lecture-thecamp-aitrading) 또는 [ZIP 내려받기](https://github.com/JungHoonGhae/lecture-thecamp-aitrading/archive/refs/heads/main.zip) — 둘 중 편한 쪽. git 은 없어도 됩니다.
+
 코딩은 안 해도 됩니다. 문서에 있는 글을 복사해 AI에 붙이면 됩니다.
 
 키도 없어도 됩니다. 토요일이라 증권사 서버가 쉬는 날이 많습니다. 그때는 연습 계좌로 갑니다. 실제 돈은 안 움직입니다.

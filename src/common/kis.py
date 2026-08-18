@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import os
 import time
+import hashlib
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -217,14 +218,55 @@ class KISClient:
         except urllib.error.URLError as e:
             raise RuntimeError(f"KIS 서버에 연결할 수 없습니다 — 네트워크 상태를 확인하세요. ({e})") from e
 
+    # KIS 접근토큰은 앱키당 **1분에 1회**만 발급된다. 프로세스가 끝날 때마다 버리면
+    # `agent.py` 미리보기 → `--execute` 처럼 연달아 실행하는 순간 발급이 거부된다
+    # (레슨이 가르치는 바로 그 흐름이다). 그래서 파일에 캐시해 재사용한다.
+    _TOKEN_CACHE = Path(__file__).resolve().parents[2] / ".kis_token.json"
+
+    def _cache_key(self) -> str:
+        """키·환경이 바뀌면 다른 토큰이어야 한다. 앱키 원문은 저장하지 않는다."""
+        raw = f"{self.app_key}:{self.env}".encode()
+        return hashlib.sha256(raw).hexdigest()[:16]
+
+    def _read_cached_token(self) -> str | None:
+        try:
+            c = json.loads(self._TOKEN_CACHE.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return None
+        # 만료 1분 전부터는 새로 받는다 (호출 도중 만료 방지)
+        if c.get("key") == self._cache_key() and c.get("expires_at", 0) - 60 > time.time():
+            return c.get("token")
+        return None
+
+    def _write_cached_token(self, token: str, ttl: int) -> None:
+        try:
+            self._TOKEN_CACHE.write_text(json.dumps({
+                "key": self._cache_key(), "token": token,
+                "expires_at": time.time() + ttl,
+            }), encoding="utf-8")
+            self._TOKEN_CACHE.chmod(0o600)   # 토큰은 자격증명이다
+        except OSError:
+            pass   # 캐시를 못 써도 동작은 해야 한다
+
     def _get_token(self) -> str:
         if self._token:
             return self._token
+        cached = self._read_cached_token()
+        if cached:
+            self._token = cached
+            return cached
         body = json.dumps({"grant_type": "client_credentials",
                            "appkey": self.app_key, "appsecret": self.app_secret}).encode()
         req = urllib.request.Request(f"{self.base}/oauth2/tokenP", data=body,
                                      headers={"Content-Type": "application/json"})
-        self._token = self._open(req)["access_token"]
+        res = self._open(req)
+        self._token = res["access_token"]
+        # KIS 는 보통 24시간(86400초)을 준다. 값이 없거나 이상하면 보수적으로 1시간.
+        try:
+            ttl = int(res.get("expires_in") or 0)
+        except (TypeError, ValueError):
+            ttl = 0
+        self._write_cached_token(self._token, ttl if 60 < ttl <= 86400 else 3600)
         return self._token
 
     def _post(self, path: str, tr_id: str, body: dict) -> dict:

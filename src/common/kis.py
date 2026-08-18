@@ -86,6 +86,44 @@ class KISClient:
             )
         return {"code": code, "price": int(data["output"]["stck_prpr"])}
 
+    def get_news(self, code: str) -> list[dict]:
+        """종목 관련 뉴스·공시 제목. [{date, source, title}] 반환.
+
+        숫자로는 안 보이는 것을 보는 자리다. mock 은 연습용 고정 제목이고,
+        평일에 live 로 두면 실제 뉴스가 온다. **제목만** 가져온다 — 본문을 지어내지
+        않게 하려는 것이고, 판단은 3~4회차에서 다룬다.
+        """
+        if self.mode == "mock":
+            return self._fixture("news.json").get(code, [])
+        data = self._call(
+            "/uapi/domestic-stock/v1/quotations/news-title", "FHKST01011800",
+            {"FID_NEWS_OFER_ENTP_CODE": "", "FID_COND_MRKT_CLS_CODE": "",
+             "FID_INPUT_ISCD": code, "FID_TITL_CNTT": "", "FID_INPUT_DATE_1": "",
+             "FID_INPUT_HOUR_1": "", "FID_RANK_SORT_CLS_CODE": "", "FID_INPUT_SRNO": ""},
+        )
+        rows = data.get("output") or []
+        return [{"date": r.get("data_dt", ""), "source": r.get("dorg", ""),
+                 "title": r.get("hts_pbnt_titl_cntt", "")} for r in rows[:10]]
+
+    def get_market_cap_top(self, n: int = 10) -> list[dict]:
+        """시가총액 상위. [{rank, code, name, 시총_억, 등락률}] 반환.
+
+        기본 스펙이 "시총 상위 균등"이라, 그 순위가 어디서 오는지 학생이 직접 본다.
+        """
+        if self.mode == "mock":
+            return self._fixture("market_cap.json")["top"][:n]
+        data = self._call(
+            "/uapi/domestic-stock/v1/ranking/market-cap", "FHPST01740000",
+            {"fid_cond_mrkt_div_code": "J", "fid_cond_scr_div_code": "20174",
+             "fid_div_cls_code": "1", "fid_input_iscd": "0000", "fid_trgt_cls_code": "0",
+             "fid_trgt_exls_cls_code": "0", "fid_input_price_1": "",
+             "fid_input_price_2": "", "fid_vol_cnt": ""},
+        )
+        rows = (data.get("output") or [])[:n]
+        return [{"rank": int(r["data_rank"]), "code": r["mksc_shrn_iscd"],
+                 "name": r["hts_kor_isnm"], "시총_억": int(r["stck_avls"]),
+                 "등락률": float(r["prdy_ctrt"])} for r in rows]
+
     def get_balance(self) -> dict:
         """계좌 잔고. {'cash', 'holdings':[{code,name,qty,eval_amt}]} 반환."""
         if self.mode == "mock":

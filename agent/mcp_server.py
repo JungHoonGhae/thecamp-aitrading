@@ -40,6 +40,16 @@ CATALOG = {
         "keywords": ["잔고", "계좌", "보유", "평가금액", "balance"],
         "params": {},
     },
+    "news_title": {
+        "summary": "종목 관련 뉴스·공시 제목 (숫자로 안 보이는 것)",
+        "keywords": ["뉴스", "공시", "소식", "이슈", "news"],
+        "params": {"code": "종목코드 6자리. 이름만 알면 search_api 로 먼저 찾으세요."},
+    },
+    "market_cap": {
+        "summary": "시가총액 상위 종목 (기본 스펙의 '시총 상위'가 어디서 오는지)",
+        "keywords": ["시가총액", "시총", "상위", "순위", "랭킹"],
+        "params": {"n": "몇 위까지 볼지 (기본 10)"},
+    },
 }
 
 
@@ -74,6 +84,18 @@ def _call(api: str, params: dict) -> dict:
     if api == "inquire_balance":
         b = kis.get_balance()
         return {"mode": kis.mode, "예수금": b["cash"], "보유": b["holdings"]}
+    if api == "news_title":
+        code = str((params or {}).get("code", "")).strip()
+        if not code:
+            return {"error": "code(종목코드 6자리)가 필요합니다. describe_api 로 확인하세요."}
+        return {"mode": kis.mode, "code": code, "뉴스": kis.get_news(code),
+                "주의": "제목만 가져옵니다. 이걸로 사고팔지는 정하지 않습니다 — 판단은 3~4회차."}
+    if api == "market_cap":
+        try:
+            n = int((params or {}).get("n", 10))
+        except (TypeError, ValueError):
+            n = 10
+        return {"mode": kis.mode, "상위": kis.get_market_cap_top(max(1, min(n, 30)))}
     return {"error": f"'{api}' 는 없는 api 입니다."}
 
 

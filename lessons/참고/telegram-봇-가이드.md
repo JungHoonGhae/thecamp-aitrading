@@ -1,7 +1,7 @@
 # 텔레그램 봇 만들기 (5분)
 
 점검 결과를 텔레그램으로 받으려면 **봇 토큰**과 **채널(또는 나와의 대화) ID** 두 개만
-있으면 됩니다. 3~4회차에서도 같은 이름(`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHANNEL_ID`)을
+있으면 됩니다. 3~4주차에서도 같은 이름(`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHANNEL_ID`)을
 씁니다 — 여기서 만든 봇을 그대로 이어 가세요.
 
 ## 순서

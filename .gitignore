@@ -15,7 +15,8 @@ ops/
 # 로컬 전용 (공개 제외)
 CLAUDE.md
 .gstack/
-docs/superpowers/
+# 내부 작업 문서 — 에이전트 규약·ADR·사용자 스토리. 수강생 대상이 아니다.
+docs/
 
 # KIS 접근토큰 캐시 (자격증명 — 커밋 금지)
 .kis_token.json

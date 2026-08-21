@@ -6,10 +6,9 @@ venv/
 src/common/fixtures/.ledger.json
 
 # 강사 전용·비공개 초안 (학생 배포 제외)
-teacher/
 
 # 내부 준비·운영 자료 (별도 git, 공개 금지)
-ops/
+강의-준비/
 .DS_Store
 
 # 로컬 전용 (공개 제외)

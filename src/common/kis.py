@@ -145,7 +145,7 @@ class KISClient:
              "qty": int(h["hldg_qty"]), "eval_amt": int(h["evlu_amt"])}
             for h in data.get("output1", []) if int(h["hldg_qty"]) > 0
         ]
-        return {"cash": int(summary.get("dnca_tot_amt", 0)), "holdings": holdings}
+        return {"cash": cash_from_summary(summary), "holdings": holdings}
 
     def place_order(self, code: str, side: str, qty: int, name: str = "") -> dict:
         """시장가 주문. side='buy'|'sell'. {'ok','code','side','qty', ...} 반환.
@@ -236,20 +236,40 @@ class KISClient:
         return {"ok": True, "code": code, "side": side, "qty": qty,
                 "simulated": True, "msg": "연습 계좌 체결 (수업용 · 주말에도 동작)"}
 
-    def _open(self, req: urllib.request.Request) -> dict:
+    def _open(self, req: urllib.request.Request, retry_on_rate_limit: bool = False) -> dict:
         """공통 호출 래퍼 — 실패를 학생이 이해할 수 있는 메시지로 바꿔준다.
 
-        특히 토큰 발급(oauth2/tokenP)은 앱키당 1분에 1회 제한이라, 에러 직후
-        바로 재실행하면 같은 이유로 또 실패한다(자격증명 문제로 착각하기 쉬움).
+        KIS 는 제한이 두 종류다. 토큰 발급(oauth2/tokenP)은 앱키당 1분에 1회,
+        일반 호출은 초당 건수 제한(EGW00201)이다. 증상이 똑같이 HTTP 500 이라
+        학생이 자격증명 문제로 착각하기 쉬워서, 응답 코드로 갈라 안내한다.
+
+        retry_on_rate_limit 은 **조회에만** 쓴다. 주문에 붙이면 중복 체결이 난다.
         """
         try:
-            return json.load(urllib.request.urlopen(req, timeout=10))
+            # 잔고 조회(inquire-balance)는 장중에 10초 가까이 걸리는 게 정상이다(실측 9.9초).
+            # 예전 값이 10초여서 경계에 걸려 있었다 — 조금만 느려지면 수업 중에 터진다.
+            return json.load(urllib.request.urlopen(req, timeout=30))
+        except TimeoutError as e:
+            # 읽기 타임아웃은 URLError 가 아니라 TimeoutError 로 온다. 안 잡으면
+            # 학생 화면에 traceback 이 그대로 뜬다.
+            raise RuntimeError(
+                "증권사 응답이 30초 안에 오지 않았습니다 — 서버가 느린 것이지 설정 문제가 아닙니다.\n"
+                "잠시 뒤 같은 명령을 다시 실행하세요."
+            ) from e
         except urllib.error.HTTPError as e:
             detail = e.read().decode(errors="ignore")[:200]
+            if "EGW00201" in detail and retry_on_rate_limit:
+                time.sleep(self._MIN_INTERVAL * 2)
+                return self._open(req)      # 조회 한정, 한 번만 (재귀 깊이 1)
+            if "EGW00201" in detail:
+                raise RuntimeError(
+                    "KIS 가 초당 호출 제한으로 거절했습니다 — 몇 초 뒤 다시 실행하세요.\n"
+                    "(자격증명 문제가 아닙니다. 여러 개를 동시에 실행 중이면 하나만 남기세요.)"
+                ) from e
             raise RuntimeError(
                 "KIS API 호출 실패.\n"
-                "- 방금 실행했다면: 토큰 발급은 1분에 1회만 가능합니다 — 1분 기다렸다가 다시 실행하세요.\n"
-                "- 방금이 아니라면: .env 의 KIS_APP_KEY/KIS_APP_SECRET/KIS_ACCOUNT 를 확인하세요.\n"
+                "- 처음 실행이라면: 토큰 발급은 1분에 1회만 가능합니다 — 1분 기다렸다가 다시 실행하세요.\n"
+                "- 그게 아니라면: .env 의 KIS_APP_KEY/KIS_APP_SECRET/KIS_ACCOUNT 를 확인하세요.\n"
                 "- 주말·공휴일이거나 장 시간이 아니면 증권사가 시세·주문을 받지 않습니다 — 평일 장중에 다시 해보세요.\n"
                 f"(서버 응답: {detail})"
             ) from e
@@ -260,6 +280,26 @@ class KISClient:
     # `agent.py` 미리보기 → `--execute` 처럼 연달아 실행하는 순간 발급이 거부된다
     # (레슨이 가르치는 바로 그 흐름이다). 그래서 파일에 캐시해 재사용한다.
     _TOKEN_CACHE = Path(__file__).resolve().parents[2] / ".kis_token.json"
+
+    # 모의투자는 **초당 호출 수**도 제한된다(토큰 발급 제한과 별개다).
+    # 대기를 프로세스 안에서만 세면 소용이 없다 — 수업은 quote.py → agent.py →
+    # agent.py --execute 처럼 매번 새 프로세스라, 직전 호출이 0.1초 전인지 모른다.
+    # 그래서 마지막 호출 시각을 파일에 남겨 프로세스가 바뀌어도 간격을 지킨다.
+    # 덤으로, 한동안 안 썼으면 안 기다린다 (예전엔 첫 호출에도 무조건 1초를 버렸다).
+    _RATE_STAMP = Path(__file__).resolve().parents[2] / ".kis_last_call"
+    _MIN_INTERVAL = 0.6   # ponytail: 모의 2건/초 기준 여유값. 계속 걸리면 이 값만 올린다.
+
+    def _throttle(self) -> None:
+        try:
+            wait = self._MIN_INTERVAL - (time.time() - self._RATE_STAMP.stat().st_mtime)
+            if wait > 0:
+                time.sleep(wait)
+        except OSError:
+            pass          # 스탬프를 못 읽어도 호출 자체는 돼야 한다
+        try:
+            self._RATE_STAMP.touch()
+        except OSError:
+            pass
 
     def _cache_key(self) -> str:
         """키·환경이 바뀌면 다른 토큰이어야 한다. 앱키 원문은 저장하지 않는다."""
@@ -316,7 +356,7 @@ class KISClient:
                      "tr_id": tr_id, "custtype": "P",
                      "Content-Type": "application/json"},
         )
-        time.sleep(1.0)
+        self._throttle()
         return self._open(req)
 
     def _call(self, path: str, tr_id: str, params: dict) -> dict:
@@ -327,5 +367,40 @@ class KISClient:
                      "appkey": self.app_key, "appsecret": self.app_secret,
                      "tr_id": tr_id, "custtype": "P"},
         )
-        time.sleep(1.0)  # 모의투자 초당 호출 제한 회피
-        return self._open(req)
+        self._throttle()
+        return self._open(req, retry_on_rate_limit=True)
+
+
+def cash_from_summary(summary: dict) -> int:
+    """잔고 응답에서 '실제로 쓸 수 있는 현금'을 고른다.
+
+    KIS 는 예수금을 여러 개 준다. dnca_tot_amt(D+0)는 오늘 산 금액이 아직 안 빠져
+    있어서, 매수 직후 조회하면 "현금은 그대로인데 주식도 있음"이 되고 총자산이 부풀려진다.
+    그러면 방금 산 종목이 또 목표 미달로 보여 **매일 다시 사게 된다**(2026-08-21 실측).
+    prvs_rcdl_excc_amt(가수도정산금액)가 정산까지 반영된 값이라 이쪽을 쓴다.
+    """
+    return int(summary.get("prvs_rcdl_excc_amt")
+               or summary.get("dnca_tot_amt", 0))
+
+
+def _self_check() -> None:
+    """회귀 검사 — live 키 없이 돈다.
+
+    실행:  PYTHONPATH=src python3 -m common.kis
+    """
+    # 2026-08-21 모의투자 실제 응답 (삼성전자 외 4종목 매수 직후)
+    real = {"dnca_tot_amt": "10000000", "prvs_rcdl_excc_amt": "1324790",
+            "thdt_buy_amt": "8674000"}
+    assert cash_from_summary(real) == 1324790, "D+0 예수금을 쓰면 총자산이 부풀려져 무한 매수가 된다"
+    # 거래가 없던 계좌는 두 값이 같다
+    assert cash_from_summary({"dnca_tot_amt": "10000000",
+                              "prvs_rcdl_excc_amt": "10000000"}) == 10000000
+    # 필드가 아예 없거나 비어 있어도 죽지 않는다 (구버전/모의 응답 편차)
+    assert cash_from_summary({"dnca_tot_amt": "500"}) == 500
+    assert cash_from_summary({"prvs_rcdl_excc_amt": "", "dnca_tot_amt": "500"}) == 500
+    assert cash_from_summary({}) == 0
+    print("kis 자가 검사 통과")
+
+
+if __name__ == "__main__":
+    _self_check()

@@ -19,3 +19,4 @@ docs/superpowers/
 
 # KIS 접근토큰 캐시 (자격증명 — 커밋 금지)
 .kis_token.json
+.kis_last_call

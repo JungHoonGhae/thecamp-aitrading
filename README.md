@@ -23,7 +23,7 @@ Part 1~2 (정훈) 실습 폴더입니다. 3·4주차는 [lecture-prism](https://
 
 ## 지금 할 일
 
-저장소를 아직 안 받으셨으면 [`git clone`](https://github.com/JungHoonGhae/lecture-thecamp-aitrading) 또는 [ZIP 내려받기](https://github.com/JungHoonGhae/lecture-thecamp-aitrading/archive/refs/heads/main.zip) 중 편한 쪽으로 받으세요. git 은 없어도 됩니다.
+저장소를 아직 안 받으셨으면 [`git clone`](https://github.com/JungHoonGhae/thecamp-aitrading) 또는 [ZIP 내려받기](https://github.com/JungHoonGhae/thecamp-aitrading/archive/refs/heads/main.zip) 중 편한 쪽으로 받으세요. git 은 없어도 됩니다.
 
 받은 폴더를 Claude Code 같은 도구에서 연 다음, 아래를 그대로 붙이세요.
 

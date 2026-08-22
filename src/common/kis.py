@@ -29,6 +29,11 @@ VPS = "https://openapivts.koreainvestment.com:29443"   # 모의투자(paper) 서
 REAL = "https://openapi.koreainvestment.com:9443"      # 실전(real) 서버 — 졸업 스위치
 
 
+def _kis_order_err(msg_cd: str, msg1: str) -> dict:
+    """주문 실패 본문. live 거절과 같은 칸이다."""
+    return {"rt_cd": "7", "msg_cd": msg_cd, "msg1": msg1, "output": {}}
+
+
 def reset_mock_ledger() -> None:
     """수업용 연습 계좌를 fixtures 처음 상태로 되돌린다."""
     LEDGER.unlink(missing_ok=True)
@@ -71,19 +76,7 @@ class KISClient:
     # ---- 공개 메서드 (mock/live 공통 인터페이스) ----
     def get_price(self, code: str) -> dict:
         """종목 현재가. {'code','price'} 반환. (종목명은 응답에 없음)"""
-        if self.mode == "mock":
-            prices = self._fixture("prices.json")
-            if code not in prices:
-                # mock 시세에 없는 종목(ETF·기타)은 코드 기반 고정 가격으로 대체 —
-                # 값은 학습용 가짜지만 결정적이라, 어떤 스펙으로 바꿔도 실습 흐름이 안 끊긴다.
-                return {"code": code, "price": 10_000 + int(code) % 190_000}
-            data = prices[code]
-        else:
-            data = self._call(
-                "/uapi/domestic-stock/v1/quotations/inquire-price",
-                "FHKST01010100",
-                {"FID_COND_MRKT_DIV_CODE": "J", "FID_INPUT_ISCD": code},
-            )
+        data = self._price_payload(code)
         return {"code": code, "price": int(data["output"]["stck_prpr"])}
 
     def get_news(self, code: str) -> list[dict]:
@@ -93,14 +86,7 @@ class KISClient:
         평일에 live 로 두면 실제 뉴스가 온다. **제목만** 가져온다 — 본문을 지어내지
         않게 하려는 것이고, 판단은 3~4회차에서 다룬다.
         """
-        if self.mode == "mock":
-            return self._fixture("news.json").get(code, [])
-        data = self._call(
-            "/uapi/domestic-stock/v1/quotations/news-title", "FHKST01011800",
-            {"FID_NEWS_OFER_ENTP_CODE": "", "FID_COND_MRKT_CLS_CODE": "",
-             "FID_INPUT_ISCD": code, "FID_TITL_CNTT": "", "FID_INPUT_DATE_1": "",
-             "FID_INPUT_HOUR_1": "", "FID_RANK_SORT_CLS_CODE": "", "FID_INPUT_SRNO": ""},
-        )
+        data = self._news_payload(code)
         rows = data.get("output") or []
         return [{"date": r.get("data_dt", ""), "source": r.get("dorg", ""),
                  "title": r.get("hts_pbnt_titl_cntt", "")} for r in rows[:10]]
@@ -110,15 +96,7 @@ class KISClient:
 
         기본 스펙이 "시총 상위 균등"이라, 그 순위가 어디서 오는지 학생이 직접 본다.
         """
-        if self.mode == "mock":
-            return self._fixture("market_cap.json")["top"][:n]
-        data = self._call(
-            "/uapi/domestic-stock/v1/ranking/market-cap", "FHPST01740000",
-            {"fid_cond_mrkt_div_code": "J", "fid_cond_scr_div_code": "20174",
-             "fid_div_cls_code": "1", "fid_input_iscd": "0000", "fid_trgt_cls_code": "0",
-             "fid_trgt_exls_cls_code": "0", "fid_input_price_1": "",
-             "fid_input_price_2": "", "fid_vol_cnt": ""},
-        )
+        data = self._market_cap_payload()
         rows = (data.get("output") or [])[:n]
         return [{"rank": int(r["data_rank"]), "code": r["mksc_shrn_iscd"],
                  "name": r["hts_kor_isnm"], "시총_억": int(r["stck_avls"]),
@@ -126,19 +104,7 @@ class KISClient:
 
     def get_balance(self) -> dict:
         """계좌 잔고. {'cash', 'holdings':[{code,name,qty,eval_amt}]} 반환."""
-        if self.mode == "mock":
-            return self._balance_from_ledger()
-        else:
-            data = self._call(
-                "/uapi/domestic-stock/v1/trading/inquire-balance",
-                self._tr("TTC8434R"),
-                {
-                    "CANO": self.account, "ACNT_PRDT_CD": "01", "AFHR_FLPR_YN": "N",
-                    "OFL_YN": "", "INQR_DVSN": "02", "UNPR_DVSN": "01",
-                    "FUND_STTL_ICLD_YN": "N", "FNCG_AMT_AUTO_RDPT_YN": "N",
-                    "PRCS_DVSN": "01", "CTX_AREA_FK100": "", "CTX_AREA_NK100": "",
-                },
-            )
+        data = self._balance_payload()
         summary = (data.get("output2") or [{}])[0]
         holdings = [
             {"code": h["pdno"], "name": h["prdt_name"],
@@ -148,93 +114,285 @@ class KISClient:
         return {"cash": cash_from_summary(summary), "holdings": holdings}
 
     def place_order(self, code: str, side: str, qty: int, name: str = "") -> dict:
-        """시장가 주문. side='buy'|'sell'. {'ok','code','side','qty', ...} 반환.
+        """시장가 주문. side='buy'|'sell'.
 
-        mock: 연습 계좌 잔고를 파일에 반영한다(주말·키 없이 다음 조회에 보임).
-        live: KIS 서버에 주문을 전송한다(장중에만 체결).
-          - KIS_ENV=paper(기본): 모의투자. KIS_ENV=real: 실전(이중 확인 필수).
+        모의·라이브 모두 KIS order-cash 본문(rt_cd, msg_cd, msg1, output.ODNO)을
+        같은 칸으로 파싱한다. mock 은 그 본문을 fixtures 로 만들고 연습 계좌에 반영한다.
+        MCP 도구는 바꾸지 않는다 — 바뀌는 것은 .env 의 KIS_MODE / KIS_ENV 뿐이다.
         """
         if qty <= 0:
-            return {"ok": False, "code": code, "side": side, "qty": qty,
-                    "msg": "수량 0 — 주문 생략"}
-        if self.mode == "mock":
-            return self._fill_mock(code, side, qty, name)
-        tr_id = self._tr("TTC0802U") if side == "buy" else self._tr("TTC0801U")  # 매수/매도
-        body = {
-            "CANO": self.account, "ACNT_PRDT_CD": "01", "PDNO": code,
-            "ORD_DVSN": "01",  # 시장가
-            "ORD_QTY": str(qty), "ORD_UNPR": "0",
-        }
-        res = self._post("/uapi/domestic-stock/v1/trading/order-cash", tr_id, body)
-        ok = res.get("rt_cd") == "0"
-        return {"ok": ok, "code": code, "side": side, "qty": qty,
-                "simulated": False, "msg": res.get("msg1", ""),
-                "order_no": (res.get("output") or {}).get("ODNO", "")}
+            res = _kis_order_err("APBK0011", "주문수량을 확인하세요.")
+        elif self.mode == "mock":
+            res = self._fill_mock(code, side, qty, name)
+        else:
+            tr_id = self._tr("TTC0802U") if side == "buy" else self._tr("TTC0801U")
+            body = {
+                "CANO": self.account, "ACNT_PRDT_CD": "01", "PDNO": code,
+                "ORD_DVSN": "01",
+                "ORD_QTY": str(qty), "ORD_UNPR": "0",
+            }
+            res = self._post("/uapi/domestic-stock/v1/trading/order-cash", tr_id, body)
+        return self._parse_order(res, code, side, qty)
 
-    # ---- 내부 ----
+    def order_request(self, code: str, side: str, qty: int) -> dict:
+        """주문 직전에 나가는 요청 형태. 미리보기에서 그대로 보여 준다."""
+        tr_id = self._tr("TTC0802U") if side == "buy" else self._tr("TTC0801U")
+        cano = self.account if self.mode == "live" else "00000000"
+        return {
+            "path": "/uapi/domestic-stock/v1/trading/order-cash",
+            "tr_id": tr_id,
+            "body": {
+                "CANO": cano, "ACNT_PRDT_CD": "01", "PDNO": code,
+                "ORD_DVSN": "01", "ORD_QTY": str(qty), "ORD_UNPR": "0",
+            },
+        }
+
+    # ---- 내부: mock 도 live 와 같은 JSON 칸을 만든다 ----
     def _fixture(self, name: str) -> dict:
         return json.loads((FIXTURES / name).read_text(encoding="utf-8"))
 
+    def _price_payload(self, code: str) -> dict:
+        if self.mode == "mock":
+            prices = self._fixture("prices.json")
+            if code in prices:
+                return prices[code]
+            price = 10_000 + int(code) % 190_000
+            return {
+                "rt_cd": "0", "msg_cd": "MCA00000",
+                "msg1": "정상처리 되었습니다.",
+                "output": {"stck_prpr": str(price), "stck_shrn_iscd": code},
+            }
+        return self._call(
+            "/uapi/domestic-stock/v1/quotations/inquire-price",
+            "FHKST01010100",
+            {"FID_COND_MRKT_DIV_CODE": "J", "FID_INPUT_ISCD": code},
+        )
+
+    def _news_payload(self, code: str) -> dict:
+        if self.mode == "mock":
+            blob = self._fixture("news.json").get(code)
+            if not blob:
+                return {"rt_cd": "0", "msg_cd": "MCA00000",
+                        "msg1": "정상처리 되었습니다.", "output": []}
+            return blob
+        return self._call(
+            "/uapi/domestic-stock/v1/quotations/news-title", "FHKST01011800",
+            {"FID_NEWS_OFER_ENTP_CODE": "", "FID_COND_MRKT_CLS_CODE": "",
+             "FID_INPUT_ISCD": code, "FID_TITL_CNTT": "", "FID_INPUT_DATE_1": "",
+             "FID_INPUT_HOUR_1": "", "FID_RANK_SORT_CLS_CODE": "", "FID_INPUT_SRNO": ""},
+        )
+
+    def _market_cap_payload(self) -> dict:
+        if self.mode == "mock":
+            return self._fixture("market_cap.json")
+        return self._call(
+            "/uapi/domestic-stock/v1/ranking/market-cap", "FHPST01740000",
+            {"fid_cond_mrkt_div_code": "J", "fid_cond_scr_div_code": "20174",
+             "fid_div_cls_code": "1", "fid_input_iscd": "0000", "fid_trgt_cls_code": "0",
+             "fid_trgt_exls_cls_code": "0", "fid_input_price_1": "",
+             "fid_input_price_2": "", "fid_vol_cnt": ""},
+        )
+
+    def _balance_payload(self) -> dict:
+        if self.mode == "mock":
+            return self._balance_envelope()
+        return self._call(
+            "/uapi/domestic-stock/v1/trading/inquire-balance",
+            self._tr("TTC8434R"),
+            {
+                "CANO": self.account, "ACNT_PRDT_CD": "01", "AFHR_FLPR_YN": "N",
+                "OFL_YN": "", "INQR_DVSN": "02", "UNPR_DVSN": "01",
+                "FUND_STTL_ICLD_YN": "N", "FNCG_AMT_AUTO_RDPT_YN": "N",
+                "PRCS_DVSN": "01", "CTX_AREA_FK100": "", "CTX_AREA_NK100": "",
+            },
+        )
+
+    def _parse_order(self, res: dict, code: str, side: str, qty: int) -> dict:
+        output = res.get("output") or {}
+        return {
+            "ok": res.get("rt_cd") == "0",
+            "code": code, "side": side, "qty": qty,
+            "simulated": self.mode == "mock",
+            "msg": (res.get("msg1") or "").strip(),
+            "order_no": output.get("ODNO", ""),
+            "rt_cd": res.get("rt_cd", ""),
+            "msg_cd": res.get("msg_cd", ""),
+            "output": output,
+        }
+
     def _ledger_from_fixture(self) -> dict:
         data = self._fixture("balance.json")
+        summary = (data.get("output2") or [{}])[0]
         holdings = {}
         for h in data.get("output1", []):
             qty = int(h["hldg_qty"])
             if qty > 0:
-                holdings[h["pdno"]] = {"name": h["prdt_name"], "qty": qty}
-        cash = int((data.get("output2") or [{}])[0].get("dnca_tot_amt", 0))
-        return {"cash": cash, "holdings": holdings}
+                holdings[h["pdno"]] = {
+                    "name": h["prdt_name"],
+                    "qty": qty,
+                    "pchs_avg_pric": float(h.get("pchs_avg_pric") or 0),
+                }
+        return {
+            "dnca_tot_amt": int(summary.get("dnca_tot_amt") or 0),
+            "prvs_rcdl_excc_amt": int(summary.get("prvs_rcdl_excc_amt")
+                                      or summary.get("dnca_tot_amt") or 0),
+            "thdt_buy_amt": int(summary.get("thdt_buy_amt") or 0),
+            "thdt_sll_amt": int(summary.get("thdt_sll_amt") or 0),
+            "next_odno": 1,
+            "holdings": holdings,
+        }
+
+    def _normalize_ledger(self, raw: dict) -> dict:
+        """예전 {cash, holdings} 장부도 읽는다."""
+        if "prvs_rcdl_excc_amt" in raw or "dnca_tot_amt" in raw:
+            holdings = {}
+            for code, h in (raw.get("holdings") or {}).items():
+                holdings[code] = {
+                    "name": h.get("name") or code,
+                    "qty": int(h.get("qty") or 0),
+                    "pchs_avg_pric": float(h.get("pchs_avg_pric") or 0),
+                }
+            cash = int(raw.get("prvs_rcdl_excc_amt")
+                       or raw.get("dnca_tot_amt") or raw.get("cash") or 0)
+            return {
+                "dnca_tot_amt": int(raw.get("dnca_tot_amt") or cash),
+                "prvs_rcdl_excc_amt": cash,
+                "thdt_buy_amt": int(raw.get("thdt_buy_amt") or 0),
+                "thdt_sll_amt": int(raw.get("thdt_sll_amt") or 0),
+                "next_odno": int(raw.get("next_odno") or 1),
+                "holdings": holdings,
+            }
+        cash = int(raw.get("cash") or 0)
+        holdings = {}
+        for code, h in (raw.get("holdings") or {}).items():
+            holdings[code] = {
+                "name": h.get("name") or code,
+                "qty": int(h.get("qty") or 0),
+                "pchs_avg_pric": float(h.get("pchs_avg_pric") or 0),
+            }
+        return {
+            "dnca_tot_amt": cash, "prvs_rcdl_excc_amt": cash,
+            "thdt_buy_amt": 0, "thdt_sll_amt": 0, "next_odno": 1,
+            "holdings": holdings,
+        }
 
     def _load_ledger(self) -> dict:
         if LEDGER.is_file():
-            return json.loads(LEDGER.read_text(encoding="utf-8"))
+            return self._normalize_ledger(
+                json.loads(LEDGER.read_text(encoding="utf-8")))
         return self._ledger_from_fixture()
 
     def _save_ledger(self, ledger: dict) -> None:
         LEDGER.write_text(json.dumps(ledger, ensure_ascii=False, indent=2) + "\n",
                           encoding="utf-8")
 
-    def _balance_from_ledger(self) -> dict:
+    def _output1_row(self, code: str, name: str, qty: int,
+                     avg: float, price: int) -> dict:
+        pchs_amt = int(round(qty * avg))
+        evlu = qty * price
+        pfls = evlu - pchs_amt
+        rt = round(pfls / pchs_amt * 100, 2) if pchs_amt else 0.0
+        return {
+            "pdno": code, "prdt_name": name, "trad_dvsn_name": "현금",
+            "hldg_qty": str(qty), "ord_psbl_qty": str(qty),
+            "pchs_avg_pric": f"{avg:.4f}", "pchs_amt": str(pchs_amt),
+            "prpr": str(price), "evlu_amt": str(evlu),
+            "evlu_pfls_amt": str(pfls), "evlu_pfls_rt": f"{rt:.2f}",
+            "fltt_rt": "0.00", "bfdy_cprs_icdc": "0",
+        }
+
+    def _balance_envelope(self) -> dict:
+        """inquire-balance 와 같은 칸. mock 다음 조회가 live 와 같은 본문을 본다."""
         ledger = self._load_ledger()
-        holdings = []
+        rows = []
+        scts = 0
+        pchs_sum = 0
+        pfls_sum = 0
         for code, h in ledger.get("holdings", {}).items():
-            qty = int(h.get("qty", 0))
+            qty = int(h.get("qty") or 0)
             if qty <= 0:
                 continue
             price = self.get_price(code)["price"]
-            holdings.append({
-                "code": code, "name": h.get("name") or code,
-                "qty": qty, "eval_amt": qty * price,
-            })
-        return {"cash": int(ledger.get("cash", 0)), "holdings": holdings}
+            avg = float(h.get("pchs_avg_pric") or price)
+            row = self._output1_row(code, h.get("name") or code, qty, avg, price)
+            rows.append(row)
+            scts += int(row["evlu_amt"])
+            pchs_sum += int(row["pchs_amt"])
+            pfls_sum += int(row["evlu_pfls_amt"])
+        cash = int(ledger.get("prvs_rcdl_excc_amt") or 0)
+        dnca = int(ledger.get("dnca_tot_amt") or cash)
+        tot = cash + scts
+        return {
+            "rt_cd": "0", "msg_cd": "20310000",
+            "msg1": "모의투자 조회가 완료되었습니다.                                                 ",
+            "output1": rows,
+            "output2": [{
+                "dnca_tot_amt": str(dnca),
+                "nxdy_excc_amt": str(tot),
+                "prvs_rcdl_excc_amt": str(cash),
+                "cma_evlu_amt": "0",
+                "bfdy_buy_amt": "0",
+                "thdt_buy_amt": str(int(ledger.get("thdt_buy_amt") or 0)),
+                "nxdy_auto_rdpt_amt": "0",
+                "bfdy_sll_amt": "0",
+                "thdt_sll_amt": str(int(ledger.get("thdt_sll_amt") or 0)),
+                "d2_auto_rdpt_amt": "0",
+                "bfdy_tlex_amt": "0",
+                "thdt_tlex_amt": "0",
+                "tot_loan_amt": "0",
+                "scts_evlu_amt": str(scts),
+                "tot_evlu_amt": str(tot),
+                "nass_amt": str(tot),
+                "fncg_gld_auto_rdpt_yn": "",
+                "pchs_amt_smtl_amt": str(pchs_sum),
+                "evlu_amt_smtl_amt": str(scts),
+                "evlu_pfls_smtl_amt": str(pfls_sum),
+                "tot_stln_slng_chgs": "0",
+                "bfdy_tot_asst_evlu_amt": str(tot),
+                "asst_icdc_amt": "0",
+                "asst_icdc_erng_rt": "0.00000000",
+            }],
+        }
 
     def _fill_mock(self, code: str, side: str, qty: int, name: str) -> dict:
+        """KIS order-cash 본문을 만들고, 연습 계좌에 반영한다."""
         ledger = self._load_ledger()
         price = self.get_price(code)["price"]
         cost = qty * price
         holdings = ledger.setdefault("holdings", {})
-        cur = holdings.get(code, {"name": name or code, "qty": 0})
+        cur = holdings.get(code, {"name": name or code, "qty": 0, "pchs_avg_pric": 0.0})
         if name:
             cur["name"] = name
+        have = int(cur.get("qty") or 0)
+        avg = float(cur.get("pchs_avg_pric") or 0)
+        cash = int(ledger.get("prvs_rcdl_excc_amt") or 0)
         if side == "buy":
-            if int(ledger.get("cash", 0)) < cost:
-                return {"ok": False, "code": code, "side": side, "qty": qty,
-                        "simulated": True,
-                        "msg": f"예수금 부족 (필요 {cost:,}원)"}
-            cur["qty"] = int(cur.get("qty", 0)) + qty
-            ledger["cash"] = int(ledger.get("cash", 0)) - cost
+            if cash < cost:
+                return _kis_order_err("APBK0400", "주문가능금액을 초과했습니다.")
+            new_qty = have + qty
+            cur["pchs_avg_pric"] = ((avg * have) + (price * qty)) / new_qty
+            cur["qty"] = new_qty
+            ledger["prvs_rcdl_excc_amt"] = cash - cost
+            ledger["thdt_buy_amt"] = int(ledger.get("thdt_buy_amt") or 0) + cost
         else:
-            have = int(cur.get("qty", 0))
             if have < qty:
-                return {"ok": False, "code": code, "side": side, "qty": qty,
-                        "simulated": True,
-                        "msg": f"보유 수량 부족 ({have}주)"}
+                return _kis_order_err("APBK0401", "주문가능수량을 초과했습니다.")
             cur["qty"] = have - qty
-            ledger["cash"] = int(ledger.get("cash", 0)) + cost
+            ledger["prvs_rcdl_excc_amt"] = cash + cost
+            ledger["thdt_sll_amt"] = int(ledger.get("thdt_sll_amt") or 0) + cost
         holdings[code] = cur
+        odno = f"{int(ledger.get('next_odno') or 1):010d}"
+        ledger["next_odno"] = int(ledger.get("next_odno") or 1) + 1
         self._save_ledger(ledger)
-        return {"ok": True, "code": code, "side": side, "qty": qty,
-                "simulated": True, "msg": "연습 계좌 체결 (수업용 · 주말에도 동작)"}
+        return {
+            "rt_cd": "0", "msg_cd": "APBK0013",
+            "msg1": "주문 전송 완료 되었습니다.",
+            "output": {
+                "KRX_FWDG_ORD_ORGNO": "06010",
+                "ODNO": odno,
+                "ORD_TMD": time.strftime("%H%M%S"),
+            },
+        }
 
     def _open(self, req: urllib.request.Request, retry_on_rate_limit: bool = False) -> dict:
         """공통 호출 래퍼 — 실패를 학생이 이해할 수 있는 메시지로 바꿔준다.
@@ -399,6 +557,30 @@ def _self_check() -> None:
     assert cash_from_summary({"dnca_tot_amt": "500"}) == 500
     assert cash_from_summary({"prvs_rcdl_excc_amt": "", "dnca_tot_amt": "500"}) == 500
     assert cash_from_summary({}) == 0
+
+    reset_mock_ledger()
+    kis = KISClient(mode="mock")
+    before = kis.get_balance()
+    filled = kis.place_order("005930", "buy", 1, name="삼성전자")
+    assert filled["ok"] and filled["rt_cd"] == "0", filled
+    assert filled["msg_cd"] == "APBK0013"
+    assert filled["output"]["ODNO"] == "0000000001"
+    assert filled["output"]["KRX_FWDG_ORD_ORGNO"] == "06010"
+    after = kis.get_balance()
+    assert after["cash"] == before["cash"] - 307_500, (before["cash"], after["cash"])
+    samsung = next(h for h in after["holdings"] if h["code"] == "005930")
+    start = next(h for h in before["holdings"] if h["code"] == "005930")
+    assert samsung["qty"] == start["qty"] + 1
+    denied = kis.place_order("005930", "buy", 99_999, name="삼성전자")
+    assert not denied["ok"] and denied["rt_cd"] == "7"
+    assert kis.get_balance()["cash"] == after["cash"]
+    news = kis.get_news("005930")
+    assert news and news[0]["title"]
+    cap = kis.get_market_cap_top(3)
+    assert cap[0]["code"] == "005930" and cap[0]["rank"] == 1
+    req = kis.order_request("005930", "buy", 1)
+    assert req["tr_id"].endswith("0802U") and req["body"]["ORD_DVSN"] == "01"
+    reset_mock_ledger()
     print("kis 자가 검사 통과")
 
 

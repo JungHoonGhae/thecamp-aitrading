@@ -1,16 +1,19 @@
 {
-  "_설명": "수업용 연습 시가총액 순위. 실제 순위는 매일 바뀌며, 평일에 KIS_MODE=live 로 조회하면 진짜 값이 온다.",
+  "_설명": "수업용 연습 시가총액 순위. 칸 이름은 모의투자 market-cap 응답과 같다. 평일에 KIS_MODE=live 면 진짜 값이 온다.",
   "_기준일": "연습용 고정값",
-  "top": [
-    {"rank": 1, "code": "005930", "name": "삼성전자", "시총_억": 15697258, "등락률": -2.19},
-    {"rank": 2, "code": "000660", "name": "SK하이닉스", "시총_억": 12140783, "등락률": 1.03},
-    {"rank": 3, "code": "402340", "name": "SK스퀘어", "시총_억": 1497728, "등락률": -1.65},
-    {"rank": 4, "code": "009150", "name": "삼성전기", "시총_억": 1075589, "등락률": -7.57},
-    {"rank": 5, "code": "005380", "name": "현대차", "시총_억": 890696, "등락률": -3.97},
-    {"rank": 6, "code": "373220", "name": "LG에너지솔루션", "시총_억": 821340, "등락률": -5.01},
-    {"rank": 7, "code": "207940", "name": "삼성바이오로직스", "시총_억": 708714, "등락률": -1.10},
-    {"rank": 8, "code": "032830", "name": "삼성생명", "시총_억": 621000, "등락률": 3.16},
-    {"rank": 9, "code": "028260", "name": "삼성물산", "시총_억": 598398, "등락률": 0.00},
-    {"rank": 10, "code": "105560", "name": "KB금융", "시총_억": 597649, "등락률": 0.00}
+  "rt_cd": "0",
+  "msg_cd": "MCA00000",
+  "msg1": "정상처리 되었습니다.",
+  "output": [
+    {"data_rank": "1", "mksc_shrn_iscd": "005930", "hts_kor_isnm": "삼성전자", "stck_avls": "15697258", "prdy_ctrt": "-2.19"},
+    {"data_rank": "2", "mksc_shrn_iscd": "000660", "hts_kor_isnm": "SK하이닉스", "stck_avls": "12140783", "prdy_ctrt": "1.03"},
+    {"data_rank": "3", "mksc_shrn_iscd": "402340", "hts_kor_isnm": "SK스퀘어", "stck_avls": "1497728", "prdy_ctrt": "-1.65"},
+    {"data_rank": "4", "mksc_shrn_iscd": "009150", "hts_kor_isnm": "삼성전기", "stck_avls": "1075589", "prdy_ctrt": "-7.57"},
+    {"data_rank": "5", "mksc_shrn_iscd": "005380", "hts_kor_isnm": "현대차", "stck_avls": "890696", "prdy_ctrt": "-3.97"},
+    {"data_rank": "6", "mksc_shrn_iscd": "373220", "hts_kor_isnm": "LG에너지솔루션", "stck_avls": "821340", "prdy_ctrt": "-5.01"},
+    {"data_rank": "7", "mksc_shrn_iscd": "207940", "hts_kor_isnm": "삼성바이오로직스", "stck_avls": "708714", "prdy_ctrt": "-1.10"},
+    {"data_rank": "8", "mksc_shrn_iscd": "032830", "hts_kor_isnm": "삼성생명", "stck_avls": "621000", "prdy_ctrt": "3.16"},
+    {"data_rank": "9", "mksc_shrn_iscd": "028260", "hts_kor_isnm": "삼성물산", "stck_avls": "598398", "prdy_ctrt": "0.00"},
+    {"data_rank": "10", "mksc_shrn_iscd": "105560", "hts_kor_isnm": "KB금융", "stck_avls": "597649", "prdy_ctrt": "0.00"}
   ]
 }

@@ -1,22 +1,33 @@
 ---
 name: troubleshooting
 description: >
-  ai-trading-lab 실습 중 에러·설치 실패·실행 막힘을 진단하고 고치는 자가수리 가이드.
-  학생이 "에러 났어", "안 돼", "설치가 안 돼", "실행이 안 돼", "막혔어"라고 하거나
-  command not found, ModuleNotFoundError, KeyError, FastMCP, .env not found,
-  Authentification token fail, unexpected keyword argument, Invalid request parameters,
-  TimeoutError, 초당 거래건수를 초과 같은
-  에러 문구가 보이면 반드시 이 스킬을 사용한다. 증상의 에러 원문을 먼저 확인하고,
-  아래 표의 증상→원인→수정→확인 순서로 처리한다.
+  ai-trading-lab 실습 중 에러·설치 실패·실행 막힘.
+  학생이 "에러 났어", "안 돼", "설치가 안 돼", "실행이 안 돼", "막혔어",
+  "강사에게 보여줘", "손을 들어"라고 하거나
+  command not found, ModuleNotFoundError, Permission denied, KeyError, FastMCP,
+  .env not found, Authentification token fail, unexpected keyword argument,
+  Invalid request parameters, TimeoutError, 초당 거래건수를 초과, UnicodeDecodeError, cp949
+  같은 문구가 보이면 반드시 이 스킬을 사용한다.
+  "매수가 안 돼", "주문이 미리보기에서 멈춰", "실행이 false 로만 나와",
+  글자가 깨져 보인다(예: 紐⑥쓽二쇰Ц) 도 여기다.
 ---
 
 # 트러블슈팅 (ai-trading-lab)
 
 학생의 화면에 뜬 **에러 원문**을 먼저 받아서 아래 증상과 대조한다.
-고친 뒤에는 반드시 **확인 명령**까지 돌려 "고쳐졌다"를 판정하고 다음 단계로 보낸다.
-학생에게는 원인을 한 줄 쉬운 말로 설명해주면 학습 효과가 크다.
+표에 있으면 **수정 한 번** 하고 **확인 명령**까지 돌려 "고쳐졌다"를 판정한 뒤
+다음 단계로 보낸다. 원인은 한 줄 쉬운 말로 말한다.
+
+표에 없거나, 한 번 고쳤는데도 확인이 실패하거나, 관리자 암호·회사 보안·설치 권한처럼
+학생이 혼자 열기 어려운 문제면 **수정을 더 하지 않고** 맨 아래 강사 칸을 채운다.
 
 ## 환경 문제
+
+### 0. 지금 폴더가 실습 루트가 아님 (`verify.py` 없음 / lessons 만 보임)
+- **원인**: `lessons/` 나 `agent/` 안에서 명령을 돌렸거나, 복사본이 여러 개다.
+- **수정**: `AGENTS.md` · `verify.py` · `lessons/` · `agent/` 가 **한 폴더**에 있는 곳으로 이동.
+  GitHub 페이지를 사람에게 열라고 하지 말고, 네가 그 폴더를 연다. ZIP 본은 버리고 `git clone` 본만 쓴다.
+- **확인**: 그 폴더에서 `python verify.py` 에 「실습 환경이 준비되었습니다」.
 
 ### 1. `command not found: python` / `'python'은(는) 내부 또는 외부 명령...이 아닙니다`
 - **원인**: Python 미설치 또는 PATH 미등록.
@@ -99,7 +110,7 @@ description: >
   없어도 실습은 된다 — 보고는 화면에 나온다.
 - **확인**: `python agent/agent.py` stderr 에 `[텔레그램으로 보고 전송 완료]`, 텔레그램에 같은 점검 보고.
 
-### 4-4. MCP 도구가 안 보인다 / `kis-lab` 연결 실패 (수업 경로)
+### 4-4. MCP 도구가 안 보인다 / `kis-lecture-lab` 연결 실패 (수업 경로)
 
 - **증상**: 등록했는데 도구 목록에 `search_api` 가 없다. 또는 서버가 바로 죽는다.
 - **가장 흔한 원인**: 등록은 됐는데 **AI 도구를 안 껐다 켰다.** 실행 중인 대화 세션에는
@@ -110,17 +121,34 @@ description: >
   1. `python3 <저장소>/agent/mcp_server.py` 를 그냥 실행해 본다 — 아무 것도 안 뜨고
      입력을 기다리면 **정상**이다(Ctrl+C 로 나온다). 에러가 뜨면 그 에러가 원인.
   2. `python verify.py` 가 5/5 인지 본다. MCP 서버 점검이 거기 들어 있다.
-  3. 다시 등록: `claude mcp add kis-lab -- python3 <절대경로>/agent/mcp_server.py`
-     (`python3` 가 없으면 `python` 으로)
-- **확인**: `claude mcp list` 에 `kis-lab ... ✔ Connected`.
+  3. 다시 등록: `claude mcp add kis-lecture-lab -- python3 <절대경로>/agent/mcp_server.py`
+     (`python3` 가 없으면 `python` 으로). Codex 면 `codex mcp add kis-lecture-lab -- python3 <절대경로>/agent/mcp_server.py`
+- **확인**: `claude mcp list` 에 `kis-lecture-lab ... ✔ Connected`. Codex 면 `codex mcp list` 에 `kis-lecture-lab` 이 있다.
+
+### 4-5. Windows — 조회는 되는데 매수만 안 된다 / `UnicodeDecodeError: 'cp949'`
+
+- **증상**: 현재가·잔고는 잘 나오는데 주문만 **미리보기에서 멈춘다**(`"실행": false`).
+  confirm 을 아무리 정확히 넣어도 같다. 또는 한글을 넣는 순간 MCP 서버가 죽고
+  `UnicodeDecodeError: 'cp949' codec can't decode byte ...` 가 뜬다.
+  `side 는 buy(매수) 또는 sell(매도) 입니다. 받은 값: '紐⑥쓽二쇰Ц'` 처럼
+  **깨진 글자가 그대로 보이는** 것도 같은 원인이다.
+- **원인**: 한국어 Windows 의 파이썬은 파이프를 `cp949` 로 읽는다. MCP 는 UTF-8 로 보내므로
+  `"모의주문"`·`"매수"` 같은 한글 인자가 깨져서 도착한다. 숫자·영문(종목코드)뿐인 조회는
+  멀쩡하고 **한글이 필요한 주문만** 막히는 이유가 이것이다.
+- **수정**: 저장소를 최신으로 받는다 — `git pull`. 지금 `agent/mcp_server.py` 는 stdin/stdout 을
+  UTF-8 로 못 박고, 깨져 들어온 한글도 되살린다. 받은 뒤 **AI 도구를 껐다 켠다**.
+- **그래도면**: 등록 명령이 `python3` 로 돼 있는지 본다. Windows 에는 `python3` 가 없다 —
+  `claude mcp add kis-lecture-lab -- python <절대경로>\agent\mcp_server.py` 로 다시 등록한다.
+- **확인**: `search_api` 에 `삼성전자` 를 넣으면 `005930` 이 나온다. 이어서 주문을
+  confirm 까지 넣어 부르면 `"실행": true` 와 `주문 전송 완료 되었습니다.` 가 나온다.
 
 ---
 
 ## 아래는 수업 중엔 안 씁니다 — 수업 후 심화(Docker) 전용
 
-> **조교/AI 안내**: 수업의 MCP 경로는 위 `kis-lab`(설치 없음) **하나**다.
+> **조교/AI 안내**: 수업의 MCP 경로는 위 `kis-lecture-lab`(설치 없음) **하나**다.
 > 학생이 아래 증상을 들고 오면, 공식 Trading MCP를 스스로 붙이는 중인 것이다.
-> 수업 시간에는 이 트리로 들어가지 말고 `kis-lab` 으로 되돌린다.
+> 수업 시간에는 이 트리로 들어가지 말고 `kis-lecture-lab` 으로 되돌린다.
 
 ## KIS Trading MCP 자가수리 (검증된 3가지 — 라이브러리 드리프트 대응)
 
@@ -171,8 +199,61 @@ description: >
 > 학생에게 원인을 설명하며 고치게 하면 학습 효과가 크다
 > (당일 리스크가 크면 미리 고친 버전을 쓰게 한다).
 
-## 여기 없는 에러라면 (에스컬레이션)
+## 강사에게 이 칸을 보여주세요
 
-1. 에러 원문 전체를 받아 원인을 진단하되, **고치기 전에 무엇을 바꿀지 한 줄로 설명**한다.
-2. 15분 넘게 막히면 붙잡지 않는다 — mock 모드로 되돌려 실습 진도를 먼저 완주하게 하고,
-   막힌 지점은 에러 원문과 함께 강사에게 전달하도록 안내한다.
+아래 중 **하나**면 수정을 더 하지 않는다.
+
+- 표에 없는 에러
+- 표의 수정을 한 번 했는데 확인이 실패
+- 관리자 암호, 회사 보안·MDM, VPN/프록시, 설치 권한 거부
+- git·Python 설치를 OS가 막음
+- 고치려면 실습 폴더 밖 시스템 설정을 깊게 건드려야 함
+- 학생이 강사·손을 들라고 함
+- `python verify.py` 가 「실습 환경이 아직 준비되지 않았습니다」를 냄
+
+`python verify.py` 가 이미 강사 칸을 냈으면 **그 칸을 다시 쓰지 말고** 화면에 남긴다.
+
+그 외에는 학생에게 이 한 줄을 먼저 말한다.
+
+> 이 칸을 강사에게 보여주세요. 손을 들어도 됩니다.
+
+그다음 코드 블록:
+
+```
+강사에게 이 칸을 보여주세요
+
+지금:
+폴더:
+컴퓨터:
+증상:
+이미 한 일:
+추정:
+부탁:
+```
+
+채우는 법:
+
+- **지금** — 환경 세팅 / MCP / 숙제처럼 지금 단계와 돌리던 명령
+- **폴더** — `verify.py` 가 있는 실습 폴더 절대경로
+- **컴퓨터** — OS와 코딩 앱. `uname` 과 이 대화로 네가 채운다. 학생에게 다시 묻지 않는다
+- **증상** — 에러에서 핵심 3~8줄. 긴 traceback 대신 마지막 에러 줄과 그 위 몇 줄
+- **이미 한 일** — 네가 시도한 수정 한두 개
+- **추정** — 원인 한 줄
+- **부탁** — 강사가 지금 할 일 한 줄. live 가 막혔으면 mock 으로 오늘 진도
+
+`KIS_APP_KEY` · `KIS_APP_SECRET` · 계좌번호 · 토큰은 칸에 쓰지 않는다. 있으면 「키는 가림」.
+칸을 낸 뒤에는 다른 설치·수정을 이어서 하지 않는다.
+
+예:
+
+```
+강사에게 이 칸을 보여주세요
+
+지금: 환경 세팅 · python verify.py
+폴더: /Users/학생/thecamp-aitrading
+컴퓨터: macOS · Claude
+증상: Permission denied: /usr/local/bin/python3
+이미 한 일: Homebrew로 Python 설치 시도 → 권한 거부
+추정: 회사 노트북이라 관리자 없이 설치가 안 됨
+부탁: 관리자 암호로 Python 설치. 안 되면 오늘 mock으로 진도
+```

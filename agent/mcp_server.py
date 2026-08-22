@@ -12,8 +12,9 @@ Docker 도, 외부 라이브러리도 필요 없다. 표준 라이브러리로 s
 2부에서 그대로 돌아가는 이유다.
 
 등록:
-    claude mcp add kis-lab -- python3 <저장소경로>/agent/mcp_server.py
-    codex  mcp add kis-lab -- python3 <저장소경로>/agent/mcp_server.py
+    claude mcp add kis-lecture-lab -- python3 <저장소경로>/agent/mcp_server.py
+    codex  mcp add kis-lecture-lab -- python3 <저장소경로>/agent/mcp_server.py
+    (Windows 는 python3 대신 python)
 """
 from __future__ import annotations
 
@@ -26,6 +27,15 @@ from common.kis import KISClient  # noqa: E402
 from common.stocks import NAME_TO_CODE  # noqa: E402
 
 PROTOCOL_VERSION = "2025-06-18"
+
+# Windows(한국어 로캘)에서 파이프는 cp949 로 열린다. MCP 클라이언트는 UTF-8 로 보내므로
+# 그대로 두면 들어오는 한글이 깨진다 — confirm="모의주문" 이 안 맞아 매수가 미리보기에서
+# 멈추는 이유가 이것이다. 양쪽 끝을 UTF-8 로 못 박는다.
+for _stream in (sys.stdin, sys.stdout):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):  # 재설정 불가한 스트림이면 그냥 둔다
+        pass
 
 # 이게 catalog 다. 330개가 아니라 2개지만 구조는 같다 —
 # 모델은 목록을 먼저 보고, 필요한 하나의 스펙만 그때 꺼내 쓴다.
@@ -50,19 +60,61 @@ CATALOG = {
         "keywords": ["시가총액", "시총", "상위", "순위", "랭킹"],
         "params": {"n": "몇 위까지 볼지 (기본 10)"},
     },
+    "order_cash": {
+        "summary": "시장가 주문. 수업(토)은 연습 계좌, 평일은 같은 도구가 모의투자 서버로 붙는다. 실전 계좌는 거부. confirm 없이는 미리보기만.",
+        "keywords": ["주문", "매수", "매도", "order", "buy", "sell"],
+        "params": {
+            "code": "종목코드 6자리. 이름만 알면 search_api 로 먼저 찾으세요.",
+            "side": "buy 또는 sell (매수/매도도 됩니다)",
+            "qty": "수량 정수",
+            "confirm": "미리보기를 본 뒤에만 '모의주문' 이라고 넣습니다. 없으면 실행하지 않습니다.",
+        },
+    },
 }
 
 
+def _repair(text: str) -> str:
+    """cp949 로 잘못 읽힌 UTF-8 한글을 되살린다 ("紐⑥쓽二쇰Ц" → "모의주문").
+
+    stdio 를 UTF-8 로 고정했으니 보통은 할 일이 없다. 학생 PC 의 PYTHONIOENCODING
+    설정 등으로 여전히 깨져 들어오는 경우를 위한 두 번째 그물이다.
+    """
+    try:
+        return text.encode("cp949").decode("utf-8")
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return text
+
+
+# 학생과 AI 가 실제로 쓰는 말들. 한 가지 철자만 받으면 주문이 조용히 미리보기에 멈춘다.
+CONFIRM_WORDS = {"모의주문", "모의 주문", "모의투자", "주문", "확인", "네", "예", "실행",
+                 "yes", "y", "ok", "confirm", "true", "1"}
+SIDE_WORDS = {"매수": "buy", "사기": "buy", "buy": "buy", "b": "buy",
+              "매도": "sell", "팔기": "sell", "sell": "sell", "s": "sell"}
+
+
+def _norm(value) -> str:
+    """인자 하나를 다듬는다 — 공백 제거, 소문자, 그리고 깨진 한글이면 복구."""
+    text = str(value if value is not None else "").strip()
+    return text if text.isascii() else _repair(text)
+
+
 def _search(query: str) -> dict:
-    q = (query or "").strip().lower()
+    query = _norm(query)
+    q = query.lower()
     hits = [
         {"api": name, "summary": spec["summary"]}
         for name, spec in CATALOG.items()
-        if not q or q in name.lower() or any(q in k.lower() for k in spec["keywords"])
-        or q in spec["summary"].lower()
+        if not q or q in name.lower() or q in spec["summary"].lower()
+        or any(k.lower() in q or q in k.lower() for k in spec["keywords"])
     ]
     # 종목 이름이 그대로 들어오면 코드를 같이 돌려준다 (학생이 "삼성전자" 라고 물을 때)
     codes = {n: c for n, c in NAME_TO_CODE.items() if query and query.strip() in n}
+    # 종목만 말해도 시세·뉴스·주문을 이어서 고를 수 있게 한다.
+    if codes and not hits:
+        hits = [
+            {"api": name, "summary": CATALOG[name]["summary"]}
+            for name in ("inquire_price", "news_title", "order_cash")
+        ]
     return {"apis": hits, "종목코드": codes}
 
 
@@ -89,14 +141,58 @@ def _call(api: str, params: dict) -> dict:
         if not code:
             return {"error": "code(종목코드 6자리)가 필요합니다. describe_api 로 확인하세요."}
         return {"mode": kis.mode, "code": code, "뉴스": kis.get_news(code),
-                "주의": "제목만 가져옵니다. 이걸로 사고팔지는 정하지 않습니다 — 판단은 3~4회차."}
+                "주의": "제목만 가져옵니다. 본문·맥락은 브라우저로 확인하세요."}
     if api == "market_cap":
         try:
             n = int((params or {}).get("n", 10))
         except (TypeError, ValueError):
             n = 10
         return {"mode": kis.mode, "상위": kis.get_market_cap_top(max(1, min(n, 30)))}
+    if api == "order_cash":
+        return _order_cash(kis, params or {})
     return {"error": f"'{api}' 는 없는 api 입니다."}
+
+
+def _order_cash(kis, params: dict) -> dict:
+    if kis.env == "real":
+        return {"error": "실전 계좌에는 주문하지 않습니다. 수업 범위 밖입니다."}
+    code = _norm(params.get("code", ""))
+    raw_side = _norm(params.get("side", "buy")).lower()
+    side = SIDE_WORDS.get(raw_side, raw_side)
+    try:
+        qty = int(params.get("qty", 0))
+    except (TypeError, ValueError):
+        qty = 0
+    confirm = _norm(params.get("confirm", ""))
+    if side not in ("buy", "sell"):
+        return {"error": f"side 는 buy(매수) 또는 sell(매도) 입니다. 받은 값: {raw_side!r}"}
+    if not code or qty <= 0:
+        return {"error": "code 와 qty(1 이상)가 필요합니다."}
+    name = next((n for n, c in NAME_TO_CODE.items() if c == code), code)
+    price = kis.get_price(code)["price"]
+    req = kis.order_request(code, side, qty)
+    if confirm.lower() not in CONFIRM_WORDS:
+        return {
+            "mode": kis.mode,
+            "env": kis.env,
+            "실행": False,
+            "name": name,
+            "현재가": price,
+            "예상금액": price * qty,
+            "안내": "미리보기입니다. 실행하려면 confirm 을 '모의주문' 으로 넣어 다시 호출하세요.",
+            **req,
+        }
+    filled = kis.place_order(code, side, qty, name=name)
+    return {
+        "mode": kis.mode,
+        "env": kis.env,
+        "실행": bool(filled.get("ok")),
+        "tr_id": req["tr_id"],
+        "rt_cd": filled.get("rt_cd"),
+        "msg_cd": filled.get("msg_cd"),
+        "msg1": filled.get("msg"),
+        "output": filled.get("output") or {},
+    }
 
 
 TOOLS = [
@@ -120,7 +216,7 @@ TOOLS = [
     },
     {
         "name": "call_api",
-        "description": "실제로 부른다(호출). 수업 기본은 mock 연습 계좌라 휴장에도 값이 나온다.",
+        "description": "실제로 부른다(호출). 수업 기본은 mock 연습 계좌라 휴장에도 값이 나온다. 도구는 그대로, 바꾸는 것은 .env 의 KIS_MODE 뿐이다.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -149,7 +245,7 @@ def handle(req: dict) -> dict | None:
         result = {
             "protocolVersion": asked,
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "kis-lab", "version": "1.0.0"},
+            "serverInfo": {"name": "kis-lecture-lab", "version": "1.0.0"},
         }
     elif method == "tools/list":
         result = {"tools": TOOLS}

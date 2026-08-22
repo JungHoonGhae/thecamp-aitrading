@@ -1,0 +1,6 @@
+# 수업용. 이 폴더 안에서는 매번 허락을 묻지 않습니다.
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+network_access = true

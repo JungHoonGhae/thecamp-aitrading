@@ -34,8 +34,8 @@ description: >
 🧠 스킬  = AI가 일하는 순서와 규칙
 🔧 MCP   = 밖 데이터를 가져오는 손
 ────────────────
-수업 MCP  : kis-lecture-lab
-수업 스킬 : environment · investment-habit-rules
+수업 MCP  : kis-lecture-lab (토) · 평일 공식 손 kis-trade-mcp
+수업 스킬 : environment · investment-habit-rules · kis-trading-mcp
 찾는 이   : 학생은 일의 이름만. 장터는 AI가 연다
 ────────────────
 ```
@@ -55,7 +55,8 @@ description: >
 
 정답: `kis-lecture-lab`
 모르면 힌트 한 줄: 「토요일에 붙인 그 이름입니다.」
-공식 트레이딩 MCP 라고 하면 아니라고 한다. 수업 손은 kis-lecture-lab 이다.
+공식 트레이딩 MCP 라고 하면: 「그건 평일 숙제 손입니다. 토요일 수업 손은 kis-lecture-lab 입니다.」
+코딩도우미라고 하면: 「그건 문서 찾기입니다. 주문이 안 나갑니다.」
 
 **완료:** 학생이 이름을 말했다.
 
@@ -114,7 +115,8 @@ MCP 라고 하면: 「MCP는 밖 숫자를 가져옵니다. 순서는 스킬이 
 학생이 말한 일로 **네가** 리서치한다. 학생에게 링크를 열고 고르라고 하지 마라.
 
 스킬 후보는 skills.sh 와 k-skill(NomaDamas/k-skill) 에서 고른다. 하나.
-MCP 후보는 mcp.so · smithery · GitHub 에서 고른다. 하나. kis-lecture-lab 과 공식 KIS 트레이딩 MCP 는 후보가 아니다.
+MCP 후보는 mcp.so · smithery · GitHub 에서 고른다. 하나.
+kis-lecture-lab · 코딩도우미 · 트레이딩 MCP 는 후보가 아니다. 본편에서 이미 붙인다.
 실전 주문·자동매매는 뺀다. Docker 가 필요하면 Windows 에서는 다른 후보를 고른다.
 k-skill 전체를 깔지 않는다.
 

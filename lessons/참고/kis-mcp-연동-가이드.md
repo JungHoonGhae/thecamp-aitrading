@@ -1,9 +1,12 @@
 # KIS Trading MCP 연동 가이드 (검증본)
 
-> AI가 실제 KIS 모의투자를 조회·주문하게 하는 공식 MCP 연동법.
-> **이 문서의 수정 사항은 실제로 검증됨** — 삼성전자 모의 현재가 조회 성공 확인(2026-07).
-> 강의 당일엔 **강사가 미리 고쳐 빌드한 이미지**를 쓰므로, 학생은 아래를 몰라도 됩니다.
-> 이 문서는 "수업 후 스스로 실제 버전을 붙일" 사람과, "왜 이렇게 고치는지" 이해할 사람용입니다.
+> AI가 실제 KIS 모의투자를 조회·주문하게 하는 **공식 트레이딩 MCP** 연동법.
+> **2026-08-24 갱신.** 예전에 적어 둔 「수정 3가지」는 **이제 필요 없다.**
+> 공식이 2026-07-28 커밋 `b093e42` 에서 고쳤다. 없는 문제를 고치려 들지 마라.
+> 먼저 공식 저장소를 최신으로 받는 것이 순서다.
+> 평일 숙제 순서는 `.agents/skills/kis-trading-mcp/SKILL.md` 가 정한다. 이 문서는 설치·패치 세부다.
+> 코딩도우미 MCP(문서 334개)는 여기가 아니다. 그 손으로는 주문이 안 나간다.
+> 호출·주문은 Kis Trading MCP(166개, Docker)만. `env_dv=demo`. 실전(`real`)은 숙제 아님.
 
 ---
 
@@ -53,40 +56,56 @@ codex mcp add kis-trade -- npx -y mcp-remote http://localhost:3000/sse
 > 무효화돼 모든 도구 호출이 `Invalid request parameters`(-32602)로 즉시 실패합니다.
 > Claude Code는 `/mcp` 에서 해당 서버 reconnect, Codex 등 다른 도구는 세션 재시작.
 
-## 3. 실전(원본) 연동 — 직접 고쳐 붙이기
-공식 원본은 현재(2026-07 기준) 최신 라이브러리와 **3곳이 어긋나** 그대로는 안 뜹니다.
-아래가 **검증된 수정 3가지**입니다. (AI에게 이 파일을 주고 "이대로 고쳐줘" 해도 됩니다.)
+## 3. 원본으로 붙일 때 — 지금은 고칠 게 없다
 
-### 수정 ①  FastMCP 버전 비호환 → 인자 제거
-- **증상**: 컨테이너가 뜨자마자 죽음.
-  `TypeError: FastMCP() no longer accepts stateless_http`
-- **원인**: `pyproject.toml` 이 `fastmcp>=2.11.2`(상한 없음) → 최신이 깔리며 `stateless_http` 인자 제거됨
-- **수정**: `server.py` 의 `FastMCP(...)` 호출에서 `stateless_http=False,` 한 줄 삭제
-  (근본적으론 `fastmcp` 버전을 검증본으로 **핀 고정**하는 게 안전)
+예전에는 세 군데를 손봐야 했다. **지금은 아니다.** (2026-08-24 공식 소스 확인)
 
-### 수정 ②  실행 환경 파일 필요
-- **증상**: `Environment variable file .env.live not found`
-- **원인**: 서버가 `ENV` 값에 해당하는 `.env.<ENV>` 파일에서 전송설정을 읽음
-- **수정**: `.env.live`(또는 `.env.paper`)에 아래를 두고 `ENV`를 그 이름으로:
-  ```
-  MCP_TYPE=sse
-  MCP_HOST=0.0.0.0
-  MCP_PORT=3000
-  MCP_PATH=/sse
-  ```
+| 예전 수정 | 지금 |
+| -- | -- |
+| `server.py` 의 `stateless_http=False` 삭제 | 소스에 그 인자가 없다 |
+| `.env.live` 직접 만들기 | 저장소에 **이미 들어 있다** |
+| `KIS_PROD_TYPE=01` 누락 | 코드 기본값이 `"01"` 이다 (그래도 명시해 주면 확실하다) |
 
-### 수정 ③  `KeyError: 'my_acct'` — 계좌상품코드 누락 (핵심)
-- **증상**: 도구 호출은 되는데 인증에서 `KeyError: 'my_acct'`
-- **원인**: `KIS_PROD_TYPE` 환경변수를 안 주면 설정 파일의 `my_prod`(계좌상품코드)가
-  빈 값으로 생성되고, 인증 코드가 계좌를 고르지 못해 `my_acct` 키가 만들어지지 않음.
-  에러 문구만 보면 계좌번호 문제 같지만 실제론 상품코드 문제라 진단이 어렵다.
-- **수정(검증됨)**: `docker run` 에 `-e KIS_PROD_TYPE="01"` 추가 (종합계좌 01).
-  컨테이너가 설정 파일을 매번 재생성하므로, 파일을 직접 고치는 것보다 환경변수가 확실하다.
-- **결과(검증)**: `env_dv=demo` 로 `inquire_price` 호출 → `success: true`, 실제 모의 시세 수신
-  (예: 삼성전자 `stck_prpr` 등 정상 응답)
+그러니 순서는 이것뿐이다.
 
-> 참고: 호출은 성공하지만 임시경로 로그에 `<coroutine object Context.get_state>` 문자열이
-> 남는 비치명 버그가 있습니다(동작엔 영향 없음). 라이브러리 버전 드리프트의 흔적입니다.
+```
+git clone https://github.com/koreainvestment/open-trading-api.git
+cd "open-trading-api/MCP/Kis Trading MCP"
+docker build -t kis-trade-mcp .
+```
+
+## 3-0. ⚠️ stdio 로 붙이지 마라
+
+공식 문서에 「대안: stdio 로컬 연동(고급)」이 있다. **쓰지 마라.**
+2026-08-24 확인 결과 서버는 뜨고 도구 목록도 보이는데, **모든 API 호출이 죽는다.**
+
+```
+AttributeError: 'tuple' object has no attribute 'my_url'
+```
+
+인증 상태가 API 를 실행하는 자식 프로세스로 넘어가지 않는다. 붙은 것처럼 보여서 더 위험하다.
+**Docker + SSE 만 쓴다.**
+
+## 3-1. ⚠️ 가장 잘 막히는 곳 — 설정 파일에 한글이 남는다
+
+**증상**: 조회를 부르면 traceback 끝에 이렇게 나온다.
+
+```
+UnicodeEncodeError: 'latin-1' codec can't encode characters in position 0-3
+```
+
+**원인**: 이 MCP 는 `~/KIS/config/kis_devlp.yaml` 을 쓴다. 없으면 공식 템플릿을 받아
+환경변수로 채우는데, **템플릿에는 `"앱키"` · `"증권계좌"` 같은 한글 자리표시자가 들어 있다.**
+안 채운 칸의 한글이 그대로 HTTP 헤더에 실려 나가고, 헤더는 한글을 못 실어서 거기서 죽는다.
+
+**더 고약한 것**: 그 파일이 **이미 있으면 환경변수를 무시하고 그 파일을 쓴다.**
+한 번 반쯤 채운 채로 만들어 두면 그 뒤로 계속 막힌다. (2026-08-24 실측)
+
+**수정**: 안 쓰는 칸도 **한글을 지운다.** 실전을 안 쓰면 빈 문자열 `""` 로 둔다.
+[`kis_devlp.example.yaml`](kis_devlp.example.yaml) 을 복사해 채우는 게 가장 안전하다.
+AI에게 그 파일을 주고 「내 키로 채워 줘」 하면 된다.
+
+**확인**: 같은 조회가 숫자로 응답한다.
 
 ## 3.5 붙인 뒤에 밟기 쉬운 함정 2가지 (검증됨, 2026-07)
 
@@ -108,7 +127,7 @@ codex mcp add kis-trade -- npx -y mcp-remote http://localhost:3000/sse
 
 ## 4. 업데이트가 계속되게 (썩지 않게)
 하드 포크는 시간이 지나면 다시 깨집니다. 유지 전략:
-- **핀 고정 + 얇은 패치 오버레이**: 원본을 특정 커밋으로 고정하고, 위 3가지 수정만 얹어 재현 가능하게
+- **공식을 먼저 최신으로**: 우리가 겪은 문제는 대부분 공식이 이미 고쳤다. 패치를 쌓기 전에 `git pull`
 - **skill 자가수리**: 새로 깨지면 AI가 증상→원인→수정을 스스로 적용(`.agents/skills/assistant` 진단 가이드)
 - (선택) **정기 점검 자동화**: GitHub Actions로 주기적으로 빌드·조회 테스트 → 깨지면 알림
   (tossinvest-cli 유지보수 자동화와 같은 접근)

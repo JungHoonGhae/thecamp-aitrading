@@ -1,0 +1,50 @@
+# KIS 설정 example — 공식 트레이딩 MCP 용
+#
+# 쓰는 법
+#   1. 이 파일을 복사해 ~/KIS/config/kis_devlp.yaml 로 둔다
+#      (Windows 는 C:\Users\<이름>\KIS\config\kis_devlp.yaml)
+#   2. paper_ 로 시작하는 세 칸만 내 모의투자 값으로 채운다
+#   3. 나머지는 그대로 둔다 (빈 문자열 "")
+#
+# AI에게 이렇게 시키면 된다
+#   lessons/참고/kis_devlp.example.yaml 을 ~/KIS/config/kis_devlp.yaml 로 복사하고,
+#   .env 에 있는 내 모의투자 키로 paper 칸만 채워 줘. 숫자는 화면에 다시 보여주지 마.
+#
+# ⚠️ 왜 example 을 따로 두는가
+#   공식 템플릿에는 "앱키" · "증권계좌" 같은 **한글 자리표시자**가 들어 있다.
+#   안 채운 칸의 한글이 HTTP 헤더에 실려 나가면 이렇게 죽는다.
+#
+#       UnicodeEncodeError: 'latin-1' codec can't encode characters in position 0-3
+#
+#   원인이 전혀 안 드러나는 에러라 한참 헤맨다. 그래서 이 파일에는 한글이 한 자도 없다.
+#   그리고 이 파일이 **이미 있으면 환경변수를 무시하고 이걸 쓴다.** 한 번 잘못 만들면
+#   그 뒤로 계속 막힌다. 막히면 이 파일부터 다시 만든다.
+#
+# ⚠️ 이 파일을 채운 뒤에는 남에게 보여주지 않는다. 키는 비밀번호와 같다.
+
+# ---- 실전투자 : 이 수업에서는 쓰지 않는다. 반드시 빈 문자열로 둔다 ----
+my_app: ""
+my_sec: ""
+
+# ---- 모의투자 : 여기 세 칸만 채운다 ----
+paper_app: "PASTE_YOUR_PAPER_APP_KEY"
+paper_sec: "PASTE_YOUR_PAPER_APP_SECRET"
+my_paper_stock: "12345678"        # 모의계좌번호 앞 8자리 (숫자만)
+
+# ---- 나머지는 손대지 않는다 ----
+my_htsid: ""
+my_acct_stock: ""
+my_acct_future: ""
+my_paper_future: ""
+
+# 계좌상품코드. 01 = 종합(주식). 빠지면 KeyError: 'my_acct' 로 죽는다
+my_prod: "01"
+
+# 서버 주소 — 고정값이다
+prod: "https://openapi.koreainvestment.com:9443"
+vps: "https://openapivts.koreainvestment.com:29443"
+ops: "ws://ops.koreainvestment.com:21000"
+vops: "ws://ops.koreainvestment.com:31000"
+
+my_token: ""
+my_agent: "Mozilla/5.0"

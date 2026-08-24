@@ -37,7 +37,7 @@ for _stream in (sys.stdin, sys.stdout):
     except (AttributeError, ValueError):  # 재설정 불가한 스트림이면 그냥 둔다
         pass
 
-# 이게 catalog 다. 330개가 아니라 2개지만 구조는 같다 —
+# 이게 catalog 다. 공식 트레이딩 166개가 아니라 수업용 다섯이지만 구조는 같다 —
 # 모델은 목록을 먼저 보고, 필요한 하나의 스펙만 그때 꺼내 쓴다.
 CATALOG = {
     "inquire_price": {

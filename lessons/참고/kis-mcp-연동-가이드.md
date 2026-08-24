@@ -74,6 +74,46 @@ cd "open-trading-api/MCP/Kis Trading MCP"
 docker build -t kis-trade-mcp .
 ```
 
+빌드는 2~5분 걸리고 이미지는 **약 920MB** 다. 학생에게 기다리는 중이라고 말해 준다.
+
+### 실행 — 2026-08-24 실제로 돌려서 확인한 명령
+
+```
+docker run -d --name kis-trade-mcp -p 127.0.0.1:3000:3000 \
+  -e ENV=live -e KIS_PROD_TYPE=01 \
+  -e MCP_HOST=0.0.0.0 -e MCP_PORT=3000 \
+  -e MCP_ACCESS_TOKEN=<아무 긴 문자열> \
+  -e KIS_APP_KEY=<모의 앱키> -e KIS_APP_SECRET=<모의 시크릿> \
+  -e KIS_PAPER_APP_KEY=<모의 앱키> -e KIS_PAPER_APP_SECRET=<모의 시크릿> \
+  -e KIS_PAPER_STOCK=<모의계좌 8자리> -e KIS_ACCT_STOCK=<모의계좌 8자리> \
+  kis-trade-mcp
+```
+
+**빠뜨리면 죽거나 안 붙는 것 세 개.** 셋 다 실제로 겪었다.
+
+| 빠뜨리면 | 증상 |
+| -- | -- |
+| `MCP_ACCESS_TOKEN` | 컨테이너가 **바로 죽는다.** 로그에 `must be set when MCP_TYPE is 'sse'` |
+| `MCP_HOST=0.0.0.0` | 컨테이너는 사는데 **밖에서 못 닿는다.** 저장소 `.env.live` 기본값이 `127.0.0.1` 이라 컨테이너 안에만 열린다. 로그의 `Uvicorn running on http://127.0.0.1:3000` 이 그 신호다 |
+| `KIS_PAPER_STOCK` · `KIS_ACCT_STOCK` | 로그 요약에 **계좌번호 ❌**. 조회가 계좌를 못 찾는다 |
+
+로그로 확인한다. 세 줄이 다 ✅ 여야 한다.
+
+```
+docker logs kis-trade-mcp | grep -E "거래:|계좌번호"
+  - 실제 거래: ✅   - 모의 거래: ✅   - 계좌번호: ✅
+```
+
+등록은 토큰을 헤더로 같이 준다.
+
+```
+claude mcp add --transport sse kis-trade-mcp http://localhost:3000/sse \
+  --header "Authorization: Bearer <위 MCP_ACCESS_TOKEN>"
+```
+
+확인: `auth` 를 `api_type: "auth_token"`, `params: {"env_dv":"demo"}` 로 부른 뒤
+`domestic_stock` / `inquire_price` 로 삼성전자 조회. **2026-08-24 이 순서로 성공 확인.**
+
 ## 3-0. ⚠️ stdio 로 붙이지 마라
 
 공식 문서에 「대안: stdio 로컬 연동(고급)」이 있다. **쓰지 마라.**
@@ -97,6 +137,11 @@ UnicodeEncodeError: 'latin-1' codec can't encode characters in position 0-3
 **원인**: 이 MCP 는 `~/KIS/config/kis_devlp.yaml` 을 쓴다. 없으면 공식 템플릿을 받아
 환경변수로 채우는데, **템플릿에는 `"앱키"` · `"증권계좌"` 같은 한글 자리표시자가 들어 있다.**
 안 채운 칸의 한글이 그대로 HTTP 헤더에 실려 나가고, 헤더는 한글을 못 실어서 거기서 죽는다.
+
+**⚠️ 반대 방향의 사고도 있다.** 이 MCP 를 **Docker 없이** 돌리면 `~/KIS/config/kis_devlp.yaml`
+을 **템플릿으로 새로 만들어 덮어쓴다.** 채워 둔 키가 한글 자리표시자로 바뀐다.
+2026-08-24 에 실제로 당했다. Docker 로 돌리면 컨테이너 안에만 만들어지므로 내 파일은 안전하다.
+**이것도 Docker 로만 붙이라는 이유다.** 혹시 덮어썼으면 이 가이드의 example 로 다시 만든다.
 
 **더 고약한 것**: 그 파일이 **이미 있으면 환경변수를 무시하고 그 파일을 쓴다.**
 한 번 반쯤 채운 채로 만들어 두면 그 뒤로 계속 막힌다. (2026-08-24 실측)

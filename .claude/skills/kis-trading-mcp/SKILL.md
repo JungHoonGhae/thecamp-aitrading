@@ -142,11 +142,34 @@ UnicodeEncodeError: 'latin-1' codec can't encode characters
 git clone https://github.com/koreainvestment/open-trading-api.git
 cd "open-trading-api/MCP/Kis Trading MCP"
 docker build -t kis-trade-mcp .
-docker run -d --name kis-trade-mcp -p 127.0.0.1:3000:3000 \
-  -e ENV="live" -e KIS_PROD_TYPE="01" kis-trade-mcp
 ```
 
-빌드는 2~5분 걸린다. **학생에게 기다리는 중이라고 말해 준다.** 조용히 있으면 멈춘 줄 안다.
+빌드는 2~5분, 이미지 약 920MB 다. **기다리는 중이라고 말해 준다.** 조용하면 멈춘 줄 안다.
+
+실행은 아래 그대로 한다. **셋 중 하나만 빠져도 안 된다** — 2026-08-24 실측.
+
+```
+docker run -d --name kis-trade-mcp -p 127.0.0.1:3000:3000 \
+  -e ENV=live -e KIS_PROD_TYPE=01 \
+  -e MCP_HOST=0.0.0.0 -e MCP_PORT=3000 \
+  -e MCP_ACCESS_TOKEN=<네가 만든 긴 문자열> \
+  -e KIS_APP_KEY=<모의 앱키> -e KIS_APP_SECRET=<모의 시크릿> \
+  -e KIS_PAPER_APP_KEY=<모의 앱키> -e KIS_PAPER_APP_SECRET=<모의 시크릿> \
+  -e KIS_PAPER_STOCK=<계좌 8자리> -e KIS_ACCT_STOCK=<계좌 8자리> \
+  kis-trade-mcp
+```
+
+| 빠뜨리면 | 로그에 |
+| -- | -- |
+| `MCP_ACCESS_TOKEN` | `must be set when MCP_TYPE is 'sse'` — 컨테이너가 바로 죽는다 |
+| `MCP_HOST=0.0.0.0` | `Uvicorn running on http://127.0.0.1:3000` — 밖에서 못 닿는다 |
+| `KIS_PAPER_STOCK`·`KIS_ACCT_STOCK` | `- 계좌번호: ❌` |
+
+띄운 뒤 **로그로 확인한다.** 세 줄이 다 ✅ 여야 다음으로 간다.
+
+```
+docker logs kis-trade-mcp | grep -E "거래:|계좌번호"
+```
 
 > **고치려 들지 마라.** 예전에 필요했던 수정 3가지(FastMCP `stateless_http`, `.env.live`,
 > `KIS_PROD_TYPE`)는 **공식이 2026-07-28 에 이미 고쳤다.** 없는 문제를 고치면 오히려 깨진다.
@@ -158,8 +181,11 @@ docker run -d --name kis-trade-mcp -p 127.0.0.1:3000:3000 \
 등록 (네가 실행):
 
 ```
-claude mcp add --transport sse kis-trade-mcp http://localhost:3000/sse
+claude mcp add --transport sse kis-trade-mcp http://localhost:3000/sse \
+  --header "Authorization: Bearer <위에서 만든 MCP_ACCESS_TOKEN>"
 ```
+
+토큰 헤더를 빠뜨리면 붙기는 하는데 호출이 전부 막힌다.
 
 **앱을 한 번 끄고 켠다.** 안 그러면 새 손이 안 보인다. 이건 학생이 눌러야 한다.
 kis-lecture-lab 은 그대로 둔다. 지우거나 갈아끼우지 마라.

@@ -217,6 +217,25 @@ description: >
 > **없는 문제를 고치게 만들지 마라.** 증상이 실제로 나올 때만 이 칸을 쓴다.
 > 먼저 `git pull` 로 공식 저장소를 최신으로 맞추는 게 순서다.
 
+### 4-8-b. 컨테이너가 바로 죽거나, 떴는데 도구가 안 보인다
+
+2026-08-24 에 실제로 겪은 세 가지다. 로그부터 본다: `docker logs kis-trade-mcp`
+
+| 로그에 이렇게 | 원인 · 수정 |
+| -- | -- |
+| `MCP_ACCESS_TOKEN must be set` | `docker run` 에 `-e MCP_ACCESS_TOKEN=<아무 긴 문자열>` 추가. 등록할 때 같은 값을 `Authorization: Bearer` 헤더로 |
+| `Uvicorn running on http://127.0.0.1:3000` | 컨테이너 **안에만** 열렸다. `-e MCP_HOST=0.0.0.0` 추가. 저장소 `.env.live` 기본값이 127.0.0.1 이다 |
+| `- 계좌번호: ❌` | `-e KIS_PAPER_STOCK=<8자리>` 와 `-e KIS_ACCT_STOCK=<8자리>` 추가 |
+
+세 줄이 다 ✅ 여야 한다: `docker logs kis-trade-mcp | grep -E "거래:|계좌번호"`
+
+### 4-8-c. 채워 둔 KIS 설정이 한글 자리표시자로 바뀌어 있다
+
+- **원인**: 트레이딩 MCP 를 **Docker 없이** 돌리면 `~/KIS/config/kis_devlp.yaml` 을
+  공식 템플릿으로 **새로 만들어 덮어쓴다.** 2026-08-24 실측.
+- **수정**: `lessons/참고/kis_devlp.example.yaml` 로 다시 만들고 모의 키 세 칸만 채운다.
+  그리고 **Docker 로만 붙인다.** 컨테이너 안에만 만들어져서 내 파일이 안 다친다.
+
 ### 4-9. stdio 로 붙였더니 모든 조회가 `'tuple' object has no attribute 'my_url'`
 
 - **원인**: 트레이딩 MCP 를 **Docker 없이 stdio 로** 붙인 것이다. 공식 문서에 「고급」으로

@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import subprocess
 import sys
 from datetime import datetime
@@ -187,6 +188,21 @@ def homework_checks() -> list[tuple[bool, str, str, str]]:
                       "그대로 두면 latin-1 에러로 죽습니다."))
         else:
             r.append((True, "공식 도구 설정", "", ""))
+
+    # 4. 도커 — 공식 도구를 붙일 사람만 해당한다. 없다고 실패로 세지 않는다.
+    #    "깔았는데 안 켬" 이 가장 흔한 막힘이라, 그 상태를 구분해서 알려 준다.
+    docker = shutil.which("docker")
+    if docker:
+        try:
+            ok = subprocess.run([docker, "ps"], capture_output=True, timeout=15).returncode == 0
+        except Exception:  # noqa: BLE001
+            ok = False
+        if not ok:
+            r.append((False, "도커가 켜져 있음", "도커는 깔렸는데 실행이 안 되어 있습니다.",
+                      "도커 데스크톱 앱을 한 번 켜 주세요. 고래 아이콘이 뜨면 됩니다. "
+                      "공식 도구를 안 쓰실 거면 넘어가셔도 됩니다."))
+        else:
+            r.append((True, "도커가 켜져 있음", "", ""))
 
     # 장 시간은 항목으로 세지 않는다 — 통과·실패가 아니라 안내다. 아래에서 한 줄로 알려 준다.
     return r

@@ -4,11 +4,18 @@
 AI 코딩 도구(Claude Code, Codex, Cursor, Gemini 등)는 아래를 따르세요.
 
 ## 먼저 읽을 것
+- **환경 설치·유지 스킬**: [`.agents/skills/environment/SKILL.md`](.agents/skills/environment/SKILL.md) —
+  받기·맞춤·체크리스트. 학생이 「수업 자료 업데이트 해 줘」「실습 환경 설치해 줘」라고 하면 이 스킬이 한다.
+  `git pull` 을 학생에게 시키지 않는다. 맞춘 뒤에는 **🔄 / 📦 상태 카드**로만 답한다.
+  카드의 📌 버전은 루트 [`VERSION`](VERSION) 과 [`CHANGELOG.md`](CHANGELOG.md) 맨 위 칸이다.
 - **학습 진행 도우미(초록이) 스킬**: [`.agents/skills/assistant/SKILL.md`](.agents/skills/assistant/SKILL.md) — 학생을 단계별로 돕는 규칙.
   학생이 "도와줘 / 다음 단계"라고 하면 이 스킬대로 안내하세요.
+- **스킬과 MCP**: [`.agents/skills/skill-vs-mcp/SKILL.md`](.agents/skills/skill-vs-mcp/SKILL.md) —
+  「스킬과 MCP 가 뭐가 다른지 가르쳐 줘」. 찾기 숙제 전에 한 질문씩. 답은 📘 카드.
+  장터는 AI가 연다. 단계 끝은 **🧃 한입**, 덩어리 끝은 **🪞 회고** (`assistant/references/digest.md`).
 - **트러블슈팅 스킬**: [`.agents/skills/troubleshooting/SKILL.md`](.agents/skills/troubleshooting/SKILL.md) —
   에러·설치 실패·막힘은 이 스킬의 증상→원인→수정→확인 순서로 처리하세요.
-  (Claude Code 는 `.claude/skills/` 심링크로 자동 인식됩니다)
+  (Claude Code 는 `.claude/skills/` **실제 폴더**를 읽습니다. Windows 에서 심링크는 깨집니다.)
 - 전체 흐름: [`README.md`](README.md), 환경 세팅: [`lessons/0-시작/1-환경-세팅.md`](lessons/0-시작/1-환경-세팅.md)
 
 ## 핵심 규칙

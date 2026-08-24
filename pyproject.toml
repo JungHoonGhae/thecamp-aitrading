@@ -1,6 +1,6 @@
 [project]
 name = "ai-trading-lab"
-version = "0.1.0"
+version = "1.1.0"
 description = "패스트캠퍼스 AI 자동매매 실습 (표준 라이브러리만 사용)"
 requires-python = ">=3.9"
 dependencies = []

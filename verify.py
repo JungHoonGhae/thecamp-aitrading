@@ -109,7 +109,10 @@ def run(desc: str, args: list[str], expect: str, stdin: str | None = None) -> bo
 
 
 def main() -> None:
-    print("ai-trading-lab 자가 점검 (mock 모드)\n")
+    ver = (ROOT / "VERSION").read_text(encoding="utf-8").strip() if (ROOT / "VERSION").is_file() else "?"
+    print("📦 실습 환경 · 점검")
+    print(f"📌 버전 {ver}")
+    print("환경설치 체크리스트 (mock)\n")
 
     problems = preflight()
     if problems:
@@ -117,6 +120,7 @@ def main() -> None:
             print(f"  ✗ {cause}")
             print(f"      다음: {action}")
         print("\n결과: 시작 전 점검에서 멈췄습니다.")
+        print("❌ 실습 환경이 아직 준비되지 않았습니다")
         print("위 '다음' 한 줄만 해결하고 다시 실행하세요.")
         sys.exit(1)
 
@@ -144,8 +148,9 @@ def main() -> None:
     passed, total = sum(results), len(results)
     print(f"\n결과: {passed}/{total} 통과")
     if passed == total:
-        print("모두 정상입니다. README 순서대로 실습을 시작하세요.")
+        print("✅ 실습 환경이 준비되었습니다")
     else:
+        print("❌ 실습 환경이 아직 준비되지 않았습니다")
         print("위에서 ✗ 가 뜬 첫 줄의 '다음' 하나만 해결하고 다시 실행하세요.")
         sys.exit(1)
 

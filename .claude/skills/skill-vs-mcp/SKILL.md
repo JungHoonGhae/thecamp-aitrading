@@ -35,7 +35,7 @@ description: >
 🧠 스킬  = AI가 일하는 순서와 규칙
 🔧 MCP   = 밖 데이터를 가져오는 손
 ────────────────
-수업 MCP  : kis-lecture-lab (토) · 평일 공식 손 kis-trade-mcp
+수업 MCP  : kis-lecture-lab (토) · 평일 공식 도구 kis-trade-mcp
 수업 스킬 : environment · investment-habit-rules · kis-trading-mcp
 찾는 이   : 학생은 일의 이름만. 장터는 AI가 연다
 ────────────────

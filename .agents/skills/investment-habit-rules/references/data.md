@@ -4,9 +4,9 @@
 
 | 언제 | 손 | 무엇을 |
 |---|---|---|
-| 평일 숙제 · 공식 손이 붙어 있음 | **kis-trade-mcp** (트레이딩 MCP) | 166개 중 고른 조회 · 모의주문. `env_dv=demo` |
+| 평일 숙제 · 공식 도구가 붙어 있음 | **kis-trade-mcp** (트레이딩 MCP) | 166개 중 고른 조회 · 모의주문. `env_dv=demo` |
 | 둘러보기만 | **kis-code-assistant-mcp** (코딩도우미) | 문서 334 검색 · 샘플. **주문 없음** |
-| 토요일 · 공식 손을 못 붙임 | **kis-lecture-lab** | 예수금 · 시총 · 현재가 · 뉴스 제목 · `order_cash` |
+| 토요일 · 공식 도구를 못 붙임 | **kis-lecture-lab** | 예수금 · 시총 · 현재가 · 뉴스 제목 · `order_cash` |
 | 확인용 브라우저 | 코딩 앱 브라우저 | 시총 1위만 네이버 뉴스 **제목** `https://finance.naver.com/item/main.naver?code=종목코드` |
 
 코딩도우미로 매수·매도를 넣지 마라. 주문이 안 나간다.

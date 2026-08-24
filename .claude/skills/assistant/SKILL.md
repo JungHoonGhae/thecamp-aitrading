@@ -7,7 +7,7 @@ description: >
   "실제(모의투자)로 돌려보고 싶어", "자동으로 돌리고 싶어",
   "리캡", "한입", "회고해 줘", "방금 뭐 배웠어" 라고 하면 반드시 이 스킬.
   경계 — 폴더를 받거나 자료를 맞추는 일은 environment 스킬이 한다.
-  이미 에러가 났으면 troubleshooting. 공식 손·도커는 kis-trading-mcp.
+  이미 에러가 났으면 troubleshooting. 공식 도구·도커는 kis-trading-mcp.
   숙제 인터뷰는 investment-habit-rules. 스킬과 MCP 개념은 skill-vs-mcp.
 ---
 

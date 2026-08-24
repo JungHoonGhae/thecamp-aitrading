@@ -1,13 +1,12 @@
 ---
 name: investment-habit-rules
 description: >
-  1주차 숙제·투자 습관을 규칙으로 남기고 모의주문까지.
+  1주차 숙제의 본체. 투자 습관을 하나씩 물어 규칙으로 남기고 모의주문까지 간다.
   "숙제", "1주차 숙제", "투자 습관", "내 판단", "내-투자-판단",
   "하지 말 것", "가드레일", "회고", "첫 모의투자", "MY_STRATEGY",
   "3·4주차 배턴", investment-habit-rules, habit 이면 반드시 이 스킬.
-  "수업 자료 업데이트 해 줘" "실습 환경 설치해 줘"는 environment 스킬.
-  "스킬과 MCP 가 뭐가 다른지 가르쳐 줘"는 skill-vs-mcp 스킬.
-  "트레이딩 MCP" "공식 손" "도커" "조회와 액션"은 kis-trading-mcp 스킬.
+  경계 — 공식 손을 붙이고 카탈로그를 둘러보는 앞 단계는 kis-trading-mcp 가 한다.
+  자료 맞춤·설치는 environment. 에러는 troubleshooting. 개념 학습은 skill-vs-mcp.
 ---
 
 # 투자 습관을 규칙으로

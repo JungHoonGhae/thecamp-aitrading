@@ -1,14 +1,16 @@
 ---
 name: troubleshooting
 description: >
-  실습이 이미 깨졌을 때. "에러 났어", "안 돼", "설치가 안 돼", "실행이 안 돼",
-  "막혔어", "고쳐줘", "강사에게 보여줘", "손을 들어" 또는
+  실습이 **이미 깨졌을 때**만. "에러 났어", "안 돼", "설치가 안 돼",
+  "실행이 안 돼", "막혔어", "고쳐줘", "강사에게 보여줘", "손을 들어" 또는
   command not found, ModuleNotFoundError, Permission denied, KeyError, FastMCP,
   .env not found, Authentification token fail, unexpected keyword argument,
-  Invalid request parameters, TimeoutError, 초당 거래건수를 초과, UnicodeDecodeError, cp949,
+  Invalid request parameters, TimeoutError, UnicodeDecodeError, UnicodeEncodeError,
+  latin-1, cp949, EGW00133, EGW00201, my_url, my_acct, 초당 거래건수를 초과,
   "매수가 안 돼", "주문이 미리보기에서 멈춰", "실행이 false", 글자 깨짐(紐⑥쓽二쇰Ц),
-  "코딩도우미", "kis-code-assistant", "kis-trade-mcp", "docker", "WSL", "my_acct".
-  "실습 환경 설치해 줘" "수업 자료 업데이트 해 줘" "맞춰 줘"처럼 아직 안 깨진 받기·맞춤은 여기가 아니다 — environment 스킬.
+  "코딩도우미로 샀는데 잔고가 그대로", kis-code-assistant, docker daemon, WSL
+  이면 반드시 이 스킬.
+  경계 — 아직 안 깨진 받기·맞춤·점검은 environment 다. 여기는 증상이 이미 나온 뒤다.
 ---
 
 # 트러블슈팅 (ai-trading-lab)

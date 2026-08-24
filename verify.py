@@ -11,6 +11,7 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -108,7 +109,119 @@ def run(desc: str, args: list[str], expect: str, stdin: str | None = None) -> bo
     return False
 
 
+
+# ---------------------------------------------------------------------------
+# 숙제 점검 (`python verify.py --숙제`)
+#
+# 기본 점검은 mock 다섯 개만 본다. 그건 토요일 수업 기준이다.
+# 평일 숙제는 진짜 서버에 붙기 때문에 볼 것이 다르고, **깨지기 전에** 잡아야 한다.
+# 여기 있는 항목은 전부 2026-08-24 에 강사가 직접 당한 것들이다.
+# ---------------------------------------------------------------------------
+
+def _env_values() -> dict:
+    """저장소 .env 를 읽어 dict 로. 값은 절대 화면에 찍지 않는다."""
+    f = ROOT / ".env"
+    if not f.is_file():
+        return {}
+    out = {}
+    for line in f.read_text(encoding="utf-8", errors="ignore").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, v = line.split("=", 1)
+        out[k.strip()] = v.strip().strip('"').strip("'")
+    return out
+
+
+def _looks_unfilled(v: str) -> bool:
+    """자리표시자가 그대로인가. 한글이 들어 있으면 십중팔구 안 채운 것이다."""
+    if not v:
+        return True
+    return any("가" <= ch <= "힣" for ch in v)
+
+
+def homework_checks() -> list[tuple[bool, str, str, str]]:
+    """(통과, 항목, 원인, 다음) 목록. 통과면 원인·다음은 빈 문자열."""
+    r = []
+    env = _env_values()
+
+    # 1. .env 키 세 개
+    need = ["KIS_APP_KEY", "KIS_APP_SECRET", "KIS_ACCOUNT"]
+    missing = [k for k in need if _looks_unfilled(env.get(k, ""))]
+    if not (ROOT / ".env").is_file():
+        r.append((False, ".env 파일", ".env 가 아직 없습니다.",
+                  "AI에게 '.env.example 을 복사해 .env 로 만들고 내 KIS 키를 넣어 줘' 라고 하세요."))
+    elif missing:
+        r.append((False, "KIS 키 세 개", f"{', '.join(missing)} 가 비었거나 안내 문구 그대로입니다.",
+                  "AI에게 '.env 에 내 모의투자 앱키·시크릿·계좌 8자리를 넣어 줘' 라고 하세요."))
+    else:
+        r.append((True, "KIS 키 세 개", "", ""))
+
+    # 2. 지금 어느 계좌를 보는가
+    mode = (env.get("KIS_MODE") or "mock").lower()
+    if mode == "mock":
+        r.append((True, "KIS_MODE", "", ""))
+    elif mode == "live" and env.get("KIS_ENV", "paper").lower() == "real":
+        r.append((False, "KIS_MODE", "실전(real) 로 켜져 있습니다. 숙제 범위가 아닙니다.",
+                  "AI에게 '.env 의 KIS_ENV 를 지워 줘' 라고 하세요. 모의투자로 돌아옵니다."))
+    else:
+        r.append((True, "KIS_MODE", "", ""))
+
+    # 3. 공식 손 설정 파일에 한글이 남았나 — 오늘 가장 오래 헤맨 곳
+    cfg = Path.home() / "KIS" / "config" / "kis_devlp.yaml"
+    if not cfg.is_file():
+        r.append((True, "공식 손 설정", "", ""))   # 안 쓰면 없는 게 정상이다
+    else:
+        body = [l for l in cfg.read_text(encoding="utf-8", errors="ignore").splitlines()
+                if not l.strip().startswith("#")]
+        if any("가" <= ch <= "힣" for ch in "\n".join(body)):
+            r.append((False, "공식 손 설정", "~/KIS/config/kis_devlp.yaml 에 한글이 남아 있습니다.",
+                      "AI에게 'lessons/참고/kis_devlp.example.yaml 로 다시 만들어 줘' 라고 하세요. "
+                      "그대로 두면 latin-1 에러로 죽습니다."))
+        else:
+            r.append((True, "공식 손 설정", "", ""))
+
+    # 장 시간은 항목으로 세지 않는다 — 통과·실패가 아니라 안내다. 아래에서 한 줄로 알려 준다.
+    return r
+
+
+def homework() -> None:
+    ver = (ROOT / "VERSION").read_text(encoding="utf-8").strip() if (ROOT / "VERSION").is_file() else "?"
+    print("🧪 숙제 준비 · 점검")
+    print(f"📌 버전 {ver}\n")
+
+    rows = homework_checks()
+    for ok, name, cause, action in rows:
+        if ok:
+            print(f"  ✓ {name}")
+        else:
+            print(f"  ✗ {name}")
+            print(f"      원인: {cause}")
+            print(f"      다음: {action}")
+
+    now = datetime.now()
+    if now.weekday() >= 5:
+        print("\n  · 참고: 주말입니다. 증권사 서버가 쉬어서 live 는 안 됩니다. 평일 9시~15시 반에 하세요.")
+    elif not (9 <= now.hour < 16):
+        print("\n  · 참고: 지금은 장 시간이 아닙니다. 평일 9시~15시 반에 하세요.")
+
+    print("\n  · 참고: 수업 랩과 공식 손을 **동시에** 부르지 마세요.")
+    print("    토큰이 앱키당 1분에 1회라 서로 막습니다. 손을 바꾸면 1분 기다리세요.")
+
+    bad = [x for x in rows if not x[0]]
+    print(f"\n결과: {len(rows) - len(bad)}/{len(rows)} 통과")
+    if bad:
+        print("❌ 위 '다음' 한 줄만 해결하고 다시 실행하세요.")
+        sys.exit(1)
+    print("✅ 숙제를 시작할 수 있습니다")
+
+
+
 def main() -> None:
+    # 숙제 점검은 보는 것이 다르다 — 다른 함수로 간다.
+    if any(a in ("--숙제", "--homework") for a in sys.argv[1:]):
+        homework()
+        return
     ver = (ROOT / "VERSION").read_text(encoding="utf-8").strip() if (ROOT / "VERSION").is_file() else "?"
     print("📦 실습 환경 · 점검")
     print(f"📌 버전 {ver}")

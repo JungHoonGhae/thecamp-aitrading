@@ -1,14 +1,15 @@
 ---
 name: kis-trading-mcp
 description: >
-  평일 숙제. 한투 공식 손 둘을 구분하고, Docker 로 트레이딩 MCP 를 붙인 뒤
-  조회·액션을 둘러보고 고른다. Docker 설치·실행·연결은 **AI가 대신** 한다.
-  막히면 10분에서 멈추고 kis-lecture-lab 으로 간다 — 숙제는 그래도 된다.
-  "트레이딩 MCP", "공식 MCP", "코딩도우미 MCP", "도커 설치",
+  1주차 숙제의 앞 단계. 한투 공식 손 둘(코딩도우미 334 · 트레이딩 166)을 구분하고,
+  Docker 로 트레이딩 MCP 를 붙인 뒤 조회·액션을 둘러보고 쓸 것을 고른다.
+  Docker 설치·실행·연결은 **AI가 대신** 한다 — 학생은 설치 창을 누르고 앱을 한 번 켠다.
+  막히면 10분에서 멈추고 kis-lecture-lab 으로 간다. 숙제는 그래도 된다.
+  "트레이딩 MCP", "공식 MCP", "코딩도우미 MCP", "도커", "도커 설치",
   "조회와 액션", "카탈로그", "334", "166", "kis-trade-mcp",
   "공식 손 붙여", "엔드포인트 둘러봐" 라고 하면 반드시 이 스킬.
-  토요일 수업 연결은 kis-lecture-lab. 환경 맞춤은 environment.
-  습관 인터뷰는 investment-habit-rules. 에러는 troubleshooting.
+  경계 — 습관 인터뷰와 모의주문은 investment-habit-rules 가 이어받는다.
+  토요일 수업 연결은 kis-lecture-lab. 자료 맞춤은 environment. 에러는 troubleshooting.
 ---
 
 # 공식 손 — 코딩도우미(보기) · 트레이딩(호출)

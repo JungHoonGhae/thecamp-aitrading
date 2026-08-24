@@ -1,14 +1,19 @@
 # 이번 주 데이터
 
-조회는 이 둘만. Python 으로 KIS 를 직접 부르지 마라. MCP 도구 3개(검색 → 상세보기 → 호출).
+조회는 MCP 로. Python 으로 KIS 를 직접 부르지 마라.
 
-| 어디서 | 무엇을 |
-|---|---|
-| KIS MCP (`kis-lecture-lab`) | 예수금 · 시총 상위 · 현재가 · 뉴스 제목 · 모의주문 |
-| 코딩 앱 브라우저 | 시총 1위만 `https://finance.naver.com/item/main.naver?code=종목코드` 의 뉴스 **제목** |
+| 언제 | 손 | 무엇을 |
+|---|---|---|
+| 평일 숙제 · 공식 손이 붙어 있음 | **kis-trade-mcp** (트레이딩 MCP) | 166개 중 고른 조회 · 모의주문. `env_dv=demo` |
+| 둘러보기만 | **kis-code-assistant-mcp** (코딩도우미) | 문서 334 검색 · 샘플. **주문 없음** |
+| 토요일 · 공식 손을 못 붙임 | **kis-lecture-lab** | 예수금 · 시총 · 현재가 · 뉴스 제목 · `order_cash` |
+| 확인용 브라우저 | 코딩 앱 브라우저 | 시총 1위만 네이버 뉴스 **제목** `https://finance.naver.com/item/main.naver?code=종목코드` |
+
+코딩도우미로 매수·매도를 넣지 마라. 주문이 안 나간다.
+평일에 kis-trade-mcp 가 없으면 `../kis-trading-mcp/SKILL.md` 를 먼저 한다.
 
 네이버가 막히면 MCP 제목만으로 표를 끝내고 「브라우저 막힘」을 한 줄 적는다.
-MCP 가 안 보이면 등록한다.
+수업 랩이 안 보이면 등록한다.
 
 ```
 이 저장소의 agent/mcp_server.py 를 MCP 서버로 등록해줘. Windows 면 python 으로 (python3 없음).
@@ -19,4 +24,4 @@ MCP 가 안 보이면 등록한다.
 없는 숫자는 없다고 한다. 문서의 「이번 주에 못 하는 것」에 적는다.
 
 수업 한도(그 사람의 전략이 아님): 한 회차 예산은 예수금의 20%. 주문은 모의만.
-이번 주 소스는 **kis-lecture-lab** 이다.
+평일 공식 소스는 **kis-trade-mcp** 이다. 코딩도우미는 찾기다.

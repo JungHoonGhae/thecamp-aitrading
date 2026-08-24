@@ -155,8 +155,10 @@ ROOT 에서 `git fetch` 하고 `git status -sb` 를 본다.
 5. **유지** — 「매번 먼저」대로 맞춘 뒤 4번을 다시 한다.
 6. **학습** — 환경이 된 뒤에만 `lessons/` 순서로. 붙여넣을 문장은 그 문서의 `📋` 블록을 연 다음 그대로.
 
-Docker는 1주차에 넣지 않는다. 공식 트레이딩 MCP를 붙일 때만
-`lessons/참고/kis-mcp-연동-가이드.md` 대로 Docker를 설치한다.
+토요일 수업 MCP(`kis-lecture-lab`)에는 Docker가 없다.
+평일 숙제의 공식 트레이딩 MCP(`kis-trade-mcp`)를 붙일 때는
+`kis-trading-mcp` 스킬과 `lessons/참고/kis-mcp-연동-가이드.md` 대로 Docker를 설치한다.
+코딩도우미 MCP는 문서 334개 검색만 하고 주문을 넣지 않는다.
 
 ## 경로가 섞일 때
 

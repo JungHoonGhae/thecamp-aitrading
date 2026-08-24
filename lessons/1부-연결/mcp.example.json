@@ -11,5 +11,5 @@
   },
   "_참고1": "stdio 방식이라 MCP 를 지원하는 도구면 대부분 그대로 됩니다. 포트도 브리지(mcp-remote)도 필요 없습니다.",
   "_참고2": "python3 가 없으면 python 으로. 경로는 반드시 절대경로.",
-  "_참고3": "KIS 공식 Trading MCP(330개 API, Docker)는 선택 심화입니다 — lessons/참고/kis-mcp-연동-가이드.md"
+  "_참고3": "토요일은 kis-lecture-lab(5개). 평일 숙제는 코딩도우미(334, 보기) + 트레이딩 MCP(166, Docker, 호출·주문). 코딩도우미로 주문하면 안 나감 — lessons/참고/kis-mcp-연동-가이드.md"
 }

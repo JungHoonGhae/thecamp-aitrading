@@ -6,7 +6,8 @@ description: >
   command not found, ModuleNotFoundError, Permission denied, KeyError, FastMCP,
   .env not found, Authentification token fail, unexpected keyword argument,
   Invalid request parameters, TimeoutError, 초당 거래건수를 초과, UnicodeDecodeError, cp949,
-  "매수가 안 돼", "주문이 미리보기에서 멈춰", "실행이 false", 글자 깨짐(紐⑥쓽二쇰Ц).
+  "매수가 안 돼", "주문이 미리보기에서 멈춰", "실행이 false", 글자 깨짐(紐⑥쓽二쇰Ц),
+  "코딩도우미", "kis-code-assistant", "kis-trade-mcp", "docker", "WSL", "my_acct".
   "실습 환경 설치해 줘" "수업 자료 업데이트 해 줘" "맞춰 줘"처럼 아직 안 깨진 받기·맞춤은 여기가 아니다 — environment 스킬.
 ---
 
@@ -135,7 +136,14 @@ description: >
      (`python3` 가 없으면 `python` 으로). Codex 면 `codex mcp add kis-lecture-lab -- python3 <절대경로>/agent/mcp_server.py`
 - **확인**: `claude mcp list` 에 `kis-lecture-lab ... ✔ Connected`. Codex 면 `codex mcp list` 에 `kis-lecture-lab` 이 있다.
 
-### 4-5. Windows — 조회는 되는데 매수만 안 된다 / `UnicodeDecodeError: 'cp949'`
+### 4-5. 코딩도우미로 샀는데 잔고가 그대로다
+
+- **원인**: 코딩도우미 MCP(334)는 문서·샘플만 준다. **주문을 넣지 않는다.**
+- **수정**: `kis-trade-mcp`(트레이딩 MCP) 로 `env_dv=demo` 주문을 다시 한다.
+  붙어 있지 않으면 `.agents/skills/kis-trading-mcp/SKILL.md`.
+- **확인**: 트레이딩 MCP 응답에 주문 접수/체결 칸이 있고, 잔고 조회가 따라간다.
+
+### 4-6. Windows — 조회는 되는데 매수만 안 된다 / `UnicodeDecodeError: 'cp949'` (수업 랩)
 
 - **증상**: 현재가·잔고는 잘 나오는데 주문만 **미리보기에서 멈춘다**(`"실행": false`).
   confirm 을 아무리 정확히 넣어도 같다. 또는 한글을 넣는 순간 MCP 서버가 죽고
@@ -154,11 +162,14 @@ description: >
 
 ---
 
-## 아래는 수업 중엔 안 씁니다 — 수업 후 심화(Docker) 전용
+## 평일 숙제 — 공식 트레이딩 MCP · Docker
 
-> **조교/AI 안내**: 수업의 MCP 경로는 위 `kis-lecture-lab`(설치 없음) **하나**다.
-> 학생이 아래 증상을 들고 오면, 공식 Trading MCP를 스스로 붙이는 중인 것이다.
-> 수업 시간에는 이 트리로 들어가지 말고 `kis-lecture-lab` 으로 되돌린다.
+> **조교/AI 안내**: 토요일 수업 경로는 `kis-lecture-lab` **하나**다.
+> 평일 숙제는 코딩도우미(334, 보기)와 트레이딩 MCP(166, 호출·주문)다.
+> 코딩도우미로 주문했다고 하면 주문이 안 나간 것이다 — `kis-trade-mcp` 로 다시.
+> Docker/WSL 이 15분 넘게 막히면 강사 칸. 수업 시간(토)에는 이 트리로 들어가지 말고
+> `kis-lecture-lab` 으로 되돌린다.
+> 상세: `.agents/skills/kis-trading-mcp/SKILL.md` · `lessons/참고/kis-mcp-연동-가이드.md`
 
 ## KIS Trading MCP 자가수리 (검증된 3가지 — 라이브러리 드리프트 대응)
 

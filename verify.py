@@ -85,7 +85,12 @@ def advise(stdout: str, stderr: str) -> tuple[str, str] | None:
 def run(desc: str, args: list[str], expect: str, stdin: str | None = None) -> bool:
     try:
         # encoding 을 안 주면 윈도우에서 자식 출력을 cp949 로 디코드하려다 깨진다.
-        out = subprocess.run([sys.executable, *args], cwd=ROOT, input=stdin,
+        # 이 점검은 **수업 경로(mock)가 도는가** 를 본다. 학생 `.env` 가 숙제 뒤
+        # live 로 남아 있으면 키를 못 찾아 실패하는데, 그건 수업 준비와 상관없는
+        # 실패다. 2주차 아침에 원인 모를 화면을 보게 된다. 그래서 여기서만 mock 을 강제한다.
+        env = {**os.environ, "KIS_MODE": "mock"}
+        env.pop("KIS_ENV", None)
+        out = subprocess.run([sys.executable, *args], cwd=ROOT, input=stdin, env=env,
                              capture_output=True, text=True, encoding="utf-8", timeout=60)
     except Exception as e:  # noqa: BLE001
         print(f"  ✗ {desc}")
@@ -254,6 +259,10 @@ def main() -> None:
     ]
     results = [run(d, a, e, s) for d, a, e, s in checks]
     reset_mock_ledger()
+
+    if (_env_values().get("KIS_MODE") or "mock").lower() == "live":
+        print("\n  · 참고: .env 가 live 로 되어 있습니다. 위 점검은 수업용(mock)으로만 돌렸습니다.")
+        print("    2주차 수업 전에 「.env 의 KIS_MODE 를 mock 으로 되돌려줘」 라고 하세요.")
 
     for note in env_notes():
         print(f"\n  · 참고: {note}")

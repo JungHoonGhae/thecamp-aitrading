@@ -103,6 +103,8 @@ def run(desc: str, args: list[str], expect: str, stdin: str | None = None) -> bo
         return True
 
     print(f"  ✗ {desc}")
+    # 성공 줄에는 파일 이름을 안 쓴다. 실패했을 때만 어디를 볼지 알려 준다.
+    print(f"      (이 단계: {' '.join(args)})")
     hint = advise(out.stdout, out.stderr)
     if hint:
         print(f"      원인: {hint[0]}")
@@ -116,7 +118,7 @@ def run(desc: str, args: list[str], expect: str, stdin: str | None = None) -> bo
 
 
 # ---------------------------------------------------------------------------
-# 숙제 점검 (`python verify.py --숙제`)
+# 숙제 환경 점검 (`python verify.py --숙제`)
 #
 # 기본 점검은 mock 다섯 개만 본다. 그건 토요일 수업 기준이다.
 # 평일 숙제는 진짜 서버에 붙기 때문에 볼 것이 다르고, **깨지기 전에** 잡아야 한다.
@@ -154,37 +156,37 @@ def homework_checks() -> list[tuple[bool, str, str, str]]:
     need = ["KIS_APP_KEY", "KIS_APP_SECRET", "KIS_ACCOUNT"]
     missing = [k for k in need if _looks_unfilled(env.get(k, ""))]
     if not (ROOT / ".env").is_file():
-        r.append((False, ".env 파일", ".env 가 아직 없습니다.",
+        r.append((False, "증권사 키가 준비됨", ".env 가 아직 없습니다.",
                   "AI에게 '.env.example 을 복사해 .env 로 만들고 내 KIS 키를 넣어 줘' 라고 하세요."))
     elif missing:
-        r.append((False, "KIS 키 세 개", f"{', '.join(missing)} 가 비었거나 안내 문구 그대로입니다.",
+        r.append((False, "증권사 키가 준비됨", f"{', '.join(missing)} 가 비었거나 안내 문구 그대로입니다.",
                   "AI에게 '.env 에 내 모의투자 앱키·시크릿·계좌 8자리를 넣어 줘' 라고 하세요."))
     else:
-        r.append((True, "KIS 키 세 개", "", ""))
+        r.append((True, "증권사 키가 준비됨", "", ""))
 
     # 2. 지금 어느 계좌를 보는가
     mode = (env.get("KIS_MODE") or "mock").lower()
     if mode == "mock":
-        r.append((True, "KIS_MODE", "", ""))
+        r.append((True, "어느 계좌를 볼지 정해짐", "", ""))
     elif mode == "live" and env.get("KIS_ENV", "paper").lower() == "real":
-        r.append((False, "KIS_MODE", "실전(real) 로 켜져 있습니다. 숙제 범위가 아닙니다.",
+        r.append((False, "어느 계좌를 볼지 정해짐", "실전(real) 로 켜져 있습니다. 숙제 범위가 아닙니다.",
                   "AI에게 '.env 의 KIS_ENV 를 지워 줘' 라고 하세요. 모의투자로 돌아옵니다."))
     else:
-        r.append((True, "KIS_MODE", "", ""))
+        r.append((True, "어느 계좌를 볼지 정해짐", "", ""))
 
     # 3. 공식 손 설정 파일에 한글이 남았나 — 오늘 가장 오래 헤맨 곳
     cfg = Path.home() / "KIS" / "config" / "kis_devlp.yaml"
     if not cfg.is_file():
-        r.append((True, "공식 손 설정", "", ""))   # 안 쓰면 없는 게 정상이다
+        r.append((True, "공식 도구 설정", "", ""))   # 안 쓰면 없는 게 정상이다
     else:
         body = [l for l in cfg.read_text(encoding="utf-8", errors="ignore").splitlines()
                 if not l.strip().startswith("#")]
         if any("가" <= ch <= "힣" for ch in "\n".join(body)):
-            r.append((False, "공식 손 설정", "~/KIS/config/kis_devlp.yaml 에 한글이 남아 있습니다.",
+            r.append((False, "공식 도구 설정", "~/KIS/config/kis_devlp.yaml 에 한글이 남아 있습니다.",
                       "AI에게 'lessons/참고/kis_devlp.example.yaml 로 다시 만들어 줘' 라고 하세요. "
                       "그대로 두면 latin-1 에러로 죽습니다."))
         else:
-            r.append((True, "공식 손 설정", "", ""))
+            r.append((True, "공식 도구 설정", "", ""))
 
     # 장 시간은 항목으로 세지 않는다 — 통과·실패가 아니라 안내다. 아래에서 한 줄로 알려 준다.
     return r
@@ -192,7 +194,7 @@ def homework_checks() -> list[tuple[bool, str, str, str]]:
 
 def homework() -> None:
     ver = (ROOT / "VERSION").read_text(encoding="utf-8").strip() if (ROOT / "VERSION").is_file() else "?"
-    print("🧪 숙제 준비 · 점검")
+    print("🧪 숙제 환경 점검")
     print(f"📌 버전 {ver}\n")
 
     rows = homework_checks()
@@ -210,15 +212,15 @@ def homework() -> None:
     elif not (9 <= now.hour < 16):
         print("\n  · 참고: 지금은 장 시간이 아닙니다. 평일 9시~15시 반에 하세요.")
 
-    print("\n  · 참고: 수업 랩과 공식 손을 **동시에** 부르지 마세요.")
-    print("    토큰이 앱키당 1분에 1회라 서로 막습니다. 손을 바꾸면 1분 기다리세요.")
+    print("\n  · 참고: 수업용 도구와 증권사 공식 도구를 동시에 쓰지 마세요.")
+    print("    토큰이 1분에 한 번만 나와서 서로 막습니다. 바꿔 쓸 때는 1분 기다리세요.")
 
     bad = [x for x in rows if not x[0]]
-    print(f"\n결과: {len(rows) - len(bad)}/{len(rows)} 통과")
     if bad:
-        print("❌ 위 '다음' 한 줄만 해결하고 다시 실행하세요.")
+        print(f"\n❌ 숙제 환경이 아직 준비되지 않았습니다 — {len(rows)}개 중 {len(rows)-len(bad)}개만 됩니다")
+        print("위 '다음' 한 줄만 해결하고 다시 실행하세요. 나머지는 그대로 두셔도 됩니다.")
         sys.exit(1)
-    print("✅ 숙제를 시작할 수 있습니다")
+    print("\n✅ 숙제 환경이 준비되었습니다 — 시작하셔도 됩니다")
 
 
 
@@ -230,7 +232,7 @@ def main() -> None:
     ver = (ROOT / "VERSION").read_text(encoding="utf-8").strip() if (ROOT / "VERSION").is_file() else "?"
     print("📦 실습 환경 · 점검")
     print(f"📌 버전 {ver}")
-    print("환경설치 체크리스트 (mock)\n")
+    print("수업 환경이 되는지 하나씩 봅니다\n")
 
     problems = preflight()
     if problems:
@@ -247,15 +249,17 @@ def main() -> None:
     from common.kis import reset_mock_ledger  # noqa: E402
 
     reset_mock_ledger()
+    # 항목 이름은 **학생이 할 수 있게 된 일**로 적는다. 파일 이름이나 「Part 1」 같은
+    # 내부 구분은 학생에게 뜻이 안 통한다. 실패했을 때만 어느 파일인지 알려 준다.
     checks = [
-        ("스펙 문서 파싱 (내-투자-스펙.md)", ["sync_spec.py", "--check"], "파싱 결과", None),
-        ("Part 1 직접 호출 (examples/quote.py)", ["examples/quote.py", "005930"], "현재가", None),
+        ("내가 적은 투자 원칙을 읽습니다", ["sync_spec.py", "--check"], "파싱 결과", None),
+        ("종목 시세를 불러옵니다", ["examples/quote.py", "005930"], "현재가", None),
         # Part 1 MCP 서버는 stdin 으로 JSON-RPC 핸드셰이크를 넣어야 한다.
-        ("Part 1 MCP 서버 (agent/mcp_server.py)", ["agent/mcp_server.py"], '"name": "search_api"',
+        ("AI가 스스로 시세·잔고를 찾습니다", ["agent/mcp_server.py"], '"name": "search_api"',
          '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}\n'
          '{"jsonrpc":"2.0","id":2,"method":"tools/list"}\n'),
-        ("Part 2 에이전트 미리보기 (agent/agent.py)", ["agent/agent.py"], "리밸런싱 미리보기", None),
-        ("Part 2 에이전트 모의주문 (--execute)", ["agent/agent.py", "--execute"], "주문 전송", None),
+        ("내 계좌를 점검해 결과를 보여줍니다", ["agent/agent.py"], "리밸런싱 미리보기", None),
+        ("연습 계좌에 주문이 들어갑니다", ["agent/agent.py", "--execute"], "주문 전송", None),
     ]
     results = [run(d, a, e, s) for d, a, e, s in checks]
     reset_mock_ledger()
@@ -268,12 +272,12 @@ def main() -> None:
         print(f"\n  · 참고: {note}")
 
     passed, total = sum(results), len(results)
-    print(f"\n결과: {passed}/{total} 통과")
     if passed == total:
-        print("✅ 실습 환경이 준비되었습니다")
+        print("\n✅ 실습 환경이 준비되었습니다 — 위 다섯 가지가 모두 됩니다")
     else:
-        print("❌ 실습 환경이 아직 준비되지 않았습니다")
+        print(f"\n❌ 실습 환경이 아직 준비되지 않았습니다 — {total}개 중 {passed}개만 됩니다")
         print("위에서 ✗ 가 뜬 첫 줄의 '다음' 하나만 해결하고 다시 실행하세요.")
+        print("나머지는 건드리지 않으셔도 됩니다.")
         sys.exit(1)
 
 

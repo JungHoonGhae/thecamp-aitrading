@@ -1,14 +1,15 @@
 ---
 name: kis-trading-mcp
 description: >
-  1주차 숙제의 앞 단계. 한투 공식 도구 둘(코딩도우미 334 · 트레이딩 166)을 구분하고,
+  한투 공식 도구 둘(코딩도우미 334 · 트레이딩 166)을 구분하고,
   Docker 로 트레이딩 MCP 를 붙인 뒤 조회·액션을 둘러보고 쓸 것을 고른다.
   Docker 설치·실행·연결은 **AI가 대신** 한다 — 학생은 설치 창을 누르고 앱을 한 번 켠다.
   막히면 10분에서 멈추고 kis-lecture-lab 으로 간다. 숙제는 그래도 된다.
   "트레이딩 MCP", "공식 MCP", "코딩도우미 MCP", "도커", "도커 설치",
   "조회와 액션", "카탈로그", "334", "166", "kis-trade-mcp",
   "공식 도구 붙여", "엔드포인트 둘러봐" 라고 하면 반드시 이 스킬.
-  경계 — 습관 인터뷰와 모의주문은 investment-habit-rules 가 이어받는다.
+  경계 — "숙제"만 말하면 homework 다. 이 스킬은 homework 가 1주차 1번에서 읽는다.
+  습관 인터뷰와 모의주문은 investment-habit-rules 가 이어받는다.
   토요일 수업 연결은 kis-lecture-lab. 자료 맞춤은 environment. 에러는 troubleshooting.
 ---
 
@@ -251,15 +252,16 @@ npx -y @koreainvestment/kis-code-assistant-mcp
 **완료:** 트레이딩 MCP 조회 한 번, 또는 막힌 한 줄.
 🧃 한입 · 공식 조회
 
-### 8 · 주문은 다음 명령
+### 8 · 주문은 다음 칸
 
 이 스킬에서 `confirm` 주문까지 넣지 마라.
 「고른 액션으로 모의주문」은 `investment-habit-rules` 가 한다. 그 스킬은 **🔧 트레이딩 MCP** 로만 평일 주문을 넣는다. 코딩도우미 금지.
 
-끝낼 때 이 한 줄을 보여 주고 멈춘다.
+**homework 가 부르고 있으면** 아래 붙여넣기를 보여 주지 마라. 한입만 하고 homework 로 돌아간다.
+학생이 이 스킬만 직접 켰으면 끝낼 때 이 한 줄을 보여 주고 멈춘다.
 
 ```
-.agents/skills/investment-habit-rules/SKILL.md 대로 내 투자 습관을 하나씩 물어봐 줘. 말한 것만 규칙으로 적고, 방금 고른 조회·액션과 그 규칙으로 첫 모의투자까지 가자. 주문은 kis-trade-mcp 만. 코딩도우미로는 주문하지 마.
+.agents/skills/investment-habit-rules/SKILL.md 대로 내 투자 습관을 하나씩 물어봐 줘. 말한 것만 규칙으로 적고, 방금 고른 조회·액션과 그 규칙으로 첫 모의투자까지 가자. 주문 다음 회고도 이어서. 주문은 kis-trade-mcp 만. 코딩도우미로는 주문하지 마.
 ```
 
 키가 없거나 🔧 를 못 붙였으면: 습관 문서만 채우고, 주문은 연습 계좌(`kis-lecture-lab`)이거나 「공식 도구 못 붙임」. 그것도 숙제다.

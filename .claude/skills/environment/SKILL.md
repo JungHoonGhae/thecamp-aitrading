@@ -9,7 +9,7 @@ description: >
   "강사가 업데이트했대", "pull", "git pull", "저장소 받아", "환경 세팅",
   "verify", "폴더가 어디야" 라고 하면 반드시 이 스킬. git 명령을 학생에게 시키지 않는다.
   경계 — 이미 에러가 났으면 troubleshooting 이다. 여기는 아직 안 깨진 상태를 다룬다.
-  다음 단계 안내는 assistant. 숙제 진행은 investment-habit-rules.
+  다음 단계 안내는 assistant. 숙제 진행은 homework.
 ---
 
 # 환경 설치·유지 (ai-trading-lab)
@@ -176,7 +176,10 @@ ROOT 에서 `git fetch` 하고 `git status -sb` 를 본다.
 - 이미 최신이고 학생이 업데이트를 안 시켰으면 아무 말 없이 하던 일로.
 - 네트워크가 안 되면 ⚪ 한 장만 하고 진행.
 
-강사 카톡의 「수업 자료 업데이트 해 줘」도 여기다.
+강사 카톡에는 긴 순서를 넣지 않는다. 카톡 한 글 안에
+`references/update.md` 원본 주소를 붙인다.
+https://raw.githubusercontent.com/JungHoonGhae/thecamp-aitrading/main/.agents/skills/environment/references/update.md
+그 글이 오면 그 순서대로 맞춘다. 「수업 자료 업데이트 해 줘」도 여기다.
 
 ## 단계 (확인한 뒤에만 다음)
 

@@ -7,7 +7,8 @@ description: >
   "스킬과 MCP 가 뭐가 다른지 가르쳐 줘", "더 찾기 전에",
   "스킬 찾아 줘", "MCP 찾아 줘", "skill vs mcp", "스킬 하나 MCP 하나"
   라고 하면 반드시 이 스킬.
-  경계 — 한투 공식 MCP 를 실제로 붙이는 일은 kis-trading-mcp 다. 여기는 개념과 찾기다.
+  경계 — "숙제"만 말하면 homework 다. 이 스킬은 homework 가 1주차 3번에서 읽는다.
+  한투 공식 MCP 를 실제로 붙이는 일은 kis-trading-mcp 다. 여기는 개념과 찾기다.
   자료 맞춤은 environment. 에러는 troubleshooting.
 ---
 
@@ -36,7 +37,7 @@ description: >
 🔧 MCP   = 밖에서 데이터를 가져오는 도구
 ────────────────
 수업 MCP  : kis-lecture-lab (토) · 평일 공식 도구 kis-trade-mcp
-수업 스킬 : environment · investment-habit-rules · kis-trading-mcp
+수업 스킬 : homework · environment · investment-habit-rules · kis-trading-mcp
 찾는 이   : 학생은 일의 이름만. 장터는 AI가 연다
 ────────────────
 ```

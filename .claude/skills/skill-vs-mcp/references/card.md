@@ -3,7 +3,7 @@
 | | 스킬 | MCP |
 |---|---|---|
 | 한 줄 | AI가 일하는 **순서와 규칙** | 밖 데이터를 가져오는 **손** |
-| 수업 예 | environment · investment-habit-rules | kis-lecture-lab |
+| 수업 예 | homework · environment · investment-habit-rules | kis-lecture-lab |
 | 하는 일 | 무엇을 묻고, 무엇을 적고, 하지 말 것 | 시세 · 잔고 · 공시 · 금리 |
 | 누가 찾나 | **AI**. 학생은 일의 이름만 말한다 | 같음 |
 | AI가 보는 길 | skills.sh · k-skill | mcp.so · smithery · GitHub |

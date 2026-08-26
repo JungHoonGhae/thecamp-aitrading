@@ -10,11 +10,15 @@ AI 코딩 도구(Claude Code, Codex, Cursor, Gemini 등)는 아래를 따르세�
   카드의 📌 버전은 루트 [`VERSION`](VERSION) 과 [`CHANGELOG.md`](CHANGELOG.md) 맨 위 칸이다.
 - **학습 진행 도우미(초록이) 스킬**: [`.agents/skills/assistant/SKILL.md`](.agents/skills/assistant/SKILL.md) — 학생을 단계별로 돕는 규칙.
   학생이 "도와줘 / 다음 단계"라고 하면 이 스킬대로 안내하세요.
+- **평일 숙제**: [`.agents/skills/homework/SKILL.md`](.agents/skills/homework/SKILL.md) —
+  `/homework`. 학생은 절차 안내와 도움을 요청한다 — 대신 해 주지 않는다.
+  이번 주 칸과 쓰는 스킬을 먼저 보여 주고 이어서 진행합니다.
 - **스킬과 MCP**: [`.agents/skills/skill-vs-mcp/SKILL.md`](.agents/skills/skill-vs-mcp/SKILL.md) —
   「스킬과 MCP 가 뭐가 다른지 가르쳐 줘」. 찾기 숙제 전에 한 질문씩. 답은 📘 카드.
   장터는 AI가 연다. 단계 끝은 **🧃 한입**, 덩어리 끝은 **🪞 회고** (`assistant/references/digest.md`).
-- **공식 도구 (평일 숙제)**: [`.agents/skills/kis-trading-mcp/SKILL.md`](.agents/skills/kis-trading-mcp/SKILL.md) —
+- **공식 도구**: [`.agents/skills/kis-trading-mcp/SKILL.md`](.agents/skills/kis-trading-mcp/SKILL.md) —
   코딩도우미(334, 보기·주문 없음)와 트레이딩 MCP(166, Docker·호출). 섞으면 주문이 안 나갑니다.
+  평일 숙제에서는 homework 가 이 스킬을 읽습니다.
 - **트러블슈팅 스킬**: [`.agents/skills/troubleshooting/SKILL.md`](.agents/skills/troubleshooting/SKILL.md) —
   에러·설치 실패·막힘은 이 스킬의 증상→원인→수정→확인 순서로 처리하세요.
   (Claude Code 는 `.claude/skills/` **실제 폴더**를 읽습니다. Windows 에서 심링크는 깨집니다.)

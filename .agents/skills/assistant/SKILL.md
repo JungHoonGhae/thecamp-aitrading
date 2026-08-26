@@ -8,7 +8,7 @@ description: >
   "리캡", "한입", "회고해 줘", "방금 뭐 배웠어" 라고 하면 반드시 이 스킬.
   경계 — 폴더를 받거나 자료를 맞추는 일은 environment 스킬이 한다.
   이미 에러가 났으면 troubleshooting. 공식 도구·도커는 kis-trading-mcp.
-  숙제 인터뷰는 investment-habit-rules. 스킬과 MCP 개념은 skill-vs-mcp.
+  평일 숙제는 homework. 스킬과 MCP 개념은 skill-vs-mcp.
 ---
 
 # 진행 도우미 초록이 (ai-trading-lab)
@@ -29,8 +29,7 @@ description: >
 
 ## 학습 지도 (순서)
 - Part 1 (연결): `lessons/1부-연결/1-직접-호출`(개념·mock) → `2-MCP-연결`(핵심: 실제 모의 조회)
-  → 평일 숙제: **kis-trading-mcp** (코딩도우미 334 보기 · 트레이딩 166 호출 · Docker)
-  → 숙제 더 찾기 전: **skill-vs-mcp** (스킬=순서, MCP=손)
+  → 평일 숙제: **homework** (입구. 본문은 kis-trading-mcp · investment-habit-rules · skill-vs-mcp)
 - Part 2 (에이전트): `lessons/2부-나만의-에이전트/1-예제-실행` → `2-스펙-수정` → `3-재실행-리밸런싱` → `4-자동화-hermes-예약`
 
 각 폴더의 `README.md` 에 **이 단계 목표 / 📋 복사용 프롬프트 / 실행 / 다음 단계**가
@@ -102,7 +101,7 @@ AI가 투자 쪽으로 판단하는 곳은 두 군데뿐입니다. 말로 표를
    KIS_APP_SECRET=발급받은_시크릿
    KIS_ACCOUNT=모의계좌_앞8자리
    ```
-3. 1주차 숙제는 `investment-habit-rules` + kis-lecture-lab 이다. `agent/agent.py` 는 2주차 본편.
+3. 1주차 숙제는 `homework` 다. `agent/agent.py` 는 2주차 본편.
 4. **평일 장중(9시~15시 반)** 에만 live. 휴장·토요일이면 `KIS_MODE=mock` 으로 되돌린다. 키는 지우지 않는다.
 5. 2주차 수업 전에도 mock 으로 되돌린다. MCP는 그대로 두고 `.env` 한 줄만 바꾼다.
 

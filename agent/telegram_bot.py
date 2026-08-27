@@ -42,11 +42,12 @@ CONFIRM_WINDOW = 900       # 승인을 기다리는 시간(초). 폰을 바로 �
 
 # 텔레그램 명령 메뉴. 이름은 소문자 영문만 된다 — 설명은 한글이어도 된다.
 COMMANDS = [
-    # 순서가 곧 하루의 순서다. 설명은 무엇을 하는지와 무엇이 남는지만 적는다.
+    # 이름은 코딩 앱(클로드 코드)에 있는 것과 맞춘다. 처음 봐도 짐작이 된다.
+    # 순서가 곧 하루 순서다. 설명은 무엇을 하고 무엇이 남는지만 적는다.
+    ("status", "총자산과 종목별 비중을 목표와 함께 보여준다"),
     ("check", "목표와 지금을 견주고 조정안을 보여준다. 주문은 나가지 않는다"),
-    ("balance", "총자산과 종목별 비중을 목표와 함께 보여준다"),
-    ("spec", "내가 정한 규칙 네 칸을 보여준다"),
-    ("report", "종목을 분석한다. 뒤에 종목 이름과 궁금한 것을 적는다"),
+    ("config", "내가 정한 규칙 네 칸을 보여준다"),
+    ("review", "종목을 분석한다. 뒤에 종목 이름과 궁금한 것을 적는다"),
     ("candidates", "시총 상위에서 내 규칙에 걸리지 않는 후보를 고른다"),
     ("news", "내 종목의 뉴스 제목을 모아 보여준다"),
     ("journal", "오늘 판단을 내-투자-판단.md 에 한 줄로 남긴다"),
@@ -56,15 +57,18 @@ COMMANDS = [
     ("help", "명령 목록을 보여준다"),
 ]
 
+# 예전 이름도 그대로 받는다. 슬라이드·문서에 남아 있어도 깨지지 않게.
+LEGACY = {"balance": "status", "spec": "config", "report": "review"}
+
 # 슬래시를 모르는 사람을 위한 말 트리거. 같은 일을 한다.
 ALIASES = {
     "점검": "check", "점검해줘": "check", "확인": "check",
-    "잔고": "balance", "계좌": "balance",
+    "잔고": "status", "계좌": "status", "상태": "status",
     "후보": "candidates", "종목": "candidates",
     "뉴스": "news", "브리프": "news",
-    "스펙": "spec", "내스펙": "spec",
+    "스펙": "config", "내스펙": "config", "설정": "config",
     "루틴": "routines", "루틴목록": "routines",
-    "분석": "report", "리포트": "report",
+    "분석": "review", "리포트": "review",
     "기록": "journal", "일지": "journal", "메모": "journal",
     "시켜": "ask", "물어봐": "ask", "고쳐": "ask",
     "리밸런싱": "rebalance", "조정": "rebalance",
@@ -117,7 +121,25 @@ class Bot:
         self.token = token
         self.owner = str(owner)
         self.offset = 0
-        self.pending_rebalance = 0.0  # 확인 대기 시각
+        # 승인 대기는 파일에 둔다. 메모리에 두면 봇을 껐다 켜거나 다른 창에서
+        # 요청했을 때 「시간이 지났습니다」가 되어 버린다.
+        self.pending_file = ROOT / ".state" / "pending.txt"
+
+    # ── 승인 대기 ───────────────────────────────────────────
+    @property
+    def pending_rebalance(self) -> float:
+        try:
+            return float(self.pending_file.read_text(encoding="utf-8").strip())
+        except (OSError, ValueError):
+            return 0.0
+
+    @pending_rebalance.setter
+    def pending_rebalance(self, value: float) -> None:
+        if value:
+            self.pending_file.parent.mkdir(exist_ok=True)
+            self.pending_file.write_text(str(value), encoding="utf-8")
+        else:
+            self.pending_file.unlink(missing_ok=True)
 
     # ── 텔레그램 API ────────────────────────────────────────
     def call(self, method: str, payload: dict) -> dict:
@@ -160,7 +182,7 @@ class Bot:
         for url in rep.charts:
             self.send_photo(url)
 
-    def cmd_balance(self) -> None:
+    def cmd_status(self) -> None:
         bal = KISClient().get_balance()
         held = {h["code"]: h for h in bal.get("holdings", [])}
         cash = int(bal.get("cash", 0))
@@ -201,7 +223,7 @@ class Bot:
             lines += [f"  - {n['title']}" for n in news]
         self.send("\n".join(lines))
 
-    def cmd_spec(self) -> None:
+    def cmd_config(self) -> None:
         rows = load_portfolio()
         self.send("\n".join([
             "[내 스펙]",
@@ -226,17 +248,17 @@ class Bot:
                   "자세한 목록은 routines/README.md 입니다."]
         self.send("\n".join(lines))
 
-    def cmd_report(self, arg: str = "") -> None:
+    def cmd_review(self, arg: str = "") -> None:
         """종목 리포트. 뒤에 종목 이름과 하고 싶은 말을 자유롭게 붙인다.
 
-        예) /report 삼성전자 현대차 반도체 쏠림이 걱정이야
+        예) /review 삼성전자 현대차 반도체 쏠림이 걱정이야
         코드가 재료를 모으고, 판단은 AI가 한다. 주문은 나가지 않는다.
         """
         names, ask = _split_names(arg)
         if not names:
             names = [r["name"] for r in load_portfolio()]
         if not names:
-            self.send("볼 종목이 없습니다. 예) /report 삼성전자 현대차")
+            self.send("볼 종목이 없습니다. 예) /review 삼성전자 현대차")
             return
 
         self.send(f"[리포트] {' · '.join(names)}\n재료를 모으는 중입니다. 잠시만요.")
@@ -381,7 +403,7 @@ class Bot:
 
     def dispatch(self, text: str) -> None:
         word = text.strip().lstrip("/").split("@")[0].split()[0] if text.strip() else ""
-        name = word if word in dict(COMMANDS) else ALIASES.get(word, "")
+        name = word if word in dict(COMMANDS) else LEGACY.get(word) or ALIASES.get(word, "")
 
         if self.pending_rebalance:
             fresh = time.time() - self.pending_rebalance < CONFIRM_WINDOW
@@ -403,7 +425,7 @@ class Bot:
             return
         if name == "rebalance":
             self.cmd_rebalance(confirmed=False)
-        elif name in ("report", "journal", "ask"):
+        elif name in ("review", "journal", "ask"):
             뒤 = text.strip().lstrip("/")[len(word):].strip()
             getattr(self, f"cmd_{name}")(뒤)
         else:

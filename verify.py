@@ -63,12 +63,13 @@ def env_notes() -> list[str]:
     """치명적이진 않지만 알고 있어야 할 것. 실패로 치지 않는다."""
     notes = []
     mode = os.getenv("KIS_MODE", "")
-    env_file = ROOT / ".env"
-    if env_file.is_file():
-        text = env_file.read_text(encoding="utf-8", errors="replace")
-        if "KIS_MODE=live" in text and "여기에_모의투자_앱키" in text:
+    # 문자열 포함으로 보지 않는다. `.env.example` 은 `# KIS_MODE=live` 를 주석으로 달고 있어서
+    # 그대로 복사한 학생 전원에게 헛경고가 떴다. 주석을 걸러내는 _env_values() 를 쓴다.
+    env = _env_values()
+    if env:
+        if env.get("KIS_MODE", "").lower() == "live" and _looks_unfilled(env.get("KIS_APP_KEY", "")):
             notes.append("`.env` 가 live 인데 키가 예시 그대로입니다 — 수업 중엔 mock 으로 두세요.")
-        if "KIS_ENV=real" in text and not text.lstrip().startswith("#"):
+        if env.get("KIS_ENV", "").lower() == "real":
             notes.append("`.env` 에 KIS_ENV=real 이 보입니다. 실전은 수업 범위 밖입니다.")
     if mode == "live":
         notes.append("환경변수 KIS_MODE=live 로 실행 중입니다 (평일·장중에만 값이 옵니다).")

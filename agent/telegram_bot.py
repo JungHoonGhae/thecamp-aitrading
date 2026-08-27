@@ -307,17 +307,53 @@ class Bot:
         ]))
 
     def cmd_routines(self) -> None:
-        lines = ["[루틴] 정해진 주기에 혼자 도는 것들", ""]
-        for path in sorted((ROOT / "routines").glob("[!_]*.py")):
-            doc = path.read_text(encoding="utf-8").splitlines()
-            한줄 = doc[0].lstrip('"').strip() if doc else path.stem
-            카테고리 = next((l.split(":", 1)[1].split("(")[0].strip()
-                          for l in doc[:8] if l.startswith("카테고리:")), "정보수집")
-            lines.append(f"· {한줄}")
-            lines.append(f"  [{카테고리}]  python routines/{path.name}")
-        lines += ["", "정해진 시각에 돌리려면 hermes 에게 말로 예약하세요.",
-                  "자세한 목록은 routines/README.md 입니다."]
-        self.send("\n".join(lines))
+        """언제 무엇이 오는지. 파일 경로는 폰에서 쓸모가 없어 적지 않는다."""
+        import subprocess
+        걸린 = ""
+        try:
+            out = subprocess.run(["hermes", "cron", "list"], capture_output=True,
+                                 text=True, timeout=30).stdout
+            걸린 = out
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+
+        표 = [
+            ("평일 08:00", "아침 브리핑", "시장·내 계좌·뉴스 제목", "아침브리핑"),
+            ("장중 10분마다", "가격 도달", "정해 둔 값에 닿으면. 그대로면 조용", "가격도달"),
+            ("평일 16:00", "마감 브리핑", "오늘 무슨 일이 있었나", "마감브리핑"),
+        ]
+        줄 = ["[루틴] 정해진 시각에 알아서 오는 것", ""]
+        for 때, 이름, 무엇, 키 in 표:
+            켜짐 = "켜짐" if 키 in 걸린 else "꺼짐"
+            줄.append(f"{때}  {이름}  [{켜짐}]")
+            줄.append(f"    {무엇}")
+        줄 += ["", "원할 때 부르는 것", ""]
+        줄 += ["내 전략 백테스팅  내 규칙이 과거에 통했는지",
+               "저점·고점 판독    지금 이 가격이 1년 안에서 어디쯤인지"]
+        줄 += ["", "노트북이 켜져 있어야 옵니다.",
+               "시각을 바꾸려면 /update_config 로 말하세요.",
+               "예) /update_config 아침 브리핑을 7시로 바꿔 줘"]
+        self.send("\n".join(줄),
+                  buttons=[("백테스팅 돌리기", "go:backtest"),
+                           ("저점·고점 보기", "go:levels")])
+
+    ROUTINE_FILES = {"backtest": "내전략-백테스팅.py", "levels": "저점고점-판독.py"}
+
+    def run_routine(self, key: str) -> None:
+        """루틴을 그 자리에서 돌린다. 결과는 루틴이 스스로 보낸다."""
+        import subprocess
+        파일 = self.ROUTINE_FILES.get(key)
+        if not 파일:
+            return
+        self.send(f"{파일.replace('.py', '')} 를 돌립니다. 30초쯤 걸립니다.")
+        self.typing()
+        try:
+            done = subprocess.run([sys.executable, 파일], cwd=str(ROOT / "routines"),
+                                  capture_output=True, text=True, timeout=420)
+            if done.returncode != 0:
+                self.send(f"돌리다 막혔습니다.\n{(done.stderr or '')[-400:]}")
+        except (OSError, subprocess.TimeoutExpired) as e:
+            self.send(f"돌리다 막혔습니다: {e}")
 
     def cmd_review(self, arg: str = "") -> None:
         """종목 리포트. 뒤에 종목 이름과 하고 싶은 말을 자유롭게 붙인다.
@@ -567,6 +603,8 @@ class Bot:
                 self.cmd_rebalance(confirmed=False)
             elif 이름 == "check":
                 self.cmd_check()
+            elif 이름 in ("backtest", "levels"):
+                self.run_routine(이름)
             return
         if data == "rb:no":
             self.pending_rebalance = 0.0

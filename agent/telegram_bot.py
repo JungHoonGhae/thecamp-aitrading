@@ -44,20 +44,20 @@ CONFIRM_WINDOW = 900       # 승인을 기다리는 시간(초). 폰을 바로 �
 COMMANDS = [
     # 이름은 코딩 앱(클로드 코드)에 있는 것과 맞춘다. 처음 봐도 짐작이 된다.
     # 순서가 곧 하루 순서다. 설명은 무엇을 하고 무엇이 남는지만 적는다.
-    ("init", "처음 설정한다. 투자 성향을 묻고 스펙과 루틴을 맞춘다"),
-    ("status", "총자산과 종목별 비중을 목표와 함께 보여준다"),
-    ("check", "목표와 지금을 견주고 조정안을 보여준다. 주문은 나가지 않는다"),
-    ("config", "내가 정한 규칙 네 칸을 보여준다"),
-    ("review", "종목을 분석한다. 뒤에 종목 이름과 궁금한 것을 적는다"),
-    ("candidates", "시총 상위에서 내 규칙에 걸리지 않는 후보를 고른다"),
-    ("news", "내 종목의 뉴스 제목을 모아 보여준다"),
+    ("init", "투자 성향을 하나씩 물어 내 종목·비중·주기를 정해 준다"),
+    ("status", "총자산·현금·종목별로 몇 주에 얼마인지"),
+    ("check", "지금 비중이 목표와 얼마나 벌어졌는지, 무엇을 몇 주 사고팔면 되는지"),
+    ("config", "내가 정한 종목·비중·점검 주기·하지 말 것"),
+    ("review", "종목의 6개월 성적·업종·뉴스를 모아 AI가 짚어 준다"),
+    ("candidates", "시총 상위 중 내 「하지 말 것」에 안 걸리는 종목 목록"),
+    ("news", "내 종목별 오늘 뉴스 제목"),
     ("journal", "오늘 판단을 내-투자-판단.md 에 한 줄로 남긴다"),
-    ("routines", "정해진 시각에 도는 루틴 목록을 보여준다"),
+    ("routines", "몇 시에 무엇이 자동으로 오는지"),
     ("ask", "물어본다. 저장소를 고치지 않는다. 뒤에 궁금한 것을 적는다"),
     ("update_config", "스펙·루틴·예약을 고친다. 뒤에 바꿀 내용을 적는다"),
-    ("rebalance", "목표 비중으로 되돌린다. 승인해야 주문이 나간다"),
-    ("pending", "승인을 기다리는 것이 있는지 보여준다"),
-    ("doctor", "무엇이 되고 무엇이 안 되는지 점검한다"),
+    ("rebalance", "목표 비중이 되도록 모의 주문을 넣는다. 승인 버튼을 눌러야 나간다"),
+    ("pending", "승인을 기다리는 주문이 있는지, 몇 분 남았는지"),
+    ("doctor", "증권사 연결·스펙·시장 데이터·AI 가 되는지 O/X 로"),
     ("help", "명령 목록을 보여준다"),
 ]
 
@@ -233,13 +233,15 @@ class Bot:
         self.send("\n".join(줄))
 
     def cmd_help(self) -> None:
-        lines = ["내 투자 시스템입니다. 위에서부터 하루 순서입니다.", ""]
+        lines = ["누르면 무엇이 오는지 적어 두었습니다. 위에서부터 하루 순서입니다.", ""]
         lines += [f"/{name}   {desc}" for name, desc in COMMANDS]
         lines += ["", "슬래시가 번거로우면 「점검」 「잔고」 「후보」 처럼 말로 보내도 됩니다."]
         self.send("\n".join(lines))
 
-    NEXT_AFTER_CHECK = [("리밸런싱", "go:rebalance"), ("종목 분석", "go:review"),
-                        ("기록 남기기", "go:journal")]
+    # 버튼 이름은 「무엇을 하는지」가 아니라 「누르면 무엇이 오는지」로 적는다.
+    NEXT_AFTER_CHECK = [("이대로 주문", "go:rebalance"),
+                        ("종목 하나 뜯어보기", "go:review"),
+                        ("오늘 판단 적기", "go:journal")]
 
     def cmd_check(self) -> None:
         self.typing()
@@ -261,7 +263,9 @@ class Bot:
             share = amt / total * 100 if total else 0
             lines.append(f"{row['name']} {h.get('qty', 0)}주 · {amt:,}원 "
                          f"({share:.1f}% / 목표 {row['target']:.0f}%)")
-        self.send("\n".join(lines), buttons=[("점검", "go:check"), ("종목 분석", "go:review")])
+        self.send("\n".join(lines),
+                  buttons=[("목표와 견주기", "go:check"),
+                           ("종목 하나 뜯어보기", "go:review")])
 
     def cmd_candidates(self) -> None:
         kis = KISClient()

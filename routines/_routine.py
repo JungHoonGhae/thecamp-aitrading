@@ -20,6 +20,7 @@ sys.path.insert(0, str(ROOT / "agent"))
 
 from common.env import load_repo_env  # noqa: E402
 from common.report import Report  # noqa: E402
+from common.judge import sources_line  # noqa: E402
 from common.telegram import report as send  # noqa: E402
 
 정보수집 = "정보수집"
@@ -46,12 +47,14 @@ class 루틴:
         r.보내기()
     """
 
-    def __init__(self, 이름: str, 카테고리: str = 정보수집, 차트: str | None = None):
+    def __init__(self, 이름: str, 카테고리: str = 정보수집, 차트: str | None = None,
+                 출처: list[str] | None = None):
         if 카테고리 not in 카테고리들:
             raise ValueError(f"카테고리는 {' · '.join(카테고리들)} 중 하나입니다: {카테고리}")
         self.이름 = 이름
         self.카테고리 = 카테고리
         self.차트 = 차트
+        self.출처 = 출처 or []          # 어떤 데이터를 보고 한 말인지. 알림 아래에 남긴다
         self.줄들: list[str] = []
         load_repo_env()
 
@@ -68,12 +71,16 @@ class 루틴:
     def 본문(self) -> str:
         머리 = f"[{self.카테고리}] {self.이름}"
         때 = datetime.now().strftime("%m/%d %H:%M")
-        return "\n".join([f"{머리} · {때}", ""] + self.줄들)
+        꼬리 = []
+        줄 = sources_line(self.출처)
+        if 줄:
+            꼬리 = ["", "─" * 30, 줄]
+        return "\n".join([f"{머리} · {때}", ""] + self.줄들 + 꼬리)
 
     def 보내기(self) -> None:
         """화면에 찍고, 텔레그램이 설정돼 있으면 그쪽으로도 보낸다."""
         send(Report(mode_label=None, notes=self.본문().splitlines(),
-                    chart_url=self.차트))
+                    charts=[c for c in [self.차트] if c]))
 
 
 def 목록() -> list[tuple[str, str, str]]:

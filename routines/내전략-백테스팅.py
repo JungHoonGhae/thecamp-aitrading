@@ -63,7 +63,7 @@ def 돌려보기(시세: dict[str, list[float]], 목표: dict[str, float],
 
 
 def main() -> None:
-    r = 루틴("내 전략 백테스팅", 정보수집)
+    r = 루틴("내 전략 백테스팅", 정보수집, 출처=["market", "spec"])
     holdings = load_portfolio()
     오차 = load_number("rules.md", "허용 오차", 5)
 

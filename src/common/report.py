@@ -65,7 +65,7 @@ class Report:
     preview: list[PreviewRow] = field(default_factory=list)
     execute_result: ExecuteResult | None = None
     notes: list[str] = field(default_factory=list)  # 이미 "※ " 등이 포함된 완성 문구
-    chart_url: str | None = None
+    charts: list[str] = field(default_factory=list)   # 함께 보낼 그림들. 앞에서부터 보낸다.
 
 
 def to_plain_text(r: Report) -> str:
@@ -112,3 +112,20 @@ def to_plain_text(r: Report) -> str:
         lines += ["", n]
 
     return "\n".join(lines)
+
+
+def to_telegram_html(r: Report) -> tuple[str, str]:
+    """(제목, 본문) — 폰에서 표가 표로 보이게.
+
+    텔레그램은 `<pre>` 를 고정폭으로 그린다. 평문으로 보내면 종목 이름 길이에 따라
+    숫자가 들쭉날쭉해서 읽기 어렵다. 본문을 통째로 `<pre>` 에 넣어 자리를 맞춘다.
+    """
+    body = to_plain_text(r)
+    lines = body.splitlines()
+    head = lines[0] if lines else ""
+    rest = "\n".join(lines[1:]).strip("\n")
+
+    def esc(s: str) -> str:
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+    return esc(head), f"<b>{esc(head)}</b>\n<pre>{esc(rest)}</pre>" if rest else f"<b>{esc(head)}</b>"

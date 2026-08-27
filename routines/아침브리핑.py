@@ -30,7 +30,7 @@ AI판단 = True        # 규칙 결과를 AI가 한 번 읽고 짚어 줍니다 
 
 
 def main() -> None:
-    r = 루틴("아침 브리핑", 맞춤알림)
+    r = 루틴("아침 브리핑", 맞춤알림, 출처=["market", "kis", "spec"])
     kis = KISClient()
     holdings = load_portfolio()
 

@@ -18,6 +18,7 @@ from __future__ import annotations
 import json
 import sys
 import time
+from datetime import datetime
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -29,7 +30,10 @@ ROOT = Path(__file__).resolve().parent.parent
 
 from agent import build_report, load_forbidden, load_number, load_portfolio, load_schedule  # noqa: E402
 from common.env import load_repo_env  # noqa: E402
+from common import judge, market  # noqa: E402
+from common.chart import branded  # noqa: E402
 from common.kis import KISClient  # noqa: E402
+from common.stocks import NAME_TO_CODE  # noqa: E402
 from common.report import to_plain_text  # noqa: E402
 
 API = "https://api.telegram.org/bot{token}/{method}"
@@ -44,6 +48,8 @@ COMMANDS = [
     ("news", "정성 브리프 — 내 종목 뉴스 제목"),
     ("spec", "내 스펙 네 칸"),
     ("routines", "루틴 목록 — 정해진 주기에 도는 것들"),
+    ("report", "종목 리포트 — 뒤에 종목과 하고 싶은 말을 적는다"),
+    ("journal", "오늘 판단 한 줄 남기기 — 뒤에 그대로 적는다"),
     ("rebalance", "리밸런싱 실행 (확인 한 번 더)"),
     ("help", "명령 목록"),
 ]
@@ -56,9 +62,51 @@ ALIASES = {
     "뉴스": "news", "브리프": "news",
     "스펙": "spec", "내스펙": "spec",
     "루틴": "routines", "루틴목록": "routines",
+    "분석": "report", "리포트": "report",
+    "기록": "journal", "일지": "journal", "메모": "journal",
     "리밸런싱": "rebalance", "조정": "rebalance",
     "도움": "help", "도움말": "help", "명령": "help",
 }
+
+
+def _split_names(arg: str) -> tuple[list[str], str]:
+    """앞쪽의 아는 종목 이름만 떼어내고, 나머지는 자연어 질문으로 본다."""
+    words, names, rest = arg.split(), [], []
+    for i, w in enumerate(words):
+        if w in NAME_TO_CODE or (w.isdigit() and len(w) == 6):
+            names.append(w)
+        else:
+            rest = words[i:]
+            break
+    return names, " ".join(rest).strip()
+
+
+def _returns_chart(rows: list[dict]) -> str:
+    """종목별 6개월 수익률 막대. 오른 것과 빠진 것을 색으로 가른다."""
+    from common.chart import CANVAS, FONT, GRID, INK, MUTED
+    import json as _json
+    import urllib.parse as _up
+    cfg = {
+        "type": "bar",
+        "data": {"labels": [r["name"] for r in rows], "datasets": [{
+            "label": "6개월 수익률(%)",
+            "data": [round(r["ret"], 1) for r in rows],
+            "backgroundColor": ["#1B5E45" if r["ret"] >= 0 else "#C2703D" for r in rows],
+            "borderWidth": 0}]},
+        "options": {
+            "title": {"display": True, "text": "6개월 수익률 (%)", "fontSize": 18,
+                      "fontStyle": "bold", "fontColor": INK, "fontFamily": FONT, "padding": 14},
+            "legend": {"display": False},
+            "scales": {
+                "yAxes": [{"ticks": {"fontColor": MUTED, "fontSize": 13, "fontFamily": FONT},
+                           "gridLines": {"color": GRID, "drawBorder": False}}],
+                "xAxes": [{"ticks": {"fontColor": INK, "fontSize": 14, "fontFamily": FONT},
+                           "gridLines": {"display": False, "drawBorder": False}}]},
+            "plugins": {"datalabels": {"display": False}}},
+    }
+    q = _up.urlencode({"c": _json.dumps(cfg, ensure_ascii=False, separators=(",", ":")),
+                       "w": 620, "h": 340, "bkg": CANVAS})
+    return branded(f"https://quickchart.io/chart?{q}")
 
 
 class Bot:
@@ -100,8 +148,8 @@ class Bot:
     def cmd_check(self) -> None:
         rep = build_report(execute=False)
         self.send(to_plain_text(rep))
-        if rep.chart_url:
-            self.send_photo(rep.chart_url, "목표 vs 현재")
+        for url in rep.charts:
+            self.send_photo(url)
 
     def cmd_balance(self) -> None:
         bal = KISClient().get_balance()
@@ -169,6 +217,91 @@ class Bot:
                   "자세한 목록은 routines/README.md 입니다."]
         self.send("\n".join(lines))
 
+    def cmd_report(self, arg: str = "") -> None:
+        """종목 리포트. 뒤에 종목 이름과 하고 싶은 말을 자유롭게 붙인다.
+
+        예) /report 삼성전자 현대차 반도체 쏠림이 걱정이야
+        코드가 재료를 모으고, 판단은 AI가 한다. 주문은 나가지 않는다.
+        """
+        names, ask = _split_names(arg)
+        if not names:
+            names = [r["name"] for r in load_portfolio()]
+        if not names:
+            self.send("볼 종목이 없습니다. 예) /report 삼성전자 현대차")
+            return
+
+        self.send(f"[리포트] {' · '.join(names)}\n재료를 모으는 중입니다. 잠시만요.")
+
+        재료, rows = [], []
+        for name in names[:6]:                      # 한 번에 여섯까지. 그 이상은 읽기 어렵다
+            code = NAME_TO_CODE.get(name, name)
+            try:
+                sym = market.to_symbol(code)
+                closes = market.history(sym, "6mo")
+                info = market.profile(sym)
+            except market.MarketError as e:
+                재료.append(f"{name}: 시세를 못 가져왔습니다 ({e})")
+                continue
+            ret = market.change_pct(closes)
+            ma = market.moving_average(closes, 60)
+            재료.append(
+                f"{name} ({info['sector']}) — 현재 {closes[-1]:,.0f}원 · "
+                f"6개월 {ret:+.1f}% · 60일선 대비 {(closes[-1] / ma - 1) * 100:+.1f}% · "
+                f"하루 등락폭 평균 {market.volatility_pct(closes):.2f}%")
+            rows.append({"name": name, "ret": ret})
+            try:
+                for n in KISClient().get_news(code)[:2]:
+                    재료.append(f"  뉴스: {n['title']}")
+            except (RuntimeError, KeyError):
+                pass
+
+        try:
+            kospi = market.change_pct(market.history(market.TICKERS["코스피"], "6mo"))
+            재료.append(f"같은 기간 코스피 {kospi:+.1f}%")
+        except market.MarketError:
+            pass
+        보유 = {r["name"]: r["target"] for r in load_portfolio()}
+        재료.append("내 목표 비중 — " + (" · ".join(f"{k} {v:.0f}%" for k, v in 보유.items()) or "없음"))
+        재료.append("내 스펙 ④ 하지 마 — " + (" · ".join(load_forbidden()) or "없음"))
+
+        질문 = ask or "이 종목들을 견주고, 내가 확인해야 할 것을 짚어라."
+        답 = judge.ask(재료="\n".join(재료), 질문=질문)
+        self.send("\n".join(["[리포트] " + " · ".join(names), ""] + 재료))
+        if 답:
+            self.send("— AI가 짚은 것 —\n" + 답)
+        elif judge.available():
+            self.send("AI 답을 못 받았습니다. 위 재료만 보냅니다.")
+        if len(rows) >= 2:
+            self.send_photo(_returns_chart(rows))
+
+    def cmd_journal(self, arg: str = "") -> None:
+        """오늘 판단을 한 줄 남긴다. 1주차에 쓴 내-투자-판단.md 의 회차 표에 붙는다.
+
+        예) /journal 삼성전자 안 팔았다. 뉴스 보고 흔들렸는데 규칙대로 뒀다.
+        시스템이 낸 숫자가 아니라 **내가 왜 그랬는지**를 남기는 자리다.
+        3·4주차가 이 칸을 읽는다.
+        """
+        문서 = ROOT / "내-투자-판단.md"
+        if not arg.strip():
+            self.send("남길 말을 뒤에 적어 주세요.\n"
+                      "예) /journal 삼성전자 안 팔았다. 뉴스 보고 흔들렸는데 규칙대로 뒀다.")
+            return
+        if not 문서.is_file():
+            self.send("내-투자-판단.md 를 못 찾았습니다.")
+            return
+        오늘 = datetime.now().strftime("%m/%d")
+        한줄 = arg.strip().replace("|", "·").replace("\n", " ")   # 표가 깨지지 않게
+        본문 = 문서.read_text(encoding="utf-8")
+        표시 = "| | | | | |"
+        새줄 = f"| | {오늘} | | | {한줄} |"
+        if 표시 in 본문:
+            본문 = 본문.replace(표시, f"{새줄}\n{표시}", 1)      # 빈 줄 위에 끼운다
+        else:
+            본문 = 본문.rstrip() + f"\n{새줄}\n"
+        문서.write_text(본문, encoding="utf-8")
+        self.send(f"[기록] {오늘}\n{한줄}\n\n"
+                  "내-투자-판단.md 회차 표에 남겼습니다. 3·4주차가 이 칸을 읽습니다.")
+
     def cmd_rebalance(self, confirmed: bool) -> None:
         if not confirmed:
             self.pending_rebalance = time.time()
@@ -207,6 +340,9 @@ class Bot:
             return
         if name == "rebalance":
             self.cmd_rebalance(confirmed=False)
+        elif name in ("report", "journal"):
+            뒤 = text.strip().lstrip("/")[len(word):].strip()
+            getattr(self, f"cmd_{name}")(뒤)
         else:
             getattr(self, f"cmd_{name}")()
 

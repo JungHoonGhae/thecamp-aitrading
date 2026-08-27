@@ -44,6 +44,7 @@ CONFIRM_WINDOW = 900       # 승인을 기다리는 시간(초). 폰을 바로 �
 COMMANDS = [
     # 이름은 코딩 앱(클로드 코드)에 있는 것과 맞춘다. 처음 봐도 짐작이 된다.
     # 순서가 곧 하루 순서다. 설명은 무엇을 하고 무엇이 남는지만 적는다.
+    ("init", "처음 설정한다. 투자 성향을 묻고 스펙과 루틴을 맞춘다"),
     ("status", "총자산과 종목별 비중을 목표와 함께 보여준다"),
     ("check", "목표와 지금을 견주고 조정안을 보여준다. 주문은 나가지 않는다"),
     ("config", "내가 정한 규칙 네 칸을 보여준다"),
@@ -52,8 +53,11 @@ COMMANDS = [
     ("news", "내 종목의 뉴스 제목을 모아 보여준다"),
     ("journal", "오늘 판단을 내-투자-판단.md 에 한 줄로 남긴다"),
     ("routines", "정해진 시각에 도는 루틴 목록을 보여준다"),
-    ("ask", "스펙·루틴·예약을 고친다. 뒤에 시킬 말을 적는다"),
+    ("ask", "물어본다. 저장소를 고치지 않는다. 뒤에 궁금한 것을 적는다"),
+    ("update_config", "스펙·루틴·예약을 고친다. 뒤에 바꿀 내용을 적는다"),
     ("rebalance", "목표 비중으로 되돌린다. 승인해야 주문이 나간다"),
+    ("pending", "승인을 기다리는 것이 있는지 보여준다"),
+    ("doctor", "무엇이 되고 무엇이 안 되는지 점검한다"),
     ("help", "명령 목록을 보여준다"),
 ]
 
@@ -70,7 +74,11 @@ ALIASES = {
     "루틴": "routines", "루틴목록": "routines",
     "분석": "review", "리포트": "review",
     "기록": "journal", "일지": "journal", "메모": "journal",
-    "시켜": "ask", "물어봐": "ask", "고쳐": "ask",
+    "물어봐": "ask", "질문": "ask",
+    "시켜": "update_config", "고쳐": "update_config", "바꿔": "update_config",
+    "시작": "init", "처음": "init", "초기화": "init",
+    "대기": "pending", "승인대기": "pending",
+    "점검": "doctor", "진단": "doctor", "왜안돼": "doctor",
     "리밸런싱": "rebalance", "조정": "rebalance",
     "도움": "help", "도움말": "help", "명령": "help",
 }
@@ -162,6 +170,13 @@ class Bot:
                     [{"text": label, "callback_data": data} for label, data in buttons]]}
             self.call("sendMessage", payload)
 
+    def typing(self) -> None:
+        """「입력 중」 표시. 오래 걸리는 명령에서 멈춘 것처럼 보이지 않게 한다."""
+        try:
+            self.call("sendChatAction", {"chat_id": self.owner, "action": "typing"})
+        except (urllib.error.HTTPError, urllib.error.URLError, RuntimeError):
+            pass
+
     def send_photo(self, url: str, caption: str = "") -> None:
         try:
             self.call("sendPhoto", {"chat_id": self.owner, "photo": url,
@@ -170,19 +185,71 @@ class Bot:
             self.send(f"차트: {url}")
 
     # ── 명령 ────────────────────────────────────────────────
+    def cmd_pending(self) -> None:
+        """승인을 기다리는 것이 있나. 눌렀는데 반응이 없을 때 여기부터 본다."""
+        남은 = self.pending_rebalance
+        if not 남은:
+            self.send("기다리는 것이 없습니다.")
+            return
+        초 = CONFIRM_WINDOW - (time.time() - 남은)
+        if 초 <= 0:
+            self.pending_rebalance = 0.0
+            self.send("리밸런싱 승인이 시간을 넘겼습니다. /rebalance 부터 다시 하세요.")
+            return
+        self.send(f"리밸런싱이 승인을 기다립니다. {int(초 // 60)}분 {int(초 % 60)}초 남았습니다.\n"
+                  "승인하려면 「승인」, 그만두려면 「거절」 이라고 보내세요.",
+                  buttons=[("승인", "rb:ok"), ("거절", "rb:no")])
+
+    def cmd_doctor(self) -> None:
+        """무엇이 되고 무엇이 안 되나. 「왜 안 되지」의 첫 자리."""
+        import shutil
+        줄 = ["[점검]", ""]
+
+        def 표시(이름: str, 됨: bool, 말: str = "") -> None:
+            줄.append(f"{'O' if 됨 else 'X'}  {이름}{('  ' + 말) if 말 else ''}")
+
+        try:
+            bal = KISClient().get_balance()
+            표시("증권사 연결", True, f"보유 {len(bal.get('holdings', []))}종목")
+        except Exception as e:
+            표시("증권사 연결", False, str(e)[:40])
+        try:
+            rows = load_portfolio()
+            표시("내 스펙", bool(rows), f"{len(rows)}종목 · 합 {sum(r['target'] for r in rows):.0f}%")
+        except Exception as e:
+            표시("내 스펙", False, str(e)[:40])
+        try:
+            market.last(market.TICKERS["코스피"])
+            표시("시장 데이터", True, "코스피·환율")
+        except Exception:
+            표시("시장 데이터", False, "야후에 못 닿습니다")
+        도구 = judge.available()
+        표시("AI 판단", bool(도구), 도구 or "클로드·코덱스가 없습니다")
+        표시("판단 문서", (ROOT / "내-투자-판단.md").is_file())
+        표시("승인 대기", bool(self.pending_rebalance), "있음" if self.pending_rebalance else "없음")
+
+        줄 += ["", "X 가 있어도 대부분 그대로 진행됩니다.",
+               "증권사 연결이 X 면 노트북에서 python verify.py 를 돌려 보세요."]
+        self.send("\n".join(줄))
+
     def cmd_help(self) -> None:
         lines = ["내 투자 시스템입니다. 위에서부터 하루 순서입니다.", ""]
         lines += [f"/{name}   {desc}" for name, desc in COMMANDS]
         lines += ["", "슬래시가 번거로우면 「점검」 「잔고」 「후보」 처럼 말로 보내도 됩니다."]
         self.send("\n".join(lines))
 
+    NEXT_AFTER_CHECK = [("리밸런싱", "go:rebalance"), ("종목 분석", "go:review"),
+                        ("기록 남기기", "go:journal")]
+
     def cmd_check(self) -> None:
+        self.typing()
         rep = build_report(execute=False)
-        self.send(to_plain_text(rep))
         for url in rep.charts:
             self.send_photo(url)
+        self.send(to_plain_text(rep), buttons=self.NEXT_AFTER_CHECK)
 
     def cmd_status(self) -> None:
+        self.typing()
         bal = KISClient().get_balance()
         held = {h["code"]: h for h in bal.get("holdings", [])}
         cash = int(bal.get("cash", 0))
@@ -194,7 +261,7 @@ class Bot:
             share = amt / total * 100 if total else 0
             lines.append(f"{row['name']} {h.get('qty', 0)}주 · {amt:,}원 "
                          f"({share:.1f}% / 목표 {row['target']:.0f}%)")
-        self.send("\n".join(lines))
+        self.send("\n".join(lines), buttons=[("점검", "go:check"), ("종목 분석", "go:review")])
 
     def cmd_candidates(self) -> None:
         kis = KISClient()
@@ -261,6 +328,7 @@ class Bot:
             self.send("볼 종목이 없습니다. 예) /review 삼성전자 현대차")
             return
 
+        self.typing()
         self.send(f"[리포트] {' · '.join(names)}\n재료를 모으는 중입니다. 잠시만요.")
 
         재료, rows = [], []
@@ -349,6 +417,60 @@ class Bot:
 - 파일을 고쳤으면 무엇을 어떻게 고쳤는지 한 줄로 알려라.
 - 답은 짧게. 다섯 줄을 넘기지 마라. 폰으로 읽는다."""
 
+    INIT_RULES = """\
+너는 이 저장소(ai-trading-lab)의 작업자다. 사용자의 첫 설정을 돕는다.
+
+순서
+1) `.agents/skills/investment-habit-rules/SKILL.md` 를 읽고 그 방식대로 한다.
+   투자 습관을 **한 번에 하나씩** 묻는다. 한꺼번에 여러 개를 묻지 마라.
+2) 답을 `내-투자-판단.md` 의 「원하는 방식」·「하지 말 것」에 적는다.
+   **사용자가 말한 문장만** 적는다. 네가 지어내지 마라.
+3) 그 내용으로 `내-투자-스펙.md` 표 ①~④ 를 채우고 `python sync_spec.py` 로 반영한다.
+4) `routines/` 의 「지시사항」을 사용자 성향에 맞춘다.
+   자주 보고 싶어 하면 주기를 짧게, 느긋하면 길게.
+5) 무엇을 어떻게 바꿨는지 **바뀐 것만** 목록으로 알려라.
+
+지켜라
+- 주문을 내지 마라. --execute · confirm · KIS_ENV=real 은 절대 쓰지 마라.
+- 폰으로 읽는다. 한 번에 다섯 줄을 넘기지 마라.
+- 이미 채워져 있으면 「지금 이렇습니다」를 먼저 보여주고 고칠지 묻는다."""
+
+    RESET_RULES = """\
+너는 이 저장소(ai-trading-lab)의 작업자다. 사용자가 처음으로 되돌리기를 원한다.
+
+할 일
+1) `내-투자-스펙.md` 를 저장소 기본값(시총 상위 다섯 종목 각 20% · 매주 월요일 ·
+   허용 오차 5%p · 한 종목 몰빵·레버리지 금지)으로 되돌린다.
+2) `python sync_spec.py` 로 반영한다.
+3) `python agent/agent.py --reset-mock` 으로 연습 계좌를 처음 상태로 되돌린다.
+4) `.state/` 안의 루틴 기억을 지운다.
+5) **`내-투자-판단.md` 는 지우지 마라.** 1주차에 사람이 쓴 글이고 3·4주차가 읽는다.
+6) 무엇을 되돌렸는지 목록으로 알려라.
+
+주문을 내지 마라. 폰으로 읽는다. 다섯 줄을 넘기지 마라."""
+
+    def cmd_init(self, arg: str = "") -> None:
+        """처음 설정. 투자 성향을 묻고 스펙과 루틴을 맞춘다.
+
+        `/init 초기화` 라고 하면 기본값으로 되돌린다.
+        1주차 investment-habit-rules 스킬이 하던 인터뷰를 폰에서 잇는다.
+        """
+        도구 = judge.available()
+        if not 도구:
+            self.send("쓸 수 있는 코딩 앱이 없습니다. 노트북에서 클로드나 코덱스를 켜 주세요.")
+            return
+        되돌리기 = any(w in arg for w in ("초기화", "리셋", "처음으로", "reset"))
+        if 되돌리기:
+            self.send("[초기화] 기본값으로 되돌립니다. 내-투자-판단.md 는 그대로 둡니다.")
+            규칙, 질문 = self.RESET_RULES, "저장소를 처음 상태로 되돌려라."
+        else:
+            self.send(f"[처음 설정] {도구} 가 투자 성향을 하나씩 묻습니다.\n"
+                      "노트북 화면에서 답해 주세요. 다 되면 여기로 알려 드립니다.")
+            규칙 = self.INIT_RULES
+            질문 = arg.strip() or "첫 설정을 시작하라."
+        답 = judge.ask(재료=f"저장소 위치: {ROOT}", 질문=질문, 규칙=규칙)
+        self.send(답 or "답을 못 받았습니다. 노트북 화면을 확인해 주세요.")
+
     def cmd_ask(self, arg: str = "") -> None:
         """폰에서 시스템을 고친다. 스펙·루틴·예약을 말로 바꾼다.
 
@@ -381,25 +503,91 @@ class Bot:
             return
         self.pending_rebalance = 0.0
         rep = build_report(execute=True)
-        self.send(to_plain_text(rep))
+        본문 = to_plain_text(rep)
+
+        # 체결 내역을 먼저, 따로 보낸다. 긴 본문에 섞이면 무엇이 나갔는지 안 보인다.
+        er = rep.execute_result
+        if er and er.kind == "executed" and er.rows:
+            된 = [e for e in er.rows if e.ok]
+            안된 = [e for e in er.rows if not e.ok]
+            줄 = [f"[체결] {er.execution_kind} · {len(된)}건", ""]
+            줄 += [f"{'매수' if e.verb == '매수' else '매도'}  {e.name}  {e.qty}주" for e in 된]
+            if 안된:
+                줄 += ["", "안 나간 것"]
+                줄 += [f"{e.name}  {e.msg}" for e in 안된]
+            self.send("\n".join(줄))
+
+        self.send(본문)
+        for url in rep.charts:
+            self.send_photo(url)
+        # 「낼 주문이 없습니다」가 성공인지 실패인지 헷갈린다. 무슨 뜻인지 붙여 준다.
+        if "이번에 낼 주문은 없습니다" in 본문:
+            self.send("주문은 나가지 않았습니다. 고장이 아닙니다.\n"
+                      "이미 목표에 가깝거나, 한 주 값이 남은 현금보다 크거나,\n"
+                      "현금 최소선을 지키느라 건너뛴 것입니다. 위 각 줄에 사유가 있습니다.\n\n"
+                      "더 맞추고 싶으면 /update_config 로 허용 오차를 좁히거나\n"
+                      "현금 최소선을 낮춰 보세요.")
+        else:
+            self.send("주문이 끝났습니다. /status 로 지금 비중을 다시 보세요.")
 
     # ── 루프 ────────────────────────────────────────────────
     def on_button(self, q: dict) -> None:
-        """버튼을 눌렀을 때. 누가 눌렀는지 반드시 확인한다."""
+        """버튼을 눌렀을 때. 누가 눌렀는지 반드시 확인한다.
+
+        누르고 아무 반응이 없으면 눌린 건지 알 수가 없다. 세 가지로 알린다.
+        1) 버튼 위에 뜨는 짧은 알림  2) 원래 메시지의 버튼을 결과 문구로 바꾸기
+        3) 진행 중이라는 메시지 — 주문은 몇 초 걸린다
+        """
         data = q.get("data", "")
-        chat = str((q.get("message") or {}).get("chat", {}).get("id", ""))
-        self.call("answerCallbackQuery", {"callback_query_id": q["id"]})
+        msg = q.get("message") or {}
+        chat = str(msg.get("chat", {}).get("id", ""))
         if chat != self.owner:
+            self.call("answerCallbackQuery", {"callback_query_id": q["id"]})
             return                                   # 내 방이 아니면 무시한다
-        if data == "rb:ok":
-            if self.pending_rebalance and time.time() - self.pending_rebalance < CONFIRM_WINDOW:
-                self.cmd_rebalance(confirmed=True)
-            else:
-                self.pending_rebalance = 0.0
-                self.send("승인 시간이 지났습니다. /rebalance 부터 다시 하세요.")
-        elif data == "rb:no":
+
+        if data.startswith("go:"):
+            self.call("answerCallbackQuery", {"callback_query_id": q["id"]})
+        else:
+            누름 = "승인" if data == "rb:ok" else "거절"
+            self.call("answerCallbackQuery",
+                      {"callback_query_id": q["id"], "text": f"{누름}했습니다"})
+            self._replace_buttons(msg, f"눌림: {누름}")
+
+        if data.startswith("go:"):
+            이름 = data[3:]
+            if 이름 == "review":
+                self.send("무엇을 볼까요? 「/review 삼성전자 현대차」 처럼 보내 주세요.")
+            elif 이름 == "journal":
+                self.send("오늘 판단을 적어 주세요. 「/journal 오늘 안 팔았다」 처럼요.")
+            elif 이름 == "rebalance":
+                self.cmd_rebalance(confirmed=False)
+            elif 이름 == "check":
+                self.cmd_check()
+            return
+        if data == "rb:no":
             self.pending_rebalance = 0.0
             self.send("거절했습니다. 주문은 나가지 않았습니다.")
+            return
+        if not self.pending_rebalance or time.time() - self.pending_rebalance >= CONFIRM_WINDOW:
+            self.pending_rebalance = 0.0
+            self.send("승인 시간이 지났습니다. /rebalance 부터 다시 하세요.")
+            return
+        self.send("승인했습니다. 주문을 넣는 중입니다. 몇 초 걸립니다.")
+        self.cmd_rebalance(confirmed=True)
+
+    def _replace_buttons(self, msg: dict, label: str) -> None:
+        """누른 뒤에는 버튼을 결과 문구로 바꾼다. 두 번 눌리는 것도 막는다."""
+        mid = msg.get("message_id")
+        if not mid:
+            return
+        try:
+            self.call("editMessageReplyMarkup", {
+                "chat_id": self.owner, "message_id": mid,
+                "reply_markup": {"inline_keyboard": [[
+                    {"text": label, "callback_data": "done"}]]},
+            })
+        except (urllib.error.HTTPError, urllib.error.URLError, RuntimeError):
+            pass
 
     def dispatch(self, text: str) -> None:
         word = text.strip().lstrip("/").split("@")[0].split()[0] if text.strip() else ""
@@ -409,6 +597,7 @@ class Bot:
             fresh = time.time() - self.pending_rebalance < CONFIRM_WINDOW
             if word in ("승인", "예", "네", "yes", "y"):
                 if fresh:
+                    self.send("승인했습니다. 주문을 넣는 중입니다. 몇 초 걸립니다.")
                     self.cmd_rebalance(confirmed=True)
                 else:
                     self.pending_rebalance = 0.0
@@ -418,14 +607,15 @@ class Bot:
                 self.pending_rebalance = 0.0
                 self.send("거절했습니다. 주문은 나가지 않았습니다.")
                 return
-            self.pending_rebalance = 0.0  # 다른 말을 해도 취소한다
+            # 다른 명령은 그대로 받는다. 승인 전에 잔고를 확인하는 건 자연스럽다.
+            # 대기는 시간이 지나거나 거절할 때만 풀린다.
 
         if not name:
             self.send("모르는 명령입니다. /help 를 보내 보세요.")
             return
         if name == "rebalance":
             self.cmd_rebalance(confirmed=False)
-        elif name in ("review", "journal", "ask"):
+        elif name in ("review", "journal", "ask", "init"):
             뒤 = text.strip().lstrip("/")[len(word):].strip()
             getattr(self, f"cmd_{name}")(뒤)
         else:

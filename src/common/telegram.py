@@ -86,10 +86,17 @@ def report(rep: Report) -> None:
 
     try:
         _, html = to_telegram_html(rep)
+        # 알림을 받고 바로 이어갈 수 있게 버튼을 붙인다. 봇이 켜져 있을 때만 눌린다.
+        키보드 = {"inline_keyboard": [[
+            {"text": "점검", "callback_data": "go:check"},
+            {"text": "종목 분석", "callback_data": "go:review"},
+            {"text": "기록 남기기", "callback_data": "go:journal"},
+        ]]}
         if len(html) <= _TEXT_LIMIT:
             # 표가 표로 보이게 고정폭으로 보낸다. 길면 평문으로 잘라 보낸다.
             _api(token, "sendMessage", {"chat_id": chat_id, "text": html,
-                                        "parse_mode": "HTML"})
+                                        "parse_mode": "HTML",
+                                        "reply_markup": 키보드})
         else:
             for part in _chunk(text):
                 _api(token, "sendMessage", {"chat_id": chat_id, "text": part})

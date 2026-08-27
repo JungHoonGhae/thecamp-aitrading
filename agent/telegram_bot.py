@@ -38,21 +38,22 @@ from common.report import to_plain_text  # noqa: E402
 
 API = "https://api.telegram.org/bot{token}/{method}"
 POLL_SECONDS = 50          # 긴 폴링. 이 시간 동안 서버가 답을 붙잡고 있다가 준다.
-CONFIRM_WINDOW = 120       # 리밸런싱 확인을 기다리는 시간(초)
+CONFIRM_WINDOW = 900       # 승인을 기다리는 시간(초). 폰을 바로 못 보는 일이 흔하다
 
 # 텔레그램 명령 메뉴. 이름은 소문자 영문만 된다 — 설명은 한글이어도 된다.
 COMMANDS = [
-    ("check", "포트폴리오 점검 (미리보기, 주문 없음)"),
-    ("balance", "지금 잔고와 현금"),
-    ("candidates", "정량 후보 — 시총 상위에서 걸러 본다"),
-    ("news", "정성 브리프 — 내 종목 뉴스 제목"),
-    ("spec", "내 스펙 네 칸"),
-    ("routines", "루틴 목록 — 정해진 주기에 도는 것들"),
-    ("report", "종목 리포트 — 뒤에 종목과 하고 싶은 말을 적는다"),
-    ("journal", "오늘 판단 한 줄 남기기 — 뒤에 그대로 적는다"),
-    ("ask", "무엇이든 시키기 — 스펙 고치기·예약 바꾸기·물어보기"),
-    ("rebalance", "리밸런싱 실행 (확인 한 번 더)"),
-    ("help", "명령 목록"),
+    # 순서가 곧 하루의 순서다. 설명은 무엇을 하는지와 무엇이 남는지만 적는다.
+    ("check", "목표와 지금을 견주고 조정안을 보여준다. 주문은 나가지 않는다"),
+    ("balance", "총자산과 종목별 비중을 목표와 함께 보여준다"),
+    ("spec", "내가 정한 규칙 네 칸을 보여준다"),
+    ("report", "종목을 분석한다. 뒤에 종목 이름과 궁금한 것을 적는다"),
+    ("candidates", "시총 상위에서 내 규칙에 걸리지 않는 후보를 고른다"),
+    ("news", "내 종목의 뉴스 제목을 모아 보여준다"),
+    ("journal", "오늘 판단을 내-투자-판단.md 에 한 줄로 남긴다"),
+    ("routines", "정해진 시각에 도는 루틴 목록을 보여준다"),
+    ("ask", "스펙·루틴·예약을 고친다. 뒤에 시킬 말을 적는다"),
+    ("rebalance", "목표 비중으로 되돌린다. 승인해야 주문이 나간다"),
+    ("help", "명령 목록을 보여준다"),
 ]
 
 # 슬래시를 모르는 사람을 위한 말 트리거. 같은 일을 한다.
@@ -129,9 +130,15 @@ class Bot:
         with urllib.request.urlopen(req, timeout=POLL_SECONDS + 15) as resp:
             return json.loads(resp.read().decode())
 
-    def send(self, text: str) -> None:
-        for i in range(0, len(text), 4000):
-            self.call("sendMessage", {"chat_id": self.owner, "text": text[i:i + 4000]})
+    def send(self, text: str, buttons: list[tuple[str, str]] | None = None) -> None:
+        """버튼을 주면 메시지 아래에 붙는다. 타이핑 대신 눌러서 답할 수 있다."""
+        parts = [text[i:i + 4000] for i in range(0, len(text), 4000)] or [text]
+        for i, part in enumerate(parts):
+            payload = {"chat_id": self.owner, "text": part}
+            if buttons and i == len(parts) - 1:
+                payload["reply_markup"] = {"inline_keyboard": [
+                    [{"text": label, "callback_data": data} for label, data in buttons]]}
+            self.call("sendMessage", payload)
 
     def send_photo(self, url: str, caption: str = "") -> None:
         try:
@@ -142,8 +149,8 @@ class Bot:
 
     # ── 명령 ────────────────────────────────────────────────
     def cmd_help(self) -> None:
-        lines = ["내 투자 시스템입니다. 아래 명령을 쓰세요.", ""]
-        lines += [f"/{name} — {desc}" for name, desc in COMMANDS]
+        lines = ["내 투자 시스템입니다. 위에서부터 하루 순서입니다.", ""]
+        lines += [f"/{name}   {desc}" for name, desc in COMMANDS]
         lines += ["", "슬래시가 번거로우면 「점검」 「잔고」 「후보」 처럼 말로 보내도 됩니다."]
         self.send("\n".join(lines))
 
@@ -345,16 +352,33 @@ class Bot:
         if not confirmed:
             self.pending_rebalance = time.time()
             self.send("[리밸런싱] 승인이 필요합니다.\n"
-                      "실행하면 모의투자로 주문이 나갑니다.\n\n"
-                      "승인하려면 2분 안에 「승인」 이라고 보내 주세요.\n"
-                      "그만두려면 「거절」 이라고 보내면 됩니다.\n"
-                      "가드레일을 어기는 주문은 승인해도 차단됩니다.")
+                      "실행하면 모의투자로 주문이 나갑니다.\n"
+                      "가드레일을 어기는 주문은 승인해도 차단됩니다.\n\n"
+                      "아래 버튼을 누르거나, 15분 안에 「승인」 이라고 보내 주세요.",
+                      buttons=[("승인", "rb:ok"), ("거절", "rb:no")])
             return
         self.pending_rebalance = 0.0
         rep = build_report(execute=True)
         self.send(to_plain_text(rep))
 
     # ── 루프 ────────────────────────────────────────────────
+    def on_button(self, q: dict) -> None:
+        """버튼을 눌렀을 때. 누가 눌렀는지 반드시 확인한다."""
+        data = q.get("data", "")
+        chat = str((q.get("message") or {}).get("chat", {}).get("id", ""))
+        self.call("answerCallbackQuery", {"callback_query_id": q["id"]})
+        if chat != self.owner:
+            return                                   # 내 방이 아니면 무시한다
+        if data == "rb:ok":
+            if self.pending_rebalance and time.time() - self.pending_rebalance < CONFIRM_WINDOW:
+                self.cmd_rebalance(confirmed=True)
+            else:
+                self.pending_rebalance = 0.0
+                self.send("승인 시간이 지났습니다. /rebalance 부터 다시 하세요.")
+        elif data == "rb:no":
+            self.pending_rebalance = 0.0
+            self.send("거절했습니다. 주문은 나가지 않았습니다.")
+
     def dispatch(self, text: str) -> None:
         word = text.strip().lstrip("/").split("@")[0].split()[0] if text.strip() else ""
         name = word if word in dict(COMMANDS) else ALIASES.get(word, "")
@@ -399,6 +423,9 @@ class Bot:
                 continue
             for upd in res.get("result", []):
                 self.offset = upd["update_id"] + 1
+                if "callback_query" in upd:
+                    self.on_button(upd["callback_query"])
+                    continue
                 msg = upd.get("message") or {}
                 if str(msg.get("chat", {}).get("id")) != self.owner:
                     continue  # 내 방이 아니면 무시한다. 이 줄을 지우지 마세요.

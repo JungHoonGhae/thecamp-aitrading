@@ -26,7 +26,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from common.kis import KISClient, reset_mock_ledger  # noqa: E402
 from common.telegram import report  # noqa: E402
-from common.chart import overview_chart_url, weight_donut_url  # noqa: E402
+from common.chart import overview_chart_url  # noqa: E402
 from common.report import (  # noqa: E402
     Callout, ComparisonRow, ExecutionRow, ExecuteResult, PreviewRow, Report,
 )
@@ -211,9 +211,8 @@ def build_report(execute: bool) -> Report:
         er = ExecuteResult("executed", execution_kind=kind, rows=rows)
 
     # 목표 vs 현재 비중을 차트 이미지로 함께 보고 (텔레그램에서 그림으로 보임)
-    # 한 장에 지금·목표·벌어진 폭이 다 보인다. 구성 비율만 볼 도넛을 뒤에 붙인다.
-    charts = [overview_chart_url(chart_rows, cash_w),
-              weight_donut_url(chart_rows, cash_w)]
+    # 한 장이면 된다. 여러 장을 보내면 폰에서 번갈아 봐야 한다.
+    charts = [overview_chart_url(chart_rows, cash_w)]
 
     return Report(
         mode_label=mode_label,

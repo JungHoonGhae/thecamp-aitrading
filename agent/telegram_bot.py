@@ -50,6 +50,7 @@ COMMANDS = [
     ("routines", "루틴 목록 — 정해진 주기에 도는 것들"),
     ("report", "종목 리포트 — 뒤에 종목과 하고 싶은 말을 적는다"),
     ("journal", "오늘 판단 한 줄 남기기 — 뒤에 그대로 적는다"),
+    ("ask", "무엇이든 시키기 — 스펙 고치기·예약 바꾸기·물어보기"),
     ("rebalance", "리밸런싱 실행 (확인 한 번 더)"),
     ("help", "명령 목록"),
 ]
@@ -64,6 +65,7 @@ ALIASES = {
     "루틴": "routines", "루틴목록": "routines",
     "분석": "report", "리포트": "report",
     "기록": "journal", "일지": "journal", "메모": "journal",
+    "시켜": "ask", "물어봐": "ask", "고쳐": "ask",
     "리밸런싱": "rebalance", "조정": "rebalance",
     "도움": "help", "도움말": "help", "명령": "help",
 }
@@ -302,6 +304,43 @@ class Bot:
         self.send(f"[기록] {오늘}\n{한줄}\n\n"
                   "내-투자-판단.md 회차 표에 남겼습니다. 3·4주차가 이 칸을 읽습니다.")
 
+    ASK_RULES = """\
+너는 이 저장소(ai-trading-lab)의 작업자다. 사용자가 폰에서 보낸 부탁이다.
+
+할 수 있는 일
+- 내-투자-스펙.md 의 표 ①~④ 를 고치고 python sync_spec.py 로 반영한다.
+- routines/ 의 「지시사항」 값을 고친다. 새 루틴 파일을 만든다.
+- hermes cron 으로 예약을 걸거나 고치거나 지운다.
+- 무엇이든 묻는 말에 답한다.
+
+지켜라
+- **주문을 내지 마라.** --execute · confirm · KIS_ENV=real 은 절대 쓰지 마라.
+  주문은 사용자가 /rebalance 로 승인해야만 나간다.
+- .env 의 값을 화면에 그리지 마라.
+- 파일을 고쳤으면 무엇을 어떻게 고쳤는지 한 줄로 알려라.
+- 답은 짧게. 다섯 줄을 넘기지 마라. 폰으로 읽는다."""
+
+    def cmd_ask(self, arg: str = "") -> None:
+        """폰에서 시스템을 고친다. 스펙·루틴·예약을 말로 바꾼다.
+
+        예) /ask 삼성전자 비중을 30으로 올리고 반영해 줘
+            /ask 아침 브리핑을 7시로 바꿔 줘
+            /ask 저점고점 판독 기간을 3개월로 바꿔 줘
+        코딩 앱(claude·codex)이 저장소에서 직접 고친다. 주문은 못 낸다.
+        """
+        if not arg.strip():
+            self.send("무엇을 할지 뒤에 적어 주세요.\n"
+                      "예) /ask 삼성전자 비중을 30으로 올리고 반영해 줘\n"
+                      "예) /ask 아침 브리핑을 7시로 바꿔 줘")
+            return
+        도구 = judge.available()
+        if not 도구:
+            self.send("쓸 수 있는 코딩 앱이 없습니다. 노트북에서 클로드나 코덱스를 켜 주세요.")
+            return
+        self.send(f"[{도구}] 저장소에서 작업합니다. 잠시만요.")
+        답 = judge.ask(재료=f"저장소 위치: {ROOT}", 질문=arg.strip(), 규칙=self.ASK_RULES)
+        self.send(답 or "답을 못 받았습니다. 노트북 화면을 확인해 주세요.")
+
     def cmd_rebalance(self, confirmed: bool) -> None:
         if not confirmed:
             self.pending_rebalance = time.time()
@@ -340,7 +379,7 @@ class Bot:
             return
         if name == "rebalance":
             self.cmd_rebalance(confirmed=False)
-        elif name in ("report", "journal"):
+        elif name in ("report", "journal", "ask"):
             뒤 = text.strip().lstrip("/")[len(word):].strip()
             getattr(self, f"cmd_{name}")(뒤)
         else:

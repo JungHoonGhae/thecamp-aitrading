@@ -116,7 +116,7 @@ description: >
   2026-08-21 장중 모의계좌에서 실측(총자산이 18,672,500원으로 표시됨).
 - **수정(2026-08-21 반영)**: `prvs_rcdl_excc_amt`(가수도정산금액 = 정산까지 반영된
   주문가능 현금)를 쓴다. 최신 코드면 안 난다.
-- **확인**: `PYTHONPATH=src python3 -m common.kis` 가 "kis 자가 검사 통과". 이어서
+- **확인**: `PYTHONPATH=src python -m common.kis` 가 "kis 자가 검사 통과". 이어서
   `KIS_MODE=live python agent/agent.py` 의 총자산이 실제 계좌 평가금액과 맞는지 본다.
 
 ### 4-2-c. `TimeoutError: The read operation timed out` / 응답이 30초 넘게 안 온다
@@ -141,13 +141,13 @@ description: >
 - **가장 흔한 원인**: 등록은 됐는데 **AI 도구를 안 껐다 켰다.** 실행 중인 대화 세션에는
   새로 등록한 MCP 가 안 붙는다. `claude mcp list` 에 `✔ Connected` 인데 도구가 안 보이면
   거의 이것이다. → AI 도구를 재시작(또는 Claude Code `/mcp` 에서 재연결).
-- **그다음 원인**: 등록 명령의 경로가 **절대경로가 아니거나** 오타. 또는 `python3` 가 없음.
+- **그다음 원인**: 등록 명령의 경로가 **절대경로가 아니거나** 오타. 또는 등록에 쓴 파이썬 명령이 그 컴퓨터에 없음.
 - **수정**:
-  1. `python3 <저장소>/agent/mcp_server.py` 를 그냥 실행해 본다 — 아무 것도 안 뜨고
+  1. `python <저장소>/agent/mcp_server.py` 를 그냥 실행해 본다 — 아무 것도 안 뜨고
      입력을 기다리면 **정상**이다(Ctrl+C 로 나온다). 에러가 뜨면 그 에러가 원인.
   2. `python verify.py` 가 5/5 인지 본다. MCP 서버 점검이 거기 들어 있다.
-  3. 다시 등록: `claude mcp add kis-lecture-lab -- python3 <절대경로>/agent/mcp_server.py`
-     (`python3` 가 없으면 `python` 으로). Codex 면 `codex mcp add kis-lecture-lab -- python3 <절대경로>/agent/mcp_server.py`
+  3. 다시 등록: `claude mcp add kis-lecture-lab -- python <절대경로>/agent/mcp_server.py`
+     (맥에서 `python` 이 없으면 `python3` 으로). Codex 면 `codex mcp add kis-lecture-lab -- python <절대경로>/agent/mcp_server.py`
 - **확인**: `claude mcp list` 에 `kis-lecture-lab ... ✔ Connected`. Codex 면 `codex mcp list` 에 `kis-lecture-lab` 이 있다.
 
 ### 4-5. 코딩도우미로 샀는데 잔고가 그대로다

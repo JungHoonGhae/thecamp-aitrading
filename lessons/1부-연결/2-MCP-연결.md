@@ -12,9 +12,9 @@ AI가 **무엇을 부를지 스스로 골라** 시세·잔고를 가져오게 �
 
 ```
 이 저장소의 agent/mcp_server.py 를 MCP 서버로 등록해줘.
-Claude Code면  claude mcp add kis-lecture-lab -- python3 <이 저장소 절대경로>/agent/mcp_server.py
-Codex면        codex  mcp add kis-lecture-lab -- python3 <이 저장소 절대경로>/agent/mcp_server.py
-Windows면 python3 자리에 python 을 넣어줘 (Windows 에는 python3 명령이 없습니다).
+Claude Code면  claude mcp add kis-lecture-lab -- python <이 저장소 절대경로>/agent/mcp_server.py
+Codex면        codex  mcp add kis-lecture-lab -- python <이 저장소 절대경로>/agent/mcp_server.py
+맥에서 python 이 없다고 나오면 python 자리에 `python3` 을 넣어줘.
 등록되면 어떤 도구가 연결됐는지 목록으로 보여줘.
 ```
 

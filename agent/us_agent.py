@@ -102,7 +102,7 @@ def main() -> None:
     print(f"\n규칙 코드 · {market_label} 주문 미리보기")
     print("─" * 58)
     print(f"채택한 제안 번호: {spec.source_proposal_id}")
-    print(f"채택 스펙 해시: {spec.spec_hash}")
+    print(f"채택 스펙 번호: {spec.spec_hash}")
     if plan.blocks:
         for reason in plan.blocks:
             print(f"차단: {reason}")
@@ -134,7 +134,7 @@ def main() -> None:
         print(f"  {mark} · {fill['ticker']} {verb} {fill['qty']}주 · {fill['message']}")
     after = broker.get_balance()
     print(f"남은 현금: {money(after['cash'], plan.currency)}")
-    print("실제 돈이 움직이지 않은 수업용 체결입니다.")
+    print("실제 돈이 움직이지 않은 미국 연습 계좌 체결입니다.")
 
 
 if __name__ == "__main__":

@@ -10,13 +10,13 @@
 | 확인용 브라우저 | 코딩 앱 브라우저 | 시총 1위만 네이버 뉴스 **제목** `https://finance.naver.com/item/main.naver?code=종목코드` |
 
 코딩도우미로 매수·매도를 넣지 마라. 주문이 안 나간다.
-평일에 kis-trade-mcp 가 없으면 `../kis-trading-mcp/SKILL.md` 를 먼저 한다.
+평일에 kis-trade-mcp 가 없으면 `../../kis-trading-mcp/SKILL.md` 를 먼저 한다.
 
 네이버가 막히면 MCP 제목만으로 표를 끝내고 「브라우저 막힘」을 한 줄 적는다.
 수업 랩이 안 보이면 등록한다.
 
 ```
-이 저장소의 agent/mcp_server.py 를 MCP 서버로 등록해줘. Windows 면 python 으로 (python3 없음).
+이 저장소의 agent/mcp_server.py 를 MCP 서버로 등록해줘. (명령은 python — 맥에서 없다면 `python3`)
 ```
 
 등록 후 앱을 한 번 끄고 켠다. 그다음 조회로 돌아온다.

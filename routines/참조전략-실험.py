@@ -1,4 +1,4 @@
-"""참조전략 실험 — 고정 US/KR 12–2 결과를 같은 조건으로 읽는다.
+"""참조 실험 — 고정 US/KR 참조 결과를 같은 조건으로 읽는다.
 
 카테고리: 정보수집 (읽기만 합니다. 주문이 나가지 않습니다)
 """
@@ -26,7 +26,7 @@ def main() -> None:
         (FIXTURES / "reference_selection.json").read_text(encoding="utf-8")
     )
     routine = 루틴(
-        "참조전략 실험",
+        "참조 실험",
         정보수집,
         출처=["고정 manifest", "고정 US/KR 결과"],
     )

@@ -48,7 +48,7 @@ open-trading-api 를 최신으로 받아 줘.
 ```
 
 수업 실습에는 영향이 없습니다. 우리는 그 저장소의 `backtester` · `strategy_builder` 를
-쓰지 않습니다. 백테스팅은 `routines/내전략-백테스팅.py` 로 직접 만들었습니다.
+쓰지 않습니다. 백테스팅은 고정 참조 결과를 읽는 `routines/참조전략-실험.py` 가 대신합니다.
 다만 같은 저장소를 받아 두었으므로 최신으로 맞추는 편이 낫습니다.
 
 공지 원문: <https://apiportal.koreainvestment.com/community>
@@ -302,7 +302,7 @@ npx -y @koreainvestment/kis-code-assistant-mcp
 
 ## 2주차 미국 주식 참조 예제 — 평일에만
 
-토요일 본편은 `python agent/us_agent.py`의 로컬 모의계좌다. 장 시간과 키에 기대지 않는다.
+토요일 본편은 `python agent/us_agent.py`의 미국 연습 계좌다. 장 시간과 키에 기대지 않는다.
 평일에 학생이 KIS 모의 키와 트레이딩 MCP를 붙였을 때만, 로컬에서 이미 승인한 주문 계획을
 공식 해외주식 모의주문으로 옮길 수 있다.
 

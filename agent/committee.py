@@ -46,7 +46,7 @@ def main() -> None:
     save_advisory(proposal, output)
 
     market_label = "미국 주식" if args.market == "US" else "한국 주식"
-    print(f"\n참조전략 실험 · {market_label} 판단 제안")
+    print(f"\n참조 실험 · {market_label} 판단 제안")
     print("─" * 58)
     print(packet["fixture_notice"])
     print(f"자료 기준일: {packet['as_of']}")

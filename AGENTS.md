@@ -38,6 +38,9 @@ AI 코딩 도구(Claude Code, Codex, Cursor, Gemini 등)는 아래를 따르세�
   학생이 다음으로 넘어가도 되는지 물으면 이 신호 기준으로 답하세요.
 - 회귀 확인은 두 줄: `python verify.py` (5/5) 와
   `python -m unittest discover -s tests -t .` (테스트 전부 통과). 코드를 고쳤으면 둘 다 돌리세요.
+- **화면 출력도 용어 표면입니다.** `committee.py`·`us_agent.py`·텔레그램 `/help` 가 찍는
+  문자열은 `CONTEXT.md` Language 절의 정본 용어를 따릅니다. 용어를 바꾸면 화면 문자열과
+  `tests/test_docs_lint.py` 의 폐기어 목록을 함께 고치세요.
 - **주문은 언제나 규칙(코드)이 냅니다.** `judge.py` 의 AI 판단은 읽고 말할 뿐이고
   주문에 닿지 않습니다. 이 선을 넘기는 코드를 쓰지 마세요.
 - **공식과 비공식 소스는 무게가 다릅니다.** `market.py`(야후)는 문서 없는 주소라

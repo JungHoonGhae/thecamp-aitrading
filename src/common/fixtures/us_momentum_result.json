@@ -1,0 +1,2723 @@
+{
+  "currency": "USD",
+  "input_hash": "b63bcccf6e3931eaf1982b1177cc758d77a1d543dc036c52ae5f676bbcfe3acc",
+  "manifest_hash": "519795069c0ee91de7305ff5f0a2d7d152e7b94003a5df45bdef59957f60ceb4",
+  "market": "US",
+  "metadata": {
+    "adjustment": "total_return_proxy",
+    "cost_bps": {
+      "buy": 10,
+      "sell": 10
+    },
+    "generation_command": "python3 generate_reference_results.py",
+    "limitations": [
+      "현재 구성 종목을 과거 전체 기간에 고정했으므로 생존편향이 있습니다.",
+      "상장폐지 수익률을 포함하지 않아 시장 전체 구성종목 백테스트가 아닙니다.",
+      "Yahoo Finance 조정주가와 ETF를 사용한 비공식 학습용 재현이며 주문 근거가 아닙니다.",
+      "ETF 추적오차와 비용 때문에 실제 S&P 500·KOSPI 200 총수익지수와 다를 수 있습니다."
+    ],
+    "period": "2015-01 through 2025-12; 2015 warm-up",
+    "raw_history_committed": false,
+    "retrieved_at": "2026-08-28",
+    "source": "Yahoo Finance chart endpoint (unofficial)",
+    "universe_method": "2015년 이전 상장된 미국 대형주 10개를 2026-08-28에 고정한 수업용 바스켓"
+  },
+  "months": [
+    {
+      "benchmark_return": -0.049786438169,
+      "buy_turnover": 1.0,
+      "cost": 0.001,
+      "gross_return": -0.08809203163233333,
+      "is_rebalance_month": true,
+      "month": "2016-01",
+      "net_return": -0.08909203163233333,
+      "scheduled_exits": [],
+      "scores": {
+        "AMZN": 1.1420977504060779,
+        "GOOGL": 0.4375494019824382,
+        "NVDA": 0.6082844867474004
+      },
+      "selected": [
+        "AMZN",
+        "NVDA",
+        "GOOGL"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": -0.000825924384,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.014042868736000002,
+      "is_rebalance_month": true,
+      "month": "2016-02",
+      "net_return": -0.014042868736000002,
+      "scheduled_exits": [],
+      "scores": {
+        "AMZN": 0.906439471257154,
+        "GOOGL": 0.44732574362949706,
+        "NVDA": 0.745139228248743
+      },
+      "selected": [
+        "AMZN",
+        "NVDA",
+        "GOOGL"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.067265713693,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.06842199528866666,
+      "is_rebalance_month": true,
+      "month": "2016-03",
+      "net_return": 0.067755328622,
+      "scheduled_exits": [
+        "NVDA"
+      ],
+      "scores": {
+        "AMZN": 0.5440867675087835,
+        "GOOGL": 0.3531983412408568,
+        "META": 0.4209191579632863
+      },
+      "selected": [
+        "AMZN",
+        "META",
+        "GOOGL"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.00394123543,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.046262457273333335,
+      "is_rebalance_month": true,
+      "month": "2016-04",
+      "net_return": 0.045595790606666665,
+      "scheduled_exits": [
+        "GOOGL"
+      ],
+      "scores": {
+        "AMZN": 0.48486966570431456,
+        "META": 0.30041342598176235,
+        "NVDA": 0.5228648963771962
+      },
+      "selected": [
+        "NVDA",
+        "AMZN",
+        "META"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.017011581804,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.14154574793133334,
+      "is_rebalance_month": true,
+      "month": "2016-05",
+      "net_return": 0.14154574793133334,
+      "scheduled_exits": [],
+      "scores": {
+        "AMZN": 0.4074635221522469,
+        "META": 0.4485212216055021,
+        "NVDA": 0.6312372794124386
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "AMZN"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.003476009204,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.013946704442000002,
+      "is_rebalance_month": true,
+      "month": "2016-06",
+      "net_return": -0.013946704442000002,
+      "scheduled_exits": [],
+      "scores": {
+        "AMZN": 0.536681944831175,
+        "META": 0.48478351551160825,
+        "NVDA": 0.6242867164460435
+      },
+      "selected": [
+        "NVDA",
+        "AMZN",
+        "META"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.036471291254,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.13326703210533333,
+      "is_rebalance_month": true,
+      "month": "2016-07",
+      "net_return": 0.13260036543866666,
+      "scheduled_exits": [
+        "META"
+      ],
+      "scores": {
+        "AMZN": 0.6650694249602971,
+        "GOOGL": 0.3866566061373049,
+        "NVDA": 1.3564910556941148
+      },
+      "selected": [
+        "NVDA",
+        "AMZN",
+        "GOOGL"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.001197547877,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.016399825591999997,
+      "is_rebalance_month": true,
+      "month": "2016-08",
+      "net_return": 0.01573315892533333,
+      "scheduled_exits": [
+        "GOOGL"
+      ],
+      "scores": {
+        "AMZN": 0.33473830494677426,
+        "JNJ": 0.24645066690098205,
+        "NVDA": 1.390136201859225
+      },
+      "selected": [
+        "NVDA",
+        "AMZN",
+        "JNJ"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 5.7848644e-05,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.07423419933366666,
+      "is_rebalance_month": true,
+      "month": "2016-09",
+      "net_return": 0.073567532667,
+      "scheduled_exits": [
+        "JNJ"
+      ],
+      "scores": {
+        "AMZN": 0.4794789240770345,
+        "META": 0.38588839844026923,
+        "NVDA": 1.5656139932318553
+      },
+      "selected": [
+        "NVDA",
+        "AMZN",
+        "META"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.017336779441,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.0010057160973333337,
+      "is_rebalance_month": true,
+      "month": "2016-10",
+      "net_return": 0.0010057160973333337,
+      "scheduled_exits": [],
+      "scores": {
+        "AMZN": 0.5025884780788643,
+        "META": 0.40289223440016264,
+        "NVDA": 1.5181300289045758
+      },
+      "selected": [
+        "NVDA",
+        "AMZN",
+        "META"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.03683836094,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.084590811569,
+      "is_rebalance_month": true,
+      "month": "2016-11",
+      "net_return": 0.08392414490233334,
+      "scheduled_exits": [
+        "META"
+      ],
+      "scores": {
+        "AMZN": 0.33776965335595643,
+        "NVDA": 1.4440451525879205,
+        "WMT": 0.29811420239498165
+      },
+      "selected": [
+        "NVDA",
+        "AMZN",
+        "WMT"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.020271845697,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.039222146220333334,
+      "is_rebalance_month": true,
+      "month": "2016-12",
+      "net_return": 0.038555479553666665,
+      "scheduled_exits": [
+        "AMZN"
+      ],
+      "scores": {
+        "META": 0.2566196441445723,
+        "NVDA": 1.261559790719327,
+        "WMT": 0.22604404130888267
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "WMT"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.017894332407,
+      "buy_turnover": 0.6666666666666666,
+      "cost": 0.0013333333333333333,
+      "gross_return": 0.011160964594333333,
+      "is_rebalance_month": true,
+      "month": "2017-01",
+      "net_return": 0.009827631261,
+      "scheduled_exits": [
+        "META",
+        "WMT"
+      ],
+      "scores": {
+        "BAC": 0.27454354116848734,
+        "JPM": 0.2499451709425664,
+        "NVDA": 1.8242213688398499
+      },
+      "selected": [
+        "NVDA",
+        "BAC",
+        "JPM"
+      ],
+      "sell_turnover": 0.6666666666666666
+    },
+    {
+      "benchmark_return": 0.039291698125,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.03051079367266667,
+      "is_rebalance_month": true,
+      "month": "2017-02",
+      "net_return": 0.03051079367266667,
+      "scheduled_exits": [],
+      "scores": {
+        "BAC": 0.587405356782609,
+        "JPM": 0.48306585798889645,
+        "NVDA": 2.6792796272424355
+      },
+      "selected": [
+        "NVDA",
+        "BAC",
+        "JPM"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.001249992039,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.0004946323723333314,
+      "is_rebalance_month": true,
+      "month": "2017-03",
+      "net_return": 0.0004946323723333314,
+      "scheduled_exits": [],
+      "scores": {
+        "BAC": 0.8366098501055019,
+        "JPM": 0.5457143043742612,
+        "NVDA": 2.5022133228488705
+      },
+      "selected": [
+        "NVDA",
+        "BAC",
+        "JPM"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.009926160537,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.018991544491666665,
+      "is_rebalance_month": true,
+      "month": "2017-04",
+      "net_return": -0.018991544491666665,
+      "scheduled_exits": [],
+      "scores": {
+        "BAC": 0.8469875704474183,
+        "JPM": 0.573508639190984,
+        "NVDA": 1.8687188541257642
+      },
+      "selected": [
+        "NVDA",
+        "BAC",
+        "JPM"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.014112778329,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.13885392276400002,
+      "is_rebalance_month": true,
+      "month": "2017-05",
+      "net_return": 0.13818725609733334,
+      "scheduled_exits": [
+        "JPM"
+      ],
+      "scores": {
+        "AAPL": 0.5649354915661924,
+        "BAC": 0.6443106304627588,
+        "NVDA": 2.0879888689808888
+      },
+      "selected": [
+        "NVDA",
+        "BAC",
+        "AAPL"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.00637530821,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.008931043963666667,
+      "is_rebalance_month": true,
+      "month": "2017-06",
+      "net_return": 0.008931043963666667,
+      "scheduled_exits": [],
+      "scores": {
+        "AAPL": 0.4600354136046243,
+        "BAC": 0.601584299489059,
+        "NVDA": 1.2427383413190993
+      },
+      "selected": [
+        "NVDA",
+        "BAC",
+        "AAPL"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.020553987035,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.050367497004000006,
+      "is_rebalance_month": true,
+      "month": "2017-07",
+      "net_return": 0.050367497004000006,
+      "scheduled_exits": [],
+      "scores": {
+        "AAPL": 0.6285082077769619,
+        "BAC": 0.7137275285337461,
+        "NVDA": 2.0880235477556472
+      },
+      "selected": [
+        "NVDA",
+        "BAC",
+        "AAPL"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.002917801341,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.009726321531,
+      "is_rebalance_month": true,
+      "month": "2017-08",
+      "net_return": 0.009059654864333334,
+      "scheduled_exits": [
+        "AAPL"
+      ],
+      "scores": {
+        "BAC": 0.6989992789913226,
+        "JPM": 0.4554594604566089,
+        "NVDA": 1.5460466921698317
+      },
+      "selected": [
+        "NVDA",
+        "BAC",
+        "JPM"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.020149536054,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.018504933385,
+      "is_rebalance_month": true,
+      "month": "2017-09",
+      "net_return": 0.017838266718333332,
+      "scheduled_exits": [
+        "JPM"
+      ],
+      "scores": {
+        "AAPL": 0.4209373774428997,
+        "BAC": 0.5094819398852248,
+        "NVDA": 1.6594441384810614
+      },
+      "selected": [
+        "NVDA",
+        "BAC",
+        "AAPL"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.023563705749,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.11151925993033333,
+      "is_rebalance_month": true,
+      "month": "2017-10",
+      "net_return": 0.11151925993033333,
+      "scheduled_exits": [],
+      "scores": {
+        "AAPL": 0.47627503159525997,
+        "BAC": 0.5497860256799663,
+        "NVDA": 1.4844790471365492
+      },
+      "selected": [
+        "NVDA",
+        "BAC",
+        "AAPL"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.030565953367,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.014300464636666664,
+      "is_rebalance_month": true,
+      "month": "2017-11",
+      "net_return": 0.013633797969999998,
+      "scheduled_exits": [
+        "AAPL"
+      ],
+      "scores": {
+        "BAC": 0.5591664871841633,
+        "JPM": 0.4022748714981861,
+        "NVDA": 1.52403566202582
+      },
+      "selected": [
+        "NVDA",
+        "BAC",
+        "JPM"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.012128111471,
+      "buy_turnover": 0.6666666666666666,
+      "cost": 0.0013333333333333333,
+      "gross_return": -0.018410494165333333,
+      "is_rebalance_month": true,
+      "month": "2017-12",
+      "net_return": -0.019743827498666666,
+      "scheduled_exits": [
+        "BAC",
+        "JPM"
+      ],
+      "scores": {
+        "AAPL": 0.5485263344645894,
+        "META": 0.5205202922969152,
+        "NVDA": 1.2502343606014112
+      },
+      "selected": [
+        "NVDA",
+        "AAPL",
+        "META"
+      ],
+      "sell_turnover": 0.6666666666666666
+    },
+    {
+      "benchmark_return": 0.056359050887,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.19001003174233333,
+      "is_rebalance_month": true,
+      "month": "2018-01",
+      "net_return": 0.18934336507566665,
+      "scheduled_exits": [
+        "AAPL"
+      ],
+      "scores": {
+        "AMZN": 0.5692720580665194,
+        "META": 0.5400257536451925,
+        "NVDA": 0.8876892394595892
+      },
+      "selected": [
+        "NVDA",
+        "AMZN",
+        "META"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.036360605113,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": -0.04268241340633333,
+      "is_rebalance_month": true,
+      "month": "2018-02",
+      "net_return": -0.043349080073,
+      "scheduled_exits": [
+        "META"
+      ],
+      "scores": {
+        "AMZN": 0.4201559139645663,
+        "NVDA": 0.7792073677208102,
+        "WMT": 0.517872371375161
+      },
+      "selected": [
+        "NVDA",
+        "WMT",
+        "AMZN"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.027410301374,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.030575754152333334,
+      "is_rebalance_month": true,
+      "month": "2018-03",
+      "net_return": -0.030575754152333334,
+      "scheduled_exits": [],
+      "scores": {
+        "AMZN": 0.7169484082338808,
+        "NVDA": 1.4285237580012082,
+        "WMT": 0.5417412220573337
+      },
+      "selected": [
+        "NVDA",
+        "AMZN",
+        "WMT"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.005168479335,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.025946589108333334,
+      "is_rebalance_month": true,
+      "month": "2018-04",
+      "net_return": 0.02527992244166667,
+      "scheduled_exits": [
+        "WMT"
+      ],
+      "scores": {
+        "AMZN": 0.7060143508783365,
+        "MSFT": 0.45359335088450714,
+        "NVDA": 1.2288381947408809
+      },
+      "selected": [
+        "NVDA",
+        "AMZN",
+        "MSFT"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.024308739089,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.07468089423266668,
+      "is_rebalance_month": true,
+      "month": "2018-05",
+      "net_return": 0.07468089423266668,
+      "scheduled_exits": [],
+      "scores": {
+        "AMZN": 0.5647087284277386,
+        "MSFT": 0.3611066228050588,
+        "NVDA": 1.2276467014267594
+      },
+      "selected": [
+        "NVDA",
+        "AMZN",
+        "MSFT"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.005751086064,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.006630143052999999,
+      "is_rebalance_month": true,
+      "month": "2018-06",
+      "net_return": -0.006630143052999999,
+      "scheduled_exits": [],
+      "scores": {
+        "AMZN": 0.5746014534539385,
+        "MSFT": 0.3593116468904958,
+        "NVDA": 0.5614436909881622
+      },
+      "selected": [
+        "AMZN",
+        "NVDA",
+        "MSFT"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.03704610289,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.05167645519433334,
+      "is_rebalance_month": true,
+      "month": "2018-07",
+      "net_return": 0.05167645519433334,
+      "scheduled_exits": [],
+      "scores": {
+        "AMZN": 0.6834917404714735,
+        "MSFT": 0.4619125894128795,
+        "NVDA": 0.7494512978107846
+      },
+      "selected": [
+        "NVDA",
+        "AMZN",
+        "MSFT"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.031919954065,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.11409069351133333,
+      "is_rebalance_month": true,
+      "month": "2018-08",
+      "net_return": 0.11409069351133333,
+      "scheduled_exits": [],
+      "scores": {
+        "AMZN": 0.7208284834439833,
+        "MSFT": 0.38287700722429463,
+        "NVDA": 0.46186467254780905
+      },
+      "selected": [
+        "AMZN",
+        "NVDA",
+        "MSFT"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.005945626788,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.0048492836646666666,
+      "is_rebalance_month": true,
+      "month": "2018-09",
+      "net_return": 0.0048492836646666666,
+      "scheduled_exits": [],
+      "scores": {
+        "AMZN": 0.8126046065795667,
+        "MSFT": 0.4387835491631915,
+        "NVDA": 0.4479110926225667
+      },
+      "selected": [
+        "AMZN",
+        "NVDA",
+        "MSFT"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": -0.069104297751,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.17268729970833332,
+      "is_rebalance_month": true,
+      "month": "2018-10",
+      "net_return": -0.17268729970833332,
+      "scheduled_exits": [],
+      "scores": {
+        "AMZN": 1.0936286640784951,
+        "MSFT": 0.535165457110143,
+        "NVDA": 0.573962175881422
+      },
+      "selected": [
+        "AMZN",
+        "NVDA",
+        "MSFT"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.018549262661,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.041231577565000004,
+      "is_rebalance_month": true,
+      "month": "2018-11",
+      "net_return": -0.041231577565000004,
+      "scheduled_exits": [],
+      "scores": {
+        "AMZN": 0.812210510213877,
+        "MSFT": 0.39974989822972096,
+        "NVDA": 0.3622070361053622
+      },
+      "selected": [
+        "AMZN",
+        "MSFT",
+        "NVDA"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": -0.088048446865,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": -0.10403179258133333,
+      "is_rebalance_month": true,
+      "month": "2018-12",
+      "net_return": -0.10469845924799999,
+      "scheduled_exits": [
+        "NVDA"
+      ],
+      "scores": {
+        "AAPL": 0.2881782304026925,
+        "AMZN": 0.3579858995432885,
+        "MSFT": 0.2853938798030906
+      },
+      "selected": [
+        "AMZN",
+        "AAPL",
+        "MSFT"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.080065770759,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.062982806174,
+      "is_rebalance_month": true,
+      "month": "2019-01",
+      "net_return": 0.06231613950733333,
+      "scheduled_exits": [
+        "AAPL"
+      ],
+      "scores": {
+        "AMZN": 0.44524442969698597,
+        "KO": 0.1365121730016654,
+        "MSFT": 0.31879359323690726
+      },
+      "selected": [
+        "AMZN",
+        "MSFT",
+        "KO"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.032415946277,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.017670864802333333,
+      "is_rebalance_month": true,
+      "month": "2019-02",
+      "net_return": 0.017004198135666667,
+      "scheduled_exits": [
+        "KO"
+      ],
+      "scores": {
+        "AMZN": 0.03520598770350869,
+        "MSFT": 0.08755163746184036,
+        "PG": 0.09381227528228431
+      },
+      "selected": [
+        "PG",
+        "MSFT",
+        "AMZN"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.018100190314,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.06143071299266667,
+      "is_rebalance_month": true,
+      "month": "2019-03",
+      "net_return": 0.060764046326,
+      "scheduled_exits": [
+        "MSFT"
+      ],
+      "scores": {
+        "AMZN": 0.1363880237183872,
+        "KO": 0.15212077052898,
+        "PG": 0.27226727430168784
+      },
+      "selected": [
+        "PG",
+        "KO",
+        "AMZN"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.040852170359,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.073259877838,
+      "is_rebalance_month": true,
+      "month": "2019-04",
+      "net_return": 0.07259321117133334,
+      "scheduled_exits": [
+        "KO"
+      ],
+      "scores": {
+        "AMZN": 0.13299576491380782,
+        "MSFT": 0.24817547087443015,
+        "PG": 0.28723891433024984
+      },
+      "selected": [
+        "PG",
+        "MSFT",
+        "AMZN"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.063771104649,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": -0.027799468291,
+      "is_rebalance_month": true,
+      "month": "2019-05",
+      "net_return": -0.028466134957666665,
+      "scheduled_exits": [
+        "AMZN"
+      ],
+      "scores": {
+        "MSFT": 0.28240724082130275,
+        "PEP": 0.255295214601603,
+        "PG": 0.47580710731715037
+      },
+      "selected": [
+        "PG",
+        "MSFT",
+        "PEP"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.069586851666,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.06018847788066667,
+      "is_rebalance_month": true,
+      "month": "2019-06",
+      "net_return": 0.06018847788066667,
+      "scheduled_exits": [],
+      "scores": {
+        "MSFT": 0.33783158059998697,
+        "PEP": 0.3086241486219681,
+        "PG": 0.503681845438922
+      },
+      "selected": [
+        "PG",
+        "MSFT",
+        "PEP"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.015119040148,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.033245472161,
+      "is_rebalance_month": true,
+      "month": "2019-07",
+      "net_return": 0.032578805494333334,
+      "scheduled_exits": [
+        "PEP"
+      ],
+      "scores": {
+        "MSFT": 0.27460065890544394,
+        "PG": 0.36222899915495566,
+        "WMT": 0.21057606136906926
+      },
+      "selected": [
+        "PG",
+        "MSFT",
+        "WMT"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.016743006095,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.024612089141000004,
+      "is_rebalance_month": true,
+      "month": "2019-08",
+      "net_return": 0.024612089141000004,
+      "scheduled_exits": [],
+      "scores": {
+        "MSFT": 0.2833266523059905,
+        "PG": 0.38824048786538845,
+        "WMT": 0.2656749891271746
+      },
+      "selected": [
+        "PG",
+        "MSFT",
+        "WMT"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.019457722713,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.013111555197666666,
+      "is_rebalance_month": true,
+      "month": "2019-09",
+      "net_return": 0.012444888531,
+      "scheduled_exits": [
+        "WMT"
+      ],
+      "scores": {
+        "KO": 0.2202303614716734,
+        "MSFT": 0.22809544201956133,
+        "PG": 0.466606117262637
+      },
+      "selected": [
+        "PG",
+        "MSFT",
+        "KO"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.022104681277,
+      "buy_turnover": 0.6666666666666666,
+      "cost": 0.0013333333333333333,
+      "gross_return": -0.00133825633,
+      "is_rebalance_month": true,
+      "month": "2019-10",
+      "net_return": -0.0026715896633333334,
+      "scheduled_exits": [
+        "KO",
+        "MSFT"
+      ],
+      "scores": {
+        "PEP": 0.25179263724751966,
+        "PG": 0.4887904847609459,
+        "WMT": 0.2425385922611789
+      },
+      "selected": [
+        "PG",
+        "PEP",
+        "WMT"
+      ],
+      "sell_turnover": 0.6666666666666666
+    },
+    {
+      "benchmark_return": 0.036198153983,
+      "buy_turnover": 0.6666666666666666,
+      "cost": 0.0013333333333333333,
+      "gross_return": -0.006731412930333335,
+      "is_rebalance_month": true,
+      "month": "2019-11",
+      "net_return": -0.008064746263666668,
+      "scheduled_exits": [
+        "PEP",
+        "WMT"
+      ],
+      "scores": {
+        "HD": 0.3545674753675139,
+        "MSFT": 0.322111370878867,
+        "PG": 0.43286357271667475
+      },
+      "selected": [
+        "PG",
+        "HD",
+        "MSFT"
+      ],
+      "sell_turnover": 0.6666666666666666
+    },
+    {
+      "benchmark_return": 0.029055492835,
+      "buy_turnover": 0.6666666666666666,
+      "cost": 0.0013333333333333333,
+      "gross_return": 0.04665145345333333,
+      "is_rebalance_month": true,
+      "month": "2019-12",
+      "net_return": 0.04531812012,
+      "scheduled_exits": [
+        "HD",
+        "MSFT"
+      ],
+      "scores": {
+        "AAPL": 0.4096862703051891,
+        "META": 0.36298962615633057,
+        "PG": 0.35447763289426626
+      },
+      "selected": [
+        "AAPL",
+        "META",
+        "PG"
+      ],
+      "sell_turnover": 0.6666666666666666
+    },
+    {
+      "benchmark_return": -0.00040370195,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.014179802969666666,
+      "is_rebalance_month": true,
+      "month": "2020-01",
+      "net_return": 0.013513136303,
+      "scheduled_exits": [
+        "PG"
+      ],
+      "scores": {
+        "AAPL": 0.7197000370425195,
+        "META": 0.5381800158696148,
+        "NVDA": 0.6298613116053451
+      },
+      "selected": [
+        "AAPL",
+        "NVDA",
+        "META"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.079165863221,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": -0.005807698225666666,
+      "is_rebalance_month": true,
+      "month": "2020-02",
+      "net_return": -0.006474364892333333,
+      "scheduled_exits": [
+        "META"
+      ],
+      "scores": {
+        "AAPL": 0.7908080904290968,
+        "MSFT": 0.532430747896208,
+        "NVDA": 0.6432625344314633
+      },
+      "selected": [
+        "AAPL",
+        "NVDA",
+        "MSFT"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.124871297432,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.040086524418,
+      "is_rebalance_month": true,
+      "month": "2020-03",
+      "net_return": -0.040086524418,
+      "scheduled_exits": [],
+      "scores": {
+        "AAPL": 0.8066352663414071,
+        "MSFT": 0.5354136946938783,
+        "NVDA": 0.5370737433159498
+      },
+      "selected": [
+        "AAPL",
+        "NVDA",
+        "MSFT"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.126983580729,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.133500314344,
+      "is_rebalance_month": true,
+      "month": "2020-04",
+      "net_return": 0.133500314344,
+      "scheduled_exits": [],
+      "scores": {
+        "AAPL": 0.457951939532361,
+        "MSFT": 0.3918387797492766,
+        "NVDA": 0.5092875795818839
+      },
+      "selected": [
+        "NVDA",
+        "AAPL",
+        "MSFT"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.047645374515,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.10838063209466665,
+      "is_rebalance_month": true,
+      "month": "2020-05",
+      "net_return": 0.10838063209466665,
+      "scheduled_exits": [],
+      "scores": {
+        "AAPL": 0.28379109082071863,
+        "MSFT": 0.22355783683809904,
+        "NVDA": 0.46140971250262597
+      },
+      "selected": [
+        "NVDA",
+        "AAPL",
+        "MSFT"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.017734499402,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.109514365893,
+      "is_rebalance_month": true,
+      "month": "2020-06",
+      "net_return": 0.109514365893,
+      "scheduled_exits": [],
+      "scores": {
+        "AAPL": 0.6936293235649855,
+        "MSFT": 0.46273771954386067,
+        "NVDA": 1.162707259279347
+      },
+      "selected": [
+        "NVDA",
+        "AAPL",
+        "MSFT"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.058892251036,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.09670308287966667,
+      "is_rebalance_month": true,
+      "month": "2020-07",
+      "net_return": 0.09670308287966667,
+      "scheduled_exits": [],
+      "scores": {
+        "AAPL": 0.6255779452261676,
+        "MSFT": 0.38477847443796653,
+        "NVDA": 1.1667559195609427
+      },
+      "selected": [
+        "NVDA",
+        "AAPL",
+        "MSFT"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.069796555183,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.19310454731466664,
+      "is_rebalance_month": true,
+      "month": "2020-08",
+      "net_return": 0.19310454731466664,
+      "scheduled_exits": [],
+      "scores": {
+        "AAPL": 0.7327906897976821,
+        "MSFT": 0.5118089068312812,
+        "NVDA": 1.257990194910986
+      },
+      "selected": [
+        "NVDA",
+        "AAPL",
+        "MSFT"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": -0.037443841685,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": -0.05937951606833333,
+      "is_rebalance_month": true,
+      "month": "2020-09",
+      "net_return": -0.060046182735,
+      "scheduled_exits": [
+        "MSFT"
+      ],
+      "scores": {
+        "AAPL": 1.0527193935238626,
+        "AMZN": 0.7816234453542037,
+        "NVDA": 1.5392602646614004
+      },
+      "selected": [
+        "NVDA",
+        "AAPL",
+        "AMZN"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.024933510016,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.056471566434,
+      "is_rebalance_month": true,
+      "month": "2020-10",
+      "net_return": -0.056471566434,
+      "scheduled_exits": [],
+      "scores": {
+        "AAPL": 1.3274606337273416,
+        "AMZN": 0.9879832566524902,
+        "NVDA": 2.0788739576474993
+      },
+      "selected": [
+        "NVDA",
+        "AAPL",
+        "AMZN"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.108776934815,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.06938164247333334,
+      "is_rebalance_month": true,
+      "month": "2020-11",
+      "net_return": 0.06938164247333334,
+      "scheduled_exits": [],
+      "scores": {
+        "AAPL": 0.8806732695081594,
+        "AMZN": 0.7722748595138764,
+        "NVDA": 1.698003917356631
+      },
+      "selected": [
+        "NVDA",
+        "AAPL",
+        "AMZN"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.037048368176,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.039021577546666665,
+      "is_rebalance_month": true,
+      "month": "2020-12",
+      "net_return": 0.039021577546666665,
+      "scheduled_exits": [],
+      "scores": {
+        "AAPL": 0.6405759421928141,
+        "AMZN": 0.6860005949966228,
+        "NVDA": 1.3163187098751639
+      },
+      "selected": [
+        "NVDA",
+        "AMZN",
+        "AAPL"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": -0.010190364776,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.008691913916333333,
+      "is_rebalance_month": true,
+      "month": "2021-01",
+      "net_return": -0.008691913916333333,
+      "scheduled_exits": [],
+      "scores": {
+        "AAPL": 0.6356630010096824,
+        "AMZN": 0.7144557507980833,
+        "NVDA": 1.2812834417303396
+      },
+      "selected": [
+        "NVDA",
+        "AMZN",
+        "AAPL"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.027805437339,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.019748840526333335,
+      "is_rebalance_month": true,
+      "month": "2021-02",
+      "net_return": -0.019748840526333335,
+      "scheduled_exits": [],
+      "scores": {
+        "AAPL": 0.729649238438526,
+        "AMZN": 0.6213957289311822,
+        "NVDA": 1.212332025188359
+      },
+      "selected": [
+        "NVDA",
+        "AAPL",
+        "AMZN"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.04539943681,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.006219248254333333,
+      "is_rebalance_month": true,
+      "month": "2021-03",
+      "net_return": -0.006219248254333333,
+      "scheduled_exits": [],
+      "scores": {
+        "AAPL": 0.9429976659325008,
+        "AMZN": 0.7020304982969068,
+        "NVDA": 0.9259311366623677
+      },
+      "selected": [
+        "AAPL",
+        "NVDA",
+        "AMZN"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.052910153933,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.11391744661499999,
+      "is_rebalance_month": true,
+      "month": "2021-04",
+      "net_return": 0.11325077994833332,
+      "scheduled_exits": [
+        "AMZN"
+      ],
+      "scores": {
+        "AAPL": 0.9222142134654205,
+        "GOOGL": 0.7401003918085287,
+        "NVDA": 1.083295315798313
+      },
+      "selected": [
+        "NVDA",
+        "AAPL",
+        "GOOGL"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.006566135031,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.025891996165666665,
+      "is_rebalance_month": true,
+      "month": "2021-05",
+      "net_return": 0.025225329499,
+      "scheduled_exits": [
+        "GOOGL"
+      ],
+      "scores": {
+        "AAPL": 0.6759275358972061,
+        "BAC": 0.649555876426479,
+        "NVDA": 0.8293274690841648
+      },
+      "selected": [
+        "NVDA",
+        "AAPL",
+        "BAC"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.022427375299,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.102486766941,
+      "is_rebalance_month": true,
+      "month": "2021-06",
+      "net_return": 0.102486766941,
+      "scheduled_exits": [],
+      "scores": {
+        "AAPL": 0.6622183102871724,
+        "BAC": 0.7229888452032196,
+        "NVDA": 0.6934785651436686
+      },
+      "selected": [
+        "BAC",
+        "NVDA",
+        "AAPL"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.024412660649,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": -0.03777720314666667,
+      "is_rebalance_month": true,
+      "month": "2021-07",
+      "net_return": -0.03844386981333334,
+      "scheduled_exits": [
+        "AAPL"
+      ],
+      "scores": {
+        "BAC": 0.8174597325641095,
+        "JPM": 0.8028670492426553,
+        "NVDA": 0.7119603276075679
+      },
+      "selected": [
+        "BAC",
+        "JPM",
+        "NVDA"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.029759715689,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.09680364299433335,
+      "is_rebalance_month": true,
+      "month": "2021-08",
+      "net_return": 0.09680364299433335,
+      "scheduled_exits": [],
+      "scores": {
+        "BAC": 0.6945415077375745,
+        "JPM": 0.6457478880077505,
+        "NVDA": 0.8866101233097328
+      },
+      "selected": [
+        "NVDA",
+        "BAC",
+        "JPM"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": -0.046605270225,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": -0.010269982198666665,
+      "is_rebalance_month": true,
+      "month": "2021-09",
+      "net_return": -0.010936648865333331,
+      "scheduled_exits": [
+        "NVDA"
+      ],
+      "scores": {
+        "BAC": 0.523910352472154,
+        "GOOGL": 0.6535628615328632,
+        "JPM": 0.5579872989177013
+      },
+      "selected": [
+        "GOOGL",
+        "JPM",
+        "BAC"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.070163383375,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.09239631699866667,
+      "is_rebalance_month": true,
+      "month": "2021-10",
+      "net_return": 0.09239631699866667,
+      "scheduled_exits": [],
+      "scores": {
+        "BAC": 0.7599251413169883,
+        "GOOGL": 0.9745835738654343,
+        "JPM": 0.7087042721702494
+      },
+      "selected": [
+        "GOOGL",
+        "BAC",
+        "JPM"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": -0.008034633495,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": -0.06457305108233334,
+      "is_rebalance_month": true,
+      "month": "2021-11",
+      "net_return": -0.065239717749,
+      "scheduled_exits": [
+        "GOOGL"
+      ],
+      "scores": {
+        "BAC": 0.8282001601330868,
+        "JPM": 0.7013007564734488,
+        "XOM": 0.9342532280064135
+      },
+      "selected": [
+        "XOM",
+        "BAC",
+        "JPM"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.04624756844,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": -0.023994980064,
+      "is_rebalance_month": true,
+      "month": "2021-12",
+      "net_return": -0.024661646730666665,
+      "scheduled_exits": [
+        "JPM"
+      ],
+      "scores": {
+        "BAC": 0.7318404727617742,
+        "NVDA": 0.9097678017384363,
+        "XOM": 0.7709628054311704
+      },
+      "selected": [
+        "NVDA",
+        "XOM",
+        "BAC"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.052741252158,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.0026686115970000063,
+      "is_rebalance_month": true,
+      "month": "2022-01",
+      "net_return": 0.0020019449303333397,
+      "scheduled_exits": [
+        "BAC"
+      ],
+      "scores": {
+        "GOOGL": 0.6192432122324769,
+        "NVDA": 1.5048287237167632,
+        "XOM": 0.5409904382418378
+      },
+      "selected": [
+        "NVDA",
+        "GOOGL",
+        "XOM"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.029516767338,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": -0.048442536384,
+      "is_rebalance_month": true,
+      "month": "2022-02",
+      "net_return": -0.04910920305066667,
+      "scheduled_exits": [
+        "XOM"
+      ],
+      "scores": {
+        "GOOGL": 0.5853692438980469,
+        "HD": 0.5644337457872155,
+        "NVDA": 1.2661474862493485
+      },
+      "selected": [
+        "NVDA",
+        "GOOGL",
+        "HD"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.037590229528,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.041936257482,
+      "is_rebalance_month": true,
+      "month": "2022-03",
+      "net_return": 0.04126959081533333,
+      "scheduled_exits": [
+        "GOOGL"
+      ],
+      "scores": {
+        "HD": 0.4502070673864902,
+        "NVDA": 0.7869692292718133,
+        "XOM": 0.458238905243314
+      },
+      "selected": [
+        "NVDA",
+        "XOM",
+        "HD"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.087769097929,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": -0.12839910472166668,
+      "is_rebalance_month": true,
+      "month": "2022-04",
+      "net_return": -0.12906577138833336,
+      "scheduled_exits": [
+        "HD"
+      ],
+      "scores": {
+        "AAPL": 0.3598145997838891,
+        "NVDA": 0.8277958178177356,
+        "XOM": 0.4823482473844962
+      },
+      "selected": [
+        "NVDA",
+        "XOM",
+        "AAPL"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.002257370002,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.02995937061566667,
+      "is_rebalance_month": true,
+      "month": "2022-05",
+      "net_return": 0.02995937061566667,
+      "scheduled_exits": [],
+      "scores": {
+        "AAPL": 0.336131002196675,
+        "NVDA": 0.8191850164362309,
+        "XOM": 0.5227156607809194
+      },
+      "selected": [
+        "NVDA",
+        "XOM",
+        "AAPL"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": -0.082460485164,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": -0.07233470199966667,
+      "is_rebalance_month": true,
+      "month": "2022-06",
+      "net_return": -0.07300136866633333,
+      "scheduled_exits": [
+        "NVDA"
+      ],
+      "scores": {
+        "AAPL": 0.2705087575784586,
+        "PG": 0.21880590800291633,
+        "XOM": 0.5191988199058757
+      },
+      "selected": [
+        "XOM",
+        "AAPL",
+        "PG"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.092087239707,
+      "buy_turnover": 0.6666666666666666,
+      "cost": 0.0013333333333333333,
+      "gross_return": 0.067220469465,
+      "is_rebalance_month": true,
+      "month": "2022-07",
+      "net_return": 0.06588713613166666,
+      "scheduled_exits": [
+        "AAPL",
+        "PG"
+      ],
+      "scores": {
+        "KO": 0.19841358065497006,
+        "PEP": 0.15515633519913785,
+        "XOM": 0.5992466451504548
+      },
+      "selected": [
+        "XOM",
+        "KO",
+        "PEP"
+      ],
+      "sell_turnover": 0.6666666666666666
+    },
+    {
+      "benchmark_return": -0.040801854061,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.019317883081333333,
+      "is_rebalance_month": true,
+      "month": "2022-08",
+      "net_return": -0.019317883081333333,
+      "scheduled_exits": [],
+      "scores": {
+        "KO": 0.1367759737451253,
+        "PEP": 0.09098523822132742,
+        "XOM": 0.5632065303114713
+      },
+      "selected": [
+        "XOM",
+        "KO",
+        "PEP"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": -0.092445847204,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.07271309476233333,
+      "is_rebalance_month": true,
+      "month": "2022-09",
+      "net_return": -0.07271309476233333,
+      "scheduled_exits": [],
+      "scores": {
+        "KO": 0.17437023269256624,
+        "PEP": 0.14942001342927558,
+        "XOM": 0.8404078400170718
+      },
+      "selected": [
+        "XOM",
+        "KO",
+        "PEP"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.081275630399,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.14991271603533332,
+      "is_rebalance_month": true,
+      "month": "2022-10",
+      "net_return": 0.14991271603533332,
+      "scheduled_exits": [],
+      "scores": {
+        "KO": 0.2029222775662205,
+        "PEP": 0.16873238645219302,
+        "XOM": 0.698628563904991
+      },
+      "selected": [
+        "XOM",
+        "KO",
+        "PEP"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.055591419541,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.021428020447,
+      "is_rebalance_month": true,
+      "month": "2022-11",
+      "net_return": 0.020761353780333332,
+      "scheduled_exits": [
+        "KO"
+      ],
+      "scores": {
+        "JNJ": 0.0293958919260926,
+        "PEP": 0.037837382917996765,
+        "XOM": 0.4155247716092061
+      },
+      "selected": [
+        "XOM",
+        "PEP",
+        "JNJ"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.057628242621,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": -0.009803296849666666,
+      "is_rebalance_month": true,
+      "month": "2022-12",
+      "net_return": -0.010469963516333333,
+      "scheduled_exits": [
+        "JNJ"
+      ],
+      "scores": {
+        "KO": 0.16657269743246528,
+        "PEP": 0.1674455874082248,
+        "XOM": 0.9098568510121763
+      },
+      "selected": [
+        "XOM",
+        "PEP",
+        "KO"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.062887308087,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.012530947693,
+      "is_rebalance_month": true,
+      "month": "2023-01",
+      "net_return": -0.012530947693,
+      "scheduled_exits": [],
+      "scores": {
+        "KO": 0.10609568179436146,
+        "PEP": 0.08970415808634113,
+        "XOM": 0.891761358932986
+      },
+      "selected": [
+        "XOM",
+        "KO",
+        "PEP"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": -0.025142655509,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.020043997973666666,
+      "is_rebalance_month": true,
+      "month": "2023-02",
+      "net_return": -0.020043997973666666,
+      "scheduled_exits": [],
+      "scores": {
+        "KO": 0.07346213127070222,
+        "PEP": 0.06900386172842943,
+        "XOM": 0.5096842992844861
+      },
+      "selected": [
+        "XOM",
+        "KO",
+        "PEP"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.037077699376,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.032348586140666664,
+      "is_rebalance_month": true,
+      "month": "2023-03",
+      "net_return": 0.031681919473999995,
+      "scheduled_exits": [
+        "KO"
+      ],
+      "scores": {
+        "PEP": 0.0724051543638764,
+        "WMT": 0.08117450411921023,
+        "XOM": 0.5211640983844259
+      },
+      "selected": [
+        "XOM",
+        "WMT",
+        "PEP"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.015975154506,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.06515149893,
+      "is_rebalance_month": true,
+      "month": "2023-04",
+      "net_return": 0.06448483226333333,
+      "scheduled_exits": [
+        "WMT"
+      ],
+      "scores": {
+        "JPM": 0.08626200045352084,
+        "PEP": 0.0575250672977381,
+        "XOM": 0.37894317666257527
+      },
+      "selected": [
+        "XOM",
+        "JPM",
+        "PEP"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.004616200549,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.07202392810933332,
+      "is_rebalance_month": true,
+      "month": "2023-05",
+      "net_return": 0.07135726144266666,
+      "scheduled_exits": [
+        "PEP"
+      ],
+      "scores": {
+        "JPM": 0.11945864413949225,
+        "NVDA": 0.49905420310044435,
+        "XOM": 0.3328780220580614
+      },
+      "selected": [
+        "NVDA",
+        "XOM",
+        "JPM"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.06479955855,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.083972467156,
+      "is_rebalance_month": true,
+      "month": "2023-06",
+      "net_return": 0.08330580048933334,
+      "scheduled_exits": [
+        "JPM"
+      ],
+      "scores": {
+        "META": 0.2410660195841079,
+        "NVDA": 0.4875179028111152,
+        "XOM": 0.2643603693874539
+      },
+      "selected": [
+        "NVDA",
+        "XOM",
+        "META"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.032733405856,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.07587323581566667,
+      "is_rebalance_month": true,
+      "month": "2023-07",
+      "net_return": 0.07520656914900001,
+      "scheduled_exits": [
+        "XOM"
+      ],
+      "scores": {
+        "AAPL": 0.3041866240782758,
+        "META": 0.6416743224904056,
+        "NVDA": 1.4976154721424555
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "AAPL"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.016251943528,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": -0.029570204630666664,
+      "is_rebalance_month": true,
+      "month": "2023-08",
+      "net_return": -0.03023687129733333,
+      "scheduled_exits": [
+        "AAPL"
+      ],
+      "scores": {
+        "JPM": 0.2914813786057395,
+        "META": 0.8037709321566249,
+        "NVDA": 1.3309451701107466
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "JPM"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.047434469021,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.03764342519733333,
+      "is_rebalance_month": true,
+      "month": "2023-09",
+      "net_return": -0.03764342519733333,
+      "scheduled_exits": [],
+      "scores": {
+        "JPM": 0.43253126957923516,
+        "META": 0.9554413165735776,
+        "NVDA": 2.098424888046967
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "JPM"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": -0.02170866129,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.030999528014000004,
+      "is_rebalance_month": true,
+      "month": "2023-10",
+      "net_return": -0.030999528014000004,
+      "scheduled_exits": [],
+      "scores": {
+        "JPM": 0.44427210762891,
+        "META": 1.1807930550962804,
+        "NVDA": 3.067972813523143
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "JPM"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.091344005575,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.10029668848333333,
+      "is_rebalance_month": true,
+      "month": "2023-11",
+      "net_return": 0.09963002181666666,
+      "scheduled_exits": [
+        "JPM"
+      ],
+      "scores": {
+        "GOOGL": 0.38461532196810544,
+        "META": 2.2225202596211915,
+        "NVDA": 2.22483621732747
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "GOOGL"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.045655248025,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.060309378580999995,
+      "is_rebalance_month": true,
+      "month": "2023-12",
+      "net_return": 0.059642711914333325,
+      "scheduled_exits": [
+        "GOOGL"
+      ],
+      "scores": {
+        "AMZN": 0.3785994932253949,
+        "META": 1.5509738379989835,
+        "NVDA": 1.410595724272072
+      },
+      "selected": [
+        "META",
+        "NVDA",
+        "AMZN"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.015926386572,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.122029540963,
+      "is_rebalance_month": true,
+      "month": "2024-01",
+      "net_return": 0.122029540963,
+      "scheduled_exits": [],
+      "scores": {
+        "AMZN": 0.7391666230729903,
+        "META": 1.7185473732971963,
+        "NVDA": 2.201494841535523
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "AMZN"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.052186763757,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.19525105060366668,
+      "is_rebalance_month": true,
+      "month": "2024-02",
+      "net_return": 0.194584383937,
+      "scheduled_exits": [
+        "AMZN"
+      ],
+      "scores": {
+        "META": 1.3760486766115214,
+        "MSFT": 0.530908196655947,
+        "NVDA": 1.5359048028311104
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "MSFT"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.032701900449,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.051125930167333335,
+      "is_rebalance_month": true,
+      "month": "2024-03",
+      "net_return": 0.050459263500666665,
+      "scheduled_exits": [
+        "MSFT"
+      ],
+      "scores": {
+        "AMZN": 0.6470337622770896,
+        "META": 1.2301366917156296,
+        "NVDA": 1.651373701542043
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "AMZN"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.040319573678,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.062565664777,
+      "is_rebalance_month": true,
+      "month": "2024-04",
+      "net_return": -0.062565664777,
+      "scheduled_exits": [],
+      "scores": {
+        "AMZN": 0.7112982180283638,
+        "META": 1.3150420853980438,
+        "NVDA": 1.8488913998983776
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "AMZN"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.050579853219,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.120773881764,
+      "is_rebalance_month": true,
+      "month": "2024-05",
+      "net_return": 0.120773881764,
+      "scheduled_exits": [],
+      "scores": {
+        "AMZN": 0.7105738274359346,
+        "META": 1.0226996171637164,
+        "NVDA": 2.257233802052677
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "AMZN"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.035279973661,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.10112733870366668,
+      "is_rebalance_month": true,
+      "month": "2024-06",
+      "net_return": 0.10112733870366668,
+      "scheduled_exits": [],
+      "scores": {
+        "AMZN": 0.45131860459827666,
+        "META": 0.6267242744755761,
+        "NVDA": 1.2844457592330554
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "AMZN"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.012109001564,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": -0.05643779932166667,
+      "is_rebalance_month": true,
+      "month": "2024-07",
+      "net_return": -0.05710446598833334,
+      "scheduled_exits": [
+        "AMZN"
+      ],
+      "scores": {
+        "GOOGL": 0.4411027417407065,
+        "META": 0.6284248520596802,
+        "NVDA": 1.5922373431619627
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "GOOGL"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.023365741166,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.024205826233666666,
+      "is_rebalance_month": true,
+      "month": "2024-08",
+      "net_return": 0.023539159567,
+      "scheduled_exits": [
+        "GOOGL"
+      ],
+      "scores": {
+        "AMZN": 0.4456164765678772,
+        "META": 0.5858635685249958,
+        "NVDA": 1.6445461028697639
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "AMZN"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.021004777672,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.01818160659466667,
+      "is_rebalance_month": true,
+      "month": "2024-09",
+      "net_return": 0.017514939928000003,
+      "scheduled_exits": [
+        "AMZN"
+      ],
+      "scores": {
+        "JPM": 0.49082490373970655,
+        "META": 0.6080490280095401,
+        "NVDA": 1.3716958776291417
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "JPM"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.008923863486,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.04787528953766667,
+      "is_rebalance_month": true,
+      "month": "2024-10",
+      "net_return": 0.04787528953766667,
+      "scheduled_exits": [],
+      "scores": {
+        "JPM": 0.5891200771502265,
+        "META": 0.7400531151343324,
+        "NVDA": 1.7447959324412583
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "JPM"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.059633651099,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.06309571752533333,
+      "is_rebalance_month": true,
+      "month": "2024-11",
+      "net_return": 0.06242905085866666,
+      "scheduled_exits": [
+        "JPM"
+      ],
+      "scores": {
+        "BAC": 0.5485049767535177,
+        "META": 0.9058104885512681,
+        "NVDA": 1.9788313871581171
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "BAC"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.024060170429,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": -0.009783203445000001,
+      "is_rebalance_month": true,
+      "month": "2024-12",
+      "net_return": -0.010449870111666667,
+      "scheduled_exits": [
+        "BAC"
+      ],
+      "scores": {
+        "META": 0.7401462406455246,
+        "NVDA": 1.839430393722051,
+        "WMT": 0.6004160640091996
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "WMT"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.026856451807,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.05253681611066666,
+      "is_rebalance_month": true,
+      "month": "2025-01",
+      "net_return": 0.05253681611066666,
+      "scheduled_exits": [],
+      "scores": {
+        "META": 0.6274413910035679,
+        "NVDA": 1.7922884260114667,
+        "WMT": 0.7773887845916889
+      },
+      "selected": [
+        "NVDA",
+        "WMT",
+        "META"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": -0.012694838335,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.004845159642333335,
+      "is_rebalance_month": true,
+      "month": "2025-02",
+      "net_return": 0.004845159642333335,
+      "scheduled_exits": [],
+      "scores": {
+        "META": 0.5065017089324984,
+        "NVDA": 1.183237758611253,
+        "WMT": 0.6599025763073616
+      },
+      "selected": [
+        "NVDA",
+        "WMT",
+        "META"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": -0.055719206435,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": -0.11013609544133333,
+      "is_rebalance_month": true,
+      "month": "2025-03",
+      "net_return": -0.110802762108,
+      "scheduled_exits": [
+        "META"
+      ],
+      "scores": {
+        "GOOGL": 0.4788357370590086,
+        "NVDA": 0.5181521652715693,
+        "WMT": 0.6948737206284583
+      },
+      "selected": [
+        "WMT",
+        "NVDA",
+        "GOOGL"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": -0.008670276875,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.02312888467466667,
+      "is_rebalance_month": true,
+      "month": "2025-04",
+      "net_return": 0.022462218008000003,
+      "scheduled_exits": [
+        "GOOGL"
+      ],
+      "scores": {
+        "AAPL": 0.4169693209113825,
+        "NVDA": 0.3828584425392896,
+        "WMT": 0.6528711002632228
+      },
+      "selected": [
+        "WMT",
+        "AAPL",
+        "NVDA"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.062844940046,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.047794937248333336,
+      "is_rebalance_month": true,
+      "month": "2025-05",
+      "net_return": 0.047128270581666666,
+      "scheduled_exits": [
+        "NVDA"
+      ],
+      "scores": {
+        "AAPL": 0.31027342235609345,
+        "META": 0.34473001441381657,
+        "WMT": 0.49593690627932974
+      },
+      "selected": [
+        "WMT",
+        "META",
+        "AAPL"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.051386235403,
+      "buy_turnover": 0.6666666666666666,
+      "cost": 0.0013333333333333333,
+      "gross_return": 0.025624983707333335,
+      "is_rebalance_month": true,
+      "month": "2025-06",
+      "net_return": 0.024291650374000003,
+      "scheduled_exits": [
+        "AAPL",
+        "META"
+      ],
+      "scores": {
+        "JPM": 0.2352227712515178,
+        "KO": 0.18734903306596618,
+        "WMT": 0.4904454410658685
+      },
+      "selected": [
+        "WMT",
+        "JPM",
+        "KO"
+      ],
+      "sell_turnover": 0.6666666666666666
+    },
+    {
+      "benchmark_return": 0.023031548697,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.025565456009666667,
+      "is_rebalance_month": true,
+      "month": "2025-07",
+      "net_return": 0.024898789343,
+      "scheduled_exits": [
+        "KO"
+      ],
+      "scores": {
+        "JPM": 0.3355221923540299,
+        "META": 0.2875481580358932,
+        "WMT": 0.4729547591011256
+      },
+      "selected": [
+        "WMT",
+        "JPM",
+        "META"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.020519581677,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": -0.011774886873666665,
+      "is_rebalance_month": true,
+      "month": "2025-08",
+      "net_return": -0.011774886873666665,
+      "scheduled_exits": [],
+      "scores": {
+        "JPM": 0.3862731839333886,
+        "META": 0.559752830662632,
+        "WMT": 0.439162480893615
+      },
+      "selected": [
+        "META",
+        "WMT",
+        "JPM"
+      ],
+      "sell_turnover": 0.0
+    },
+    {
+      "benchmark_return": 0.035620335108,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.03751794634966667,
+      "is_rebalance_month": true,
+      "month": "2025-09",
+      "net_return": 0.036851279683,
+      "scheduled_exits": [
+        "WMT"
+      ],
+      "scores": {
+        "JPM": 0.34738569980323275,
+        "META": 0.48872697467477666,
+        "NVDA": 0.4905436624294468
+      },
+      "selected": [
+        "NVDA",
+        "META",
+        "JPM"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.023837393576,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.03748558383133333,
+      "is_rebalance_month": true,
+      "month": "2025-10",
+      "net_return": 0.03681891716466666,
+      "scheduled_exits": [
+        "META"
+      ],
+      "scores": {
+        "BAC": 0.30158286251686883,
+        "JPM": 0.46157944127146133,
+        "NVDA": 0.43461877202884325
+      },
+      "selected": [
+        "JPM",
+        "NVDA",
+        "BAC"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.001950004913,
+      "buy_turnover": 0.3333333333333333,
+      "cost": 0.0006666666666666666,
+      "gross_return": 0.006359302825666664,
+      "is_rebalance_month": true,
+      "month": "2025-11",
+      "net_return": 0.005692636158999997,
+      "scheduled_exits": [
+        "BAC"
+      ],
+      "scores": {
+        "GOOGL": 0.4269889499326105,
+        "JPM": 0.44443445121854475,
+        "NVDA": 0.40579609544864925
+      },
+      "selected": [
+        "JPM",
+        "GOOGL",
+        "NVDA"
+      ],
+      "sell_turnover": 0.3333333333333333
+    },
+    {
+      "benchmark_return": 0.000797502958,
+      "buy_turnover": 0.0,
+      "cost": 0.0,
+      "gross_return": 0.020379793075666668,
+      "is_rebalance_month": true,
+      "month": "2025-12",
+      "net_return": 0.020379793075666668,
+      "scheduled_exits": [],
+      "scores": {
+        "GOOGL": 0.6716782560540915,
+        "JPM": 0.2722491284482518,
+        "NVDA": 0.4650852986324929
+      },
+      "selected": [
+        "GOOGL",
+        "NVDA",
+        "JPM"
+      ],
+      "sell_turnover": 0.0
+    }
+  ],
+  "periods": {
+    "earlier": {
+      "benchmark_compounded_return": 1.019867451477725,
+      "buy_turnover": 12.666666666666666,
+      "end": "2020-12",
+      "maximum_drawdown": -0.28984566068118867,
+      "months": 60,
+      "net_compounded_return": 4.398580102142772,
+      "net_excess_return": 3.3787126506650473,
+      "sell_turnover": 11.666666666666666,
+      "start": "2016-01"
+    },
+    "later": {
+      "benchmark_compounded_return": 0.9538799934288362,
+      "buy_turnover": 13.0,
+      "end": "2025-12",
+      "maximum_drawdown": -0.27095204453022237,
+      "months": 60,
+      "net_compounded_return": 2.3271344134540644,
+      "net_excess_return": 1.3732544200252281,
+      "sell_turnover": 13.0,
+      "start": "2021-01"
+    }
+  },
+  "result_hash": "652d0a7b57537a9b1e95cc4a312216599b73b0fa5116532c7a4d6490b3ff6e95",
+  "schema_version": 1,
+  "strategy_id": "course-momentum-12-2-v1",
+  "summary": {
+    "benchmark_compounded_return": 2.946578602820415,
+    "buy_turnover": 25.666666666666664,
+    "maximum_drawdown": -0.28984566068118867,
+    "net_compounded_return": 16.9618016416276,
+    "net_excess_return": 14.015223038807184,
+    "sell_turnover": 24.666666666666664
+  }
+}

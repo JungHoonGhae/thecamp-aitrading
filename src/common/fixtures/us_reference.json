@@ -1,0 +1,31 @@
+{
+  "title": "미국 주식 로컬 모의 체결 가격",
+  "market": "US",
+  "currency": "USD",
+  "initial_cash": 1000000,
+  "as_of": "2026-08-21",
+  "fixture_notice": "12–2 참조 실험의 로컬 모의 체결용 가격입니다. 실시간 시세나 투자 추천이 아닙니다.",
+  "benchmark": "S&P 500 total return proxy",
+  "method": {
+    "rule": "course-momentum-12-2-v1",
+    "use": "local_mock_quotes_only"
+  },
+  "prices": {
+    "META": 75400,
+    "MSFT": 52100,
+    "NVDA": 18200,
+    "GOOGL": 21400,
+    "AAPL": 22800,
+    "JPM": 30000
+  },
+  "exchanges": {
+    "GOOGL": "NASD",
+    "JPM": "NYSE",
+    "NVDA": "NASD"
+  },
+  "names": {
+    "GOOGL": "Alphabet",
+    "JPM": "JPMorgan Chase",
+    "NVDA": "NVIDIA"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "later_net_excess_return": {
+    "KR": 0.6223876453093902,
+    "US": 1.3732544200252281
+  },
+  "manifest_hash": "519795069c0ee91de7305ff5f0a2d7d152e7b94003a5df45bdef59957f60ceb4",
+  "reference_market": "US",
+  "result_hashes": {
+    "KR": "730bafbe742670f7fe068c94c56bde0459bdacd7a31b115490b8b2ad846aff8b",
+    "US": "652d0a7b57537a9b1e95cc4a312216599b73b0fa5116532c7a4d6490b3ff6e95"
+  },
+  "schema_version": 1,
+  "selection_hash": "9e0e72d325709c6e93d349ea0934d7e5579945622c0e60105a4a981540fef9f9",
+  "selection_rule": "later-period net excess return; KR wins exact ties"
+}

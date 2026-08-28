@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "strategy_id": "course-momentum-12-2-v1",
+  "title": "미국·한국 고정 바스켓 12–2 모멘텀",
+  "formation_months": 11,
+  "skip_months": 1,
+  "top_fraction": 0.2,
+  "rebalance_months": 1,
+  "adjustment": "total_return_proxy",
+  "warmup": [
+    "2015-01",
+    "2015-12"
+  ],
+  "periods": {
+    "earlier": [
+      "2016-01",
+      "2020-12"
+    ],
+    "later": [
+      "2021-01",
+      "2025-12"
+    ]
+  },
+  "entry": "H-1 월말에 H-12부터 H-2까지의 복리 수익률을 계산해 상위 20%를 다음 달 H에 동일 비중 보유",
+  "scheduled_exit": "매월 다시 계산했을 때 상위 20%에서 빠진 종목은 교체",
+  "loss_review": "진입 뒤 월말 고점보다 10% 이상 낮으면 재검토 필요 표시. 자동 매도하지 않음",
+  "scope": "local_mock",
+  "markets": {
+    "US": {
+      "currency": "USD",
+      "benchmark": {
+        "symbol": "SPY",
+        "label": "S&P 500 total-return ETF proxy"
+      },
+      "cost_bps": {
+        "buy": 10,
+        "sell": 10
+      },
+      "universe_method": "2015년 이전 상장된 미국 대형주 10개를 2026-08-28에 고정한 수업용 바스켓",
+      "symbols": [
+        "AAPL",
+        "AMZN",
+        "BAC",
+        "GOOGL",
+        "HD",
+        "JNJ",
+        "JPM",
+        "KO",
+        "META",
+        "MSFT",
+        "NVDA",
+        "PEP",
+        "PG",
+        "WMT",
+        "XOM"
+      ]
+    },
+    "KR": {
+      "currency": "KRW",
+      "benchmark": {
+        "symbol": "069500.KS",
+        "label": "KOSPI 200 total-return ETF proxy"
+      },
+      "cost_bps": {
+        "buy": 15,
+        "sell": 35
+      },
+      "universe_method": "2015년 이전 상장된 한국 대형주 10개를 2026-08-28에 고정한 수업용 바스켓",
+      "symbols": [
+        "000270.KS",
+        "000660.KS",
+        "005380.KS",
+        "005490.KS",
+        "005930.KS",
+        "006400.KS",
+        "012330.KS",
+        "028260.KS",
+        "032830.KS",
+        "035420.KS",
+        "051910.KS",
+        "055550.KS",
+        "068270.KS",
+        "086790.KS",
+        "105560.KS"
+      ]
+    }
+  },
+  "limitations": [
+    "현재 구성 종목을 과거 전체 기간에 고정했으므로 생존편향이 있습니다.",
+    "상장폐지 수익률을 포함하지 않아 시장 전체 구성종목 백테스트가 아닙니다.",
+    "Yahoo Finance 조정주가와 ETF를 사용한 비공식 학습용 재현이며 주문 근거가 아닙니다.",
+    "ETF 추적오차와 비용 때문에 실제 S&P 500·KOSPI 200 총수익지수와 다를 수 있습니다."
+  ]
+}

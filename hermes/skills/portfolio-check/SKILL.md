@@ -33,6 +33,11 @@ python REPO/agent/agent.py --execute
 
 - 이 스크립트는 `REPO/agent/spec/` 의 마크다운(목표 비중·규칙·한도)을 읽어, KIS(기본
   mock)로 현재 계좌와 비교해 "무엇을 얼마나 사고팔지"를 계산해 출력한다.
+- 2주차 미국 대형주 후보는 이 스킬과 별개다. 정보만 보려면
+  `python REPO/routines/참조전략-실험.py --no-send`,
+  채택·로컬 모의는 `python REPO/agent/committee.py` 와
+  `python REPO/agent/us_agent.py --adopt …` 를 쓴다. 주문 기본은 로컬 모의이며,
+  텔레그램 `/rebalance` 는 저장된 주문 계획 해시가 같을 때만 한 번 실행한다.
 - **출력 텍스트를 그대로 사용자에게 전달**한다. 별도 해석을 덧붙이려면 초보자 눈높이로
   한두 줄만 요약한다.
 

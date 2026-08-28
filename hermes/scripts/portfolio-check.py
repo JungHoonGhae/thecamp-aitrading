@@ -1,4 +1,4 @@
-"""hermes cron(no-agent)용 포트폴리오 점검 스크립트 — 크로스플랫폼(mac/Linux/Windows).
+"""hermes gateway(no-agent)용 고정 참조전략 점검 스크립트.
 
 hermes 는 ~/.hermes/scripts/ 아래 스크립트를 실행하는데, `.sh` 는 bash 로(→ Windows 불가)
 `.py` 는 현재 Python 인터프리터로 실행한다. 그래서 OS 를 안 가리게 `.py` 로 둔다.
@@ -15,6 +15,7 @@ from pathlib import Path
 
 REPO = r"__여기에_저장소_절대경로__"  # 예: /Users/나/workspace/projects/lecture-thecamp-aitrading
 
-agent = Path(REPO) / "agent" / "agent.py"
-sys.argv = [str(agent)]
-runpy.run_path(str(agent), run_name="__main__")
+routine = Path(REPO) / "routines" / "참조전략-실험.py"
+sys.path.insert(0, str(routine.parent))
+sys.argv = [str(routine)]
+runpy.run_path(str(routine), run_name="__main__")

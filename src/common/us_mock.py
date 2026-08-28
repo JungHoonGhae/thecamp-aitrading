@@ -95,7 +95,7 @@ class LocalMockBroker:
         crosses = limit_price >= market_price if side == "buy" else limit_price <= market_price
 
         ok = True
-        message = "수업용 지정가 주문이 체결되었습니다."
+        message = "지정가 주문이 체결되었습니다."
         if not crosses:
             ok = False
             message = "지정가가 수업용 현재가에 닿지 않아 미체결입니다."
@@ -206,7 +206,7 @@ class LocalMockBroker:
                 "qty": order.qty,
                 "limit_price": order.limit_price,
                 "fill_price": market_price,
-                "message": "수업용 지정가 주문이 체결되었습니다.",
+                "message": "지정가 주문이 체결되었습니다.",
                 "simulated": True,
             })
 

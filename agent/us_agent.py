@@ -57,8 +57,8 @@ def main() -> None:
     )
     if args.reset_mock:
         broker.reset()
-        market_label = "미국 주식" if args.market == "US" else "한국 주식"
-        print(f"{market_label} 로컬 모의계좌를 처음 상태로 되돌렸습니다.")
+        account = "미국 연습 계좌" if args.market == "US" else "한국 연습 계좌"
+        print(f"{account}를 처음 상태로 되돌렸습니다.")
         return
 
     if not proposal_path.is_file():
@@ -127,14 +127,15 @@ def main() -> None:
         )
 
     fills = execute_approved_plan(plan, args.approve, broker)
-    print("\n로컬 모의계좌 체결")
+    account = "미국 연습 계좌" if args.market == "US" else "한국 연습 계좌"
+    print(f"\n{account} 체결")
     for fill in fills:
         verb = "매수" if fill["side"] == "buy" else "매도"
         mark = "완료" if fill["ok"] else "실패"
         print(f"  {mark} · {fill['ticker']} {verb} {fill['qty']}주 · {fill['message']}")
     after = broker.get_balance()
     print(f"남은 현금: {money(after['cash'], plan.currency)}")
-    print("실제 돈이 움직이지 않은 미국 연습 계좌 체결입니다.")
+    print(f"실제 돈이 움직이지 않은 {account} 체결입니다.")
 
 
 if __name__ == "__main__":

@@ -61,7 +61,7 @@ def main() -> None:
     head("다음", "이 목록은 「살 종목」이 아니라 「더 볼 종목」입니다")
     bullet("숫자는 무엇을 볼지만 정합니다. 왜 담을지는 다음 두 예제에서 봅니다.")
     bullet("정성(뉴스): python examples/analysis/2-정성-뉴스브리프.py")
-    bullet("펀더멘탈(재무): python examples/analysis/3-펀더멘탈-붙일자리.py")
+    bullet("시장 맥락: python examples/analysis/3-시장맥락-벤치마크.py")
 
 
 if __name__ == "__main__":

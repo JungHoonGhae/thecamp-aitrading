@@ -102,7 +102,7 @@ class USReferenceCliTests(unittest.TestCase):
                 "--execute",
             )
             self.assertEqual(executed.returncode, 0, executed.stderr)
-            self.assertIn("로컬 모의계좌 체결", executed.stdout)
+            self.assertIn("미국 연습 계좌 체결", executed.stdout)
             self.assertTrue(ledger_path.is_file())
 
     def test_same_cli_flow_supports_korean_stocks(self) -> None:

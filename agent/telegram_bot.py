@@ -89,7 +89,7 @@ ALIASES = {
     "시켜": "update_config", "고쳐": "update_config", "바꿔": "update_config",
     "시작": "init", "처음": "init", "초기화": "init",
     "대기": "pending", "승인대기": "pending",
-    "점검": "doctor", "진단": "doctor", "왜안돼": "doctor",
+    "진단": "doctor", "왜안돼": "doctor",
     "리밸런싱": "rebalance", "조정": "rebalance",
     "도움": "help", "도움말": "help", "명령": "help",
 }
@@ -429,13 +429,20 @@ class Bot:
             줄.append(f"{때}  {이름}  [{켜짐}]")
             줄.append(f"    {무엇}")
         줄 += ["", "스펙의 다시 볼 날  점검 미리보기  살·팔 목록만. 승인은 사람",
-               "", "트리거 없음 · 원할 때", ""]
+               "", "트리거 없음 · 원할 때 · 아래 버튼", ""]
         줄 += ["참조 실험          미국·한국 바스켓을 지수와 다시 본 결과",
-               "저점·고점 판독    지금 이 가격이 1년 안에서 어디쯤인지"]
+               "저점·고점 판독    지금 이 가격이 1년 안에서 어디쯤인지",
+               "", "가격 도달의 짝  가격도달-감시  hermes 가 견줄 때"]
         줄 += ["", "아침·마감 외에 주간·월간·연간 브리핑은 수업 본편이 아닙니다.",
                "칸을 바꾸려면 /update_config 로 말하세요.",
                "예) /update_config 아침 브리핑을 7시로 바꿔 줘"]
-        self.send("\n".join(줄))
+        self.send(
+            "\n".join(줄),
+            buttons=[
+                ("참조 실험", "go:backtest"),
+                ("저점·고점 판독", "go:levels"),
+            ],
+        )
 
     ROUTINE_FILES = {"backtest": "참조전략-실험.py", "levels": "저점고점-판독.py"}
 
@@ -692,7 +699,7 @@ class Bot:
             return
 
         lines = [
-            "[리밸런싱] 정확한 로컬 모의 주문 계획",
+            "[리밸런싱] 정확한 주문 계획",
             f"시장: {plan.market} · 계좌: {plan.account_id}",
             f"유효시간: {plan.expires_at}",
             "",
@@ -782,7 +789,7 @@ class Bot:
         if len(data) != 64 or any(ch not in "0123456789abcdef" for ch in data):
             self.send("알 수 없는 승인 버튼입니다. /pending에서 다시 확인하세요.")
             return
-        self.send("저장된 주문 목록과 해시를 확인한 뒤 로컬 모의계좌에 넣습니다.")
+        self.send("저장된 주문 목록과 해시를 확인한 뒤 미국 연습 계좌에 넣습니다.")
         try:
             fills = approve_reference_plan(
                 self.fixtures_dir,
@@ -799,7 +806,7 @@ class Bot:
             self.send(f"주문을 실행하지 않았습니다: {error}")
             return
         self._replace_buttons(msg, "실행됨 · 재사용 불가")
-        lines = [f"[체결] 로컬 모의계좌 · {len(fills)}건", ""]
+        lines = [f"[체결] 미국 연습 계좌 · {len(fills)}건", ""]
         for fill in fills:
             verb = "매수" if fill["side"] == "buy" else "매도"
             lines.append(f"{verb}  {fill['ticker']}  {fill['qty']}주")

@@ -95,7 +95,7 @@ def main() -> None:
     head("다음", "숫자는 질문을 만들 뿐, 답은 아닙니다")
     bullet("눈에 띄는 줄 하나를 골라 AI에게 물어보세요. 「왜 그런지 짐작되는 이유를 말해 줘」")
     bullet("코스피를 못 따라갔다면, 그게 내 스펙 ① 때문인지 시장 때문인지 갈라 보세요.")
-    bullet("펀더멘탈(재무)은 아직 비어 있습니다: python examples/analysis/4-펀더멘탈-붙일자리.py")
+    bullet("섹터 쏠림: python examples/analysis/4-섹터-쏠림점검.py")
 
 
 if __name__ == "__main__":

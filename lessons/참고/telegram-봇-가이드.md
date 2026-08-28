@@ -28,6 +28,19 @@ TELEGRAM_CHANNEL_ID=복사한_숫자
 ```
 python agent/agent.py
 ```
+
+## 첫 장면 — 기본 스펙이 이미 있습니다
+
+봇을 켜 두고 (`python agent/telegram_bot.py`) 폰에서 **`/config`** 를 보냅니다.
+표 ①~④가 보이면 된 겁니다. 안 고쳐도 오늘 돕니다.
+
+칸을 고치려면 **`/update_config`** 뒤에 바꿀 말을 적습니다.
+예) `/update_config 허용 오차를 7%p 로`
+
+가져가는 것: `/config` 보기, `/update_config` 고치기, `/check` 벌어짐, `/rebalance` 진입·청산, `/journal` 기록, `/routines` 루틴.
+
+전체 명령 목록은 `/help` 맨 아래입니다. `/init` 인터뷰는 학생 창구가 아닙니다.
+
 환경변수로 바로 넣을 수도 있습니다.
 ```
 TELEGRAM_BOT_TOKEN="토큰" TELEGRAM_CHANNEL_ID="숫자" python agent/agent.py

@@ -299,3 +299,37 @@ npx -y @koreainvestment/kis-code-assistant-mcp
 - 수업 랩과 공식 도구를 **동시에** 부르기 (토큰 1분 1회를 서로 잡아먹는다)
 
 에러는 `.agents/skills/troubleshooting/SKILL.md`.
+
+## 2주차 미국 주식 참조 예제 — 평일에만
+
+토요일 본편은 `python agent/us_agent.py`의 로컬 모의계좌다. 장 시간과 키에 기대지 않는다.
+평일에 학생이 KIS 모의 키와 트레이딩 MCP를 붙였을 때만, 로컬에서 이미 승인한 주문 계획을
+공식 해외주식 모의주문으로 옮길 수 있다.
+
+순서를 바꾸지 않는다.
+
+1. `python agent/committee.py` — AI 판단 제안. 주문 아님.
+2. `python agent/us_agent.py --adopt <제안번호>` — 확정 스펙에서 주문 미리보기.
+3. 학생이 종목·방향·수량·지정가·주문 계획 번호를 확인한다.
+4. 학생이 승인한 **그 값 그대로만** 트레이딩 MCP `overseas_stock` / `order`에 전달한다.
+
+미국 주식 모의주문 필수값:
+
+```
+api_type: order
+env_dv: demo
+ovrs_excg_cd: NASD | NYSE | AMEX
+pdno: 승인된 티커
+ord_qty: 승인된 수량
+ovrs_ord_unpr: 승인된 지정가
+ord_dv: buy | sell
+ord_dvsn: "00"
+ord_svr_dvsn_cd: "0"
+```
+
+모의 미국 주식 주문은 **지정가(`00`)만** 사용한다. 시장가·예약·정정취소로 바꾸지 않는다.
+AI가 티커, 방향, 수량, 가격을 다시 계산하거나 “더 좋아 보이는 값”으로 고치면 승인이
+깨진 것이다. 주문하지 말고 로컬 미리보기부터 다시 한다.
+
+이 경로에서도 `env_dv=real`은 멈춘다. 실계좌 안내는 `lessons/9-마무리`의 졸업 스위치로
+넘기며, 이 스킬이 대신 켜거나 주문하지 않는다.

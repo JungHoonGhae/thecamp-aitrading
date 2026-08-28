@@ -31,7 +31,7 @@ class ReferenceCompareTests(unittest.TestCase):
 
     def test_compare_cli_stays_offline_and_does_not_order(self) -> None:
         result = subprocess.run(
-            ["python3", "routines/참조전략-실험.py", "--compare", "--no-send"],
+            [sys.executable, "routines/참조전략-실험.py", "--compare", "--no-send"],
             cwd=ROOT,
             text=True,
             capture_output=True,

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import sys
+
 import subprocess
 import unittest
 from pathlib import Path
@@ -10,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class ReferenceRoutineTests(unittest.TestCase):
     def test_offline_routine_shows_both_markets_and_locked_reference(self):
         result = subprocess.run(
-            ["python3", "routines/참조전략-실험.py", "--no-send"],
+            [sys.executable, "routines/참조전략-실험.py", "--no-send"],
             cwd=ROOT,
             text=True,
             capture_output=True,

@@ -55,7 +55,7 @@ description: >
 `.claude` 만 위로 복사하는 우회는 하지 마라 — `lessons/` 와 `.agents/` 가 아래 남아
 프롬프트의 경로가 전부 어긋난다.
 
-이 기수 전원은 **Windows**. 실행·MCP 등록은 `python` (`python3` 없음).
+이 기수는 **Windows 가 많고 맥도 있다**. 실행·MCP 등록의 정본 명령은 `python` — 윈도우(스토어 파이썬)는 그대로 되고, 맥에서 `python` 이 없다고 나오면 `python3` 으로 바꿔 실행한다.
 `.claude/skills/` 는 실제 폴더여야 한다. 「스킬이 설치되지 않았다」면 ROOT 를 연 뒤
 맞추고, 앱을 한 번 끄고 연다. 그래도 없으면 `.agents/skills/environment/SKILL.md` 를 파일로 읽어 그대로 한다.
 

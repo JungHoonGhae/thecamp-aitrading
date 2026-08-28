@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import sys
+
 import json
 import subprocess
 import tempfile
@@ -12,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class USReferenceCliTests(unittest.TestCase):
     def run_cli(self, *args: str) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
-            ["python3", *args],
+            [sys.executable, *args],
             cwd=ROOT,
             text=True,
             capture_output=True,

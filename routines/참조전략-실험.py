@@ -88,9 +88,20 @@ def main() -> None:
     routine.줄("고점 대비 -10%는 재검토 표시이며 자동 손절이 아닙니다.")
     routine.줄("고정 종목 바스켓의 생존편향이 있어 시장 전체 성과로 일반화하지 않습니다.")
 
-    if "--with-ai" in sys.argv and judge.available():
+    if "--with-ai" in sys.argv:
         packet = load_reference_packet(FIXTURES, selection["reference_market"])
-        proposal = build_reference_advisory(packet, ask_fn=judge.ask)
+        ai_result = None
+
+        def ask_with_status(**kwargs):
+            nonlocal ai_result
+            ai_result = judge.ask_with_status(**kwargs)
+            return ai_result.text
+
+        proposal = build_reference_advisory(packet, ask_fn=ask_with_status)
+        if ai_result is not None and not ai_result.ok:
+            routine.칸("AI 검토 미실행")
+            routine.줄(ai_result.notice)
+            routine.줄("아래 약점은 수업용 고정 설명입니다.")
         routine.칸("AI가 한 번 검토한 것 · 주문 권한 없음")
         routine.줄(f"약점: {proposal.review.weakness}")
         routine.줄(f"반대 근거: {proposal.review.contrary_evidence}")

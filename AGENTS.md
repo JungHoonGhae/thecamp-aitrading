@@ -54,8 +54,8 @@ AI 코딩 도구(Claude Code, Codex, Cursor, Gemini 등)는 아래를 따르세�
 - `agent/` — 학생의 에이전트(agent.py)와 스펙(`agent/spec/` 3개 파일)
 - `src/common/` — KIS 클라이언트(mock/live) · fixtures · 텔레그램·차트 헬퍼 ·
   `market.py`(과거시세·지수·환율·섹터, **비공식**) · `crypto.py`(업비트, 공식) · `judge.py`(AI 판단 층)
-- `routines/` — **루틴**. 정해진 주기·사건에 혼자 도는 일. 카테고리로 위험을 가른다
-  (정보수집·스크리닝·매매제안은 주문 없음 / **리밸런싱만 주문**). 목록은 `routines/README.md`
+- `routines/` — **읽기 전용 루틴**. 정해진 주기·사건에 조회하고 Telegram으로 알린다.
+  주문 계획·승인·실행은 이 폴더에 두지 않는다. 목록은 `routines/README.md`
 - `examples/` — 단계별 실행 스크립트(quote.py)와 `examples/analysis/`(정량·정성·시장맥락·섹터)
-- `agent/telegram_bot.py` — 폰에서 명령·승인을 받는 창구 · `hermes/` — 예약 통합 패키지
+- `hermes/` — Telegram 명령·승인·AI 라우팅·읽기 전용 예약을 맡는 단일 인터페이스 패키지
 - 각 부의 `README.md`(파트 목표)와 번호 스텝 `.md`에 복사용 프롬프트가 있습니다.

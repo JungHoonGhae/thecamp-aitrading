@@ -1,77 +1,77 @@
-# 2부 · 4 — 자동화: 자는 동안 (hermes)
+# 4 · 아침 브리핑 자동화
 
-## 이 단계 목표
-완성한 점검(`agent/agent.py`)을 **손 안 대고 정해진 시각에** 돌립니다.
-이 강의에서 말한 **"자동화 에이전트"** 가 여기입니다. 도구 이름은 hermes-agent.
+## 목표
 
-같은 실행은 `agent/agent.py` 한 줄입니다. 시작하는 방법만 두 가지입니다.
+Telegram에서 아침 브리핑을 한 번 직접 실행한 뒤 평일 오전 8시로 예약합니다. 브리핑은
+시장, 내 계좌, 보유 종목을 조회해 보고합니다. 주문안과 주문은 만들지 않습니다.
 
-- **B. hermes (본편)** — 말로 예약·즉석 점검. 무료 Nous 로그인.
-- **A. OS 예약 (폴백)** — 설치가 **20분**을 넘기면 crontab / 작업 스케줄러 / 화면.
-
-설치가 막혀도 오늘 본편(참조 실험 → 가드레일 → 미국 연습 계좌 승인)은 이미 끝난 상태입니다.
-
-> 자동화는 코드를 새로 짜는 게 아닙니다. 이미 만든 걸 정해진 시각에 시작하는 것뿐입니다.
-> 텔레그램은 에이전트가 `.env` 봇으로 직접 보냅니다.
-
----
-
-## B. 본편 — hermes-agent
-
-패키지는 [`hermes/`](../../hermes/README.md) 에 있습니다.
-
-### B0. 한 번만 세우기 (무료)
-```bash
-curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash   # mac/Linux/WSL2
-hermes setup --portal    # Nous Portal 무료 로그인 (추가 카드 없음)
-hermes --tui             # 채팅이 되면 성공
+```text
+사람의 Telegram 요청
+        ↓
+Hermes → morning-brief.py → KIS·시장 자료 조회
+        ↑                         │
+        └─────── Telegram 결과 ─────────┘
 ```
 
-> 수업 경로는 **Nous Portal** 입니다. 이미 쓰는 Claude Code / Codex 를 hermes 에
-> 다시 붙일 필요 없습니다. (Claude Pro 로는 hermes Anthropic 로그인이 안 됩니다.)
+## 1 · 수동 실행
 
-### B1. 스크립트 넣기
-```bash
-mkdir -p ~/.hermes/scripts
-cp hermes/scripts/portfolio-check.py ~/.hermes/scripts/
-# 파일을 열어 REPO 를 내 저장소 절대경로로 수정
+Telegram에 보냅니다.
+
+```text
+아침 브리핑 지금 실행해 줘.
 ```
 
-### B2. 말로 예약
-hermes 채팅에:
+정상 결과:
+
+- 시장 점검, 계좌 상태, 보유 종목 점검이 한 메시지로 옵니다.
+- 실행 시각과 사용한 자료가 표시됩니다.
+- `주문 없음`이 표시됩니다.
+
+완료되지 않은 경우:
+
+- `morning-brief.py 없음`: `python hermes/setup_course.py`를 다시 실행합니다.
+- KIS 또는 시장 자료 실패: 실패한 자료 이름이 표시되고 주문 없이 끝납니다.
+- 2분 동안 답이 없음: `/stop`을 한 번 보낸 뒤 강사와 gateway 상태를 확인합니다.
+
+수동 결과가 오기 전에는 예약하지 않습니다.
+
+## 2 · 예약
+
+수동 실행이 끝나면 Telegram에 보냅니다.
+
+```text
+평일 오전 8시에 아침 브리핑 보내 줘. 예약 이름과 시각도 보여 줘.
 ```
-portfolio-check.py 를 매주 월요일 아침 8시에 no-agent 로 실행해줘.
+
+정상 결과:
+
+```text
+예약 이름  수업 아침 브리핑
+시각       평일 오전 8시
+스크립트   morning-brief.py
+실행 방식  no-agent
+전달 위치  현재 Telegram 대화
 ```
-- `no-agent` = 숫자는 스크립트가 계산 (공짜·매번 같음). 텔레그램은 에이전트가 보냄.
-- "지금 점검해줘"는 스킬을 넣은 뒤 채팅으로도 됩니다:
-  `hermes skills install ./hermes/skills/portfolio-check`
 
-점검·보고만. hermes 가 주문을 넣게 하지 않습니다.
-(`portfolio-rebalance.py` 는 `--execute` 라서, 원할 때만 · 가드레일 통과분만.)
+같은 이름의 예약이 이미 있으면 새로 만들지 않고 기존 예약을 보여 줍니다. 노트북이 꺼져
+있으면 예약 시각에 실행되지 않습니다.
 
----
+## 3 · 역할 구분
 
-## A. 폴백 — OS 예약
+| 구분 | 하는 일 | 하지 않는 일 |
+|---|---|---|
+| Telegram | 실행 요청·결과 확인 | 계산·주문 |
+| Hermes | 수동 실행·예약·결과 전달 | 투자 판단 |
+| 브리핑 코드 | 시장·계좌·보유 종목 조회 | 주문안 생성·주문 실행 |
+| 사람 | 결과 확인 | 이 단계에서 승인할 주문 없음 |
 
-hermes 가 안 되면 이것만으로도 자는 동안 돌아갑니다.
-봇: [`lessons/참고/telegram-봇-가이드.md`](../참고/telegram-봇-가이드.md)
-
-**mac / Linux** — `crontab -e`:
-```
-0 8 * * 1 python /내/저장소/절대경로/agent/agent.py
-```
-`python` 이 없으면 `python3`.
-
-**Windows** — 작업 스케줄러 → 매주 월 08:00 → `python C:\내\저장소\경로\agent\agent.py`
-
-지금 확인: `python agent/agent.py` 한 번에 텔레그램이 오면 예약만 남은 겁니다.
+모의주문안은 자동화와 분리된 `/ts_order_plan`에서만 만듭니다.
 
 ## ☑️ 넘어가도 되는 신호
-- hermes 채팅에서 예약이 등록됐거나, "점검해줘"에 보고가 왔다.
-  (막혔으면 A로 텔레그램 한 통 + crontab 한 줄이면 통과)
 
-> 🧭 **초록이(진행 도우미)에게** — 막혔으면 이 한 줄을 복붙하세요:
-> `.agents/skills/assistant/SKILL.md 대로, 내가 지금 어느 단계에서 막혔는지 진단하고 다음 행동을 하나만 알려줘.`
+- 수동 실행 결과가 Telegram에 도착했습니다.
+- 결과에 `주문 없음`이 표시됐습니다.
+- 예약 이름과 평일 오전 8시가 표시됐습니다.
+- 노트북이 꺼져 있으면 실행되지 않는다고 설명할 수 있습니다.
 
----
-◀ [이전: 3-재실행-리밸런싱](3-재실행-리밸런싱.md) · 다음 ▶ [**5-넓히기-루틴과-데이터**](5-넓히기-루틴과-데이터.md)
+→ 수업 뒤: [5 · 수업 뒤 이어 보기](5-넓히기-루틴과-데이터.md)

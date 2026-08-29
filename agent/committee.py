@@ -33,13 +33,16 @@ def main() -> None:
 
     packet = load_reference_packet(FIXTURES, args.market)
     ask_fn = None
+    ai_result = None
     if args.with_ai:
         from common import judge
 
-        if judge.available():
-            ask_fn = judge.ask
-        else:
-            print("설치된 AI를 찾지 못해 수업용 고정 설명을 사용합니다.")
+        def ask_with_status(**kwargs):
+            nonlocal ai_result
+            ai_result = judge.ask_with_status(**kwargs)
+            return ai_result.text
+
+        ask_fn = ask_with_status
 
     proposal = build_reference_advisory(packet, ask_fn=ask_fn)
     output = args.output or ROOT / ".state" / f"{args.market.lower()}-proposal.json"
@@ -60,6 +63,14 @@ def main() -> None:
         f"나중 구간 비용 후 {later['net_compounded_return']:+.1%} · "
         f"벤치마크 차이 {later['net_excess_return']:+.1%}p"
     )
+    if args.with_ai and ai_result is not None and not ai_result.ok:
+        print("\n" + judge.route_report(ai_result))
+        print(f"\n[AI 검토 미실행] {ai_result.notice}")
+        print("아래 약점은 수업용 고정 설명입니다.")
+    elif args.with_ai and ai_result is not None:
+        print("\n" + judge.route_report(ai_result))
+    elif not args.with_ai:
+        print("\n[AI 검토 미요청] --with-ai를 붙이지 않아 수업용 고정 설명을 사용합니다.")
     print("\n[AI 검토 · 주문 권한 없음]")
     print(f"약점: {proposal.review.weakness}")
     print(f"반대 근거: {proposal.review.contrary_evidence}")

@@ -1,11 +1,12 @@
 {
   "_설명": "수업용 MCP 등록 예시. 설치할 것도 켜 둘 것도 없습니다 — 이 저장소의 서버를 바로 붙입니다.",
-  "_한줄등록_ClaudeCode": "claude mcp add kis-lecture-lab -- python3 /내/저장소/절대경로/agent/mcp_server.py",
-  "_한줄등록_Codex": "codex mcp add kis-lecture-lab -- python3 /내/저장소/절대경로/agent/mcp_server.py",
-  "_Windows": "python3 대신 python 을 쓰고, 경로는 C:\\내\\저장소\\경로\\agent\\mcp_server.py 처럼 씁니다.",
+  "_한줄등록_ClaudeCode": "claude mcp add kis-lecture-lab -- python /내/저장소/절대경로/agent/mcp_server.py",
+  "_한줄등록_Codex": "codex mcp add kis-lecture-lab -- python /내/저장소/절대경로/agent/mcp_server.py",
+  "_Windows": "python 을 쓰고, 경로는 C:\\내\\저장소\\경로\\agent\\mcp_server.py 처럼 씁니다.",
+  "_Mac": "python 명령이 없을 때만 python3 로 바꿉니다.",
   "mcpServers": {
     "kis-lecture-lab": {
-      "command": "python3",
+      "command": "python",
       "args": ["/내/저장소/절대경로/agent/mcp_server.py"]
     }
   },

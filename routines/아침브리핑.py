@@ -78,18 +78,20 @@ def main() -> None:
 
     # 5. AI가 짚은 것 — 여기까지가 규칙, 여기부터가 판단
     if AI판단:
-        본 = judge.ask(재료=r.본문(),
-                      질문="위 브리핑에서 사람이 오늘 확인해야 할 것만 짚어라.")
-        if 본:
+        ai_result = judge.ask_with_status(
+            재료=r.본문(), 질문="위 브리핑에서 사람이 오늘 확인해야 할 것만 짚어라."
+        )
+        if ai_result.ok:
             r.칸("AI가 짚은 것")
-            for line in 본.splitlines():
+            for line in ai_result.text.splitlines():
                 if line.strip():
                     r.줄(line.strip())
-        elif judge.available():
-            r.칸("AI가 짚은 것").줄("이번엔 답을 못 받았습니다. 규칙 결과만 보냅니다.")
+        else:
+            r.칸("AI 검토 미실행").줄(ai_result.notice)
 
     r.줄("")
     r.줄("판단은 사람이 합니다. 이 알림은 재료입니다.")
+    r.줄("주문 없음 · 조회와 보고만 실행했습니다.")
     r.보내기()
 
 

@@ -1,0 +1,6 @@
+name: thecamp-invest
+version: 1.0.0
+description: "Telegram에 /ts_* 수업 명령을 등록하고 안전한 모의투자 흐름으로 연결한다."
+author: "The Camp AI Trading"
+hooks:
+  - pre_gateway_dispatch

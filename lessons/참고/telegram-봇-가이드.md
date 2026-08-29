@@ -1,55 +1,96 @@
-# 텔레그램 봇 만들기 (5분)
+# 텔레그램 투자 에이전트 만들기 (3분)
 
-점검 결과를 텔레그램으로 받으려면 **봇 토큰**과 **채널(또는 나와의 대화) ID** 두 개만
-있으면 됩니다. 3~4주차에서도 같은 이름(`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHANNEL_ID`)을
-씁니다 — 여기서 만든 봇을 그대로 이어 가세요.
+## 권장 경로 · 사람은 Create Bot만 누릅니다
+
+Telegram 공식 앱에 로그인한 뒤 코딩 앱에 아래 문장을 보냅니다.
+
+```text
+python hermes/setup_course.py --managed-telegram 를 실행해 줘.
+내가 Telegram에서 Create Bot만 누르면 나머지 연결과 확인은 네가 끝내 줘.
+토큰과 대화 ID는 다시 출력하지 마.
+```
+
+Hermes 공식 Managed Bot 경로가 사용자 소유의 새 봇을 만들고, 토큰과 내 대화 ID를 로컬
+`.env`와 Hermes 비밀 저장소에 직접 기록합니다. 강의 채팅이나 문서에는 비밀값을 남기지 않습니다.
+
+## 수동 대체 경로
+
+Managed Bot 화면이 열리지 않는 경우에만 아래 순서를 사용합니다. 점검 결과를 Telegram으로
+받으려면 **봇 토큰**과 **나와의 대화 ID** 두 개가 필요합니다.
 
 ## 순서
 1. 텔레그램에서 **@BotFather** 검색 → 대화 시작 → `/newbot`.
 2. 봇 이름을 정한다 (표시 이름, 그다음 `@…bot` 사용자명).
 3. BotFather가 준 **토큰**(긴 문자열)을 복사한다. 이건 열쇠라 **공유·업로드 금지**.
 4. 방금 만든 봇을 검색해 열고 **`/start`** 를 보낸다. (채널을 쓸 거면 채널에 봇을 관리자로 추가)
-5. 브라우저 주소창에 붙여넣는다 (토큰만 바꿔서):
+5. AI에게 토큰을 한 번 전달하고 대화 ID를 대신 찾게 합니다. 브라우저 주소에 토큰을 직접
+   붙여 넣는 것은 수동 진단이 꼭 필요할 때만 사용합니다.
+6. 수동 진단 주소:
    ```
    https://api.telegram.org/bot여기에_토큰/getUpdates
    ```
-6. 열린 글에서 `"chat":{"id":` 뒤에 나오는 **숫자**가 채널 ID 입니다.
+7. 열린 글에서 `"chat":{"id":` 뒤에 나오는 **숫자**가 채널 ID 입니다.
    (나와의 대화면 양수, 채널이면 보통 `-100`으로 시작합니다)
 
 > 숫자가 안 보이면: 봇에게 아무 말이나 한 번 더 보내고, 주소창을 새로고침하세요.
 
-## 이 프로젝트에 쓰기
+## Hermes에 연결하기
 `.env.example` 을 복사해 `.env` 로 만든 뒤 두 줄을 채웁니다.
 ```
 TELEGRAM_BOT_TOKEN=복사한_토큰
 TELEGRAM_CHANNEL_ID=복사한_숫자
 ```
-그다음 평소처럼 실행하면 화면 대신 텔레그램으로 갑니다.
+그다음 수업 플러그인과 명령을 Hermes에 설치하고 gateway를 시작합니다.
 ```
-python agent/agent.py
+python hermes/setup_course.py --from-project-env
 ```
 
-## 첫 장면 — 기본 스펙이 이미 있습니다
+스크립트가 gateway 설치·시작·재연결까지 확인합니다.
 
-봇을 켜 두고 (`python agent/telegram_bot.py`) 폰에서 **`/config`** 를 보냅니다.
-표 ①~④가 보이면 된 겁니다. 안 고쳐도 오늘 돕니다.
+## 첫 장면 — Trading System 명령
 
-칸을 고치려면 **`/update_config`** 뒤에 바꿀 말을 적습니다.
-예) `/update_config 허용 오차를 7%p 로`
+폰에서 **`/ts_help`** 를 보냅니다. 아래 수업 명령이 먼저 보이고, 그 아래 Hermes 기본
+명령이 함께 보이면 연결된 것입니다.
 
-가져가는 것: `/config` 보기, `/update_config` 고치기, `/check` 벌어짐, `/rebalance` 진입·청산, `/journal` 기록, `/routines` 루틴.
+수업 뒤에도 가져가는 핵심 명령은 아래 열 개입니다. Claude Code와 Codex에서 익숙한
+`help`·`status`·`config`·`review` 이름을 따르고, 비슷한 일은 버튼 안에 묶었습니다.
 
-전체 명령 목록은 `/help` 맨 아래입니다. `/init` 인터뷰는 학생 창구가 아닙니다.
-
-환경변수로 바로 넣을 수도 있습니다.
+```text
+/ts_help                    수업 명령 전체 보기
+/ts_update                  최신 강의자료 받기·5/5 확인·연결 갱신
+/ts_doctor                  실습 코드·설정·gateway 빠른 진단
+/ts_auth                    Hermes·Claude·Codex·KIS 연결 상태
+/ts_status                  잔고·보유 주식·대기 주문 한 번에 확인
+/ts_config                  계좌 종류·기술적 분석 지표 설정
+/ts_analyze 삼성전자        기술적·펀더멘탈·둘 다 중 선택
+/ts_rule                  현재 규칙·가설 근거와 약점 중 선택
+/ts_order_plan                    정확한 주문 계획과 사람 승인 버튼
+/ts_log 이유                사고·팔고·안 움직인 이유 기록
 ```
-TELEGRAM_BOT_TOKEN="토큰" TELEGRAM_CHANNEL_ID="숫자" python agent/agent.py
-```
-Windows(PowerShell):
-```
-$env:TELEGRAM_BOT_TOKEN="토큰"; $env:TELEGRAM_CHANNEL_ID="숫자"; python agent/agent.py
+
+`/ts_status`는 버튼과 AI 없이 선택한 계좌의 세 항목을 한 번에 읽습니다. `/ts_config`에서 계좌 종류와
+기술적 분석 지표를 버튼으로 설정합니다. 계좌를 바꿔도 수업용 계좌와 KIS 모의투자 계좌의
+현금·보유 주식은 서로 섞이지 않습니다. 분석 지표 변경은 주문 규칙에 닿지 않습니다. Hermes
+자체 상태·세션 명령도 감추지 않으며 수업 명령 아래에 그대로 둡니다.
+
+## 버튼과 복구
+
+- 강사가 자료를 바꿨다고 하면 `/ts_update`를 한 번 보냅니다. Claude Code가 우선 맡고,
+  없거나 한도에 걸리면 Codex가 이어받습니다. 1~3분 걸릴 수 있으며 무료 대화 모델은
+  저장소를 고치지 않습니다. `.env`·학생 스펙·판단 기록·Telegram/KIS 설정·연습 계좌 장부는
+  실행 전후 자동으로 보존합니다. 그 밖의 학생 수정과 충돌하면 덮지 않고 확인 필요 카드를 보여 줍니다.
+- 뭔가 빠졌는지 먼저 보려면 `/ts_doctor`, 로그인 경로만 보려면 `/ts_auth`를 보냅니다.
+  두 명령은 모델·잔고·주문을 부르지 않습니다.
+- 버튼 선택은 2분 안에 합니다. 시간이 지나면 주문 없이 자동으로 끝납니다.
+- 버튼을 기다리던 중 다른 명령이 막히면 `/stop`을 보낸 뒤 원래 명령을 다시 보냅니다.
+- `/ts_help`가 바로 답하지 않고 파일을 오래 찾으면 코딩 앱에 아래 한 줄을 보냅니다.
+
+```text
+python hermes/setup_course.py --from-project-env 를 다시 실행하고 hermes gateway를 재시작해 줘.
 ```
 
 ## 주의
 - 토큰은 그 봇으로 글을 쓸 수 있는 열쇠입니다. **공유·업로드 금지.**
-- 없어도 실습은 됩니다 — 보고가 화면에만 나옵니다.
+- 같은 BotFather 토큰은 Hermes gateway 하나에서만 사용합니다. 다른 봇 프로그램을 같은
+  토큰으로 함께 실행하지 않습니다.
+- 연결이 끊기면 조용히 건너뛰지 않고 Telegram 또는 Hermes 로그에 상태를 표시합니다.

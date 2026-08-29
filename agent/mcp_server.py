@@ -12,9 +12,9 @@ Docker 도, 외부 라이브러리도 필요 없다. 표준 라이브러리로 s
 2부에서 그대로 돌아가는 이유다.
 
 등록:
-    claude mcp add kis-lecture-lab -- python3 <저장소경로>/agent/mcp_server.py
-    codex  mcp add kis-lecture-lab -- python3 <저장소경로>/agent/mcp_server.py
-    (Windows 는 python3 대신 python)
+    claude mcp add kis-lecture-lab -- python <저장소경로>/agent/mcp_server.py
+    codex  mcp add kis-lecture-lab -- python <저장소경로>/agent/mcp_server.py
+    (맥에서 python 이 없을 때만 python3)
 """
 from __future__ import annotations
 

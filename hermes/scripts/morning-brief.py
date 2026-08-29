@@ -12,6 +12,7 @@ hermes 는 ~/.hermes/scripts/ 아래 스크립트를 실행한다. `.sh` 는 bas
   2) 아래 REPO 를 내 저장소 절대경로로 수정
      (Windows 예: r"C:\\Users\\나\\...\\thecamp-aitrading")
 """
+import os
 import runpy
 import sys
 from pathlib import Path
@@ -19,6 +20,7 @@ from pathlib import Path
 REPO = r"__여기에_저장소_절대경로__"  # 예: /Users/나/workspace/projects/thecamp-aitrading
 
 routine = Path(REPO) / "routines" / "아침브리핑.py"
+os.environ["THECAMP_STDOUT_ONLY"] = "1"
 sys.path.insert(0, str(routine.parent))   # 루틴이 _routine.py 를 찾게 한다
 sys.argv = [str(routine)]
 runpy.run_path(str(routine), run_name="__main__")

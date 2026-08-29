@@ -32,10 +32,11 @@ FORBIDDEN = {
     "수업용 체결": "미국 연습 계좌 체결",
     "최근 월 상위": "직전 한 달을 빼고 1년 성적 상위",
     "python3 ": "python (맥 폴백은 스킬이 안내)",
+    "창구": "인터페이스",
 }
 
 # 실재하지 않아도 되는 경로 (예시로 든 가상의 파일)
-HYPOTHETICAL_PATHS: set[str] = set()
+HYPOTHETICAL_PATHS: set[str] = {".state/us-guardrail-demo.json"}
 
 PATH_RE = re.compile(r"(?<![\w/.-])((?:[\w가-힣.-]+/)+[\w가-힣.-]+\.(?:py|md|json))")
 

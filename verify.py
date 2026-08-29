@@ -90,7 +90,15 @@ def run(desc: str, args: list[str], expect: str, stdin: str | None = None) -> bo
         # 이 점검은 **수업 경로(mock)가 도는가** 를 본다. 학생 `.env` 가 숙제 뒤
         # live 로 남아 있으면 키를 못 찾아 실패하는데, 그건 수업 준비와 상관없는
         # 실패다. 2주차 아침에 원인 모를 화면을 보게 된다. 그래서 여기서만 mock 을 강제한다.
-        env = {**os.environ, "KIS_MODE": "mock"}
+        # 검증 결과는 이 터미널에만 남긴다. `.env` 의 실제 봇 설정을 물려주면
+        # agent.py 미리보기와 모의 주문 확인이 학생 Telegram 으로 매번 전송된다.
+        # 빈 값을 명시하면 자식의 load_repo_env() 도 파일 값으로 다시 채우지 않는다.
+        env = {
+            **os.environ,
+            "KIS_MODE": "mock",
+            "TELEGRAM_BOT_TOKEN": "",
+            "TELEGRAM_CHANNEL_ID": "",
+        }
         env.pop("KIS_ENV", None)
         out = subprocess.run([sys.executable, *args], cwd=ROOT, input=stdin, env=env,
                              capture_output=True, text=True, encoding="utf-8", timeout=60)

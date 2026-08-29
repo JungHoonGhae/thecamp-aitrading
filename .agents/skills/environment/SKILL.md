@@ -7,7 +7,8 @@ description: >
   "실습 환경 준비됐는지 확인해 줘", "숙제 환경 준비됐는지 확인해 줘",
   "업데이트 해 줘", "맞춰 줘", "최신으로", "설치해 줘", "업뎃",
   "강사가 업데이트했대", "pull", "git pull", "저장소 받아", "환경 세팅",
-  "verify", "폴더가 어디야" 라고 하면 반드시 이 스킬. git 명령을 학생에게 시키지 않는다.
+  "verify", "폴더가 어디야", "2주차 실습 환경 설치해 줘", "2주차 환경 세팅"
+  이라고 하면 반드시 이 스킬. git 명령을 학생에게 시키지 않는다.
   경계 — 이미 에러가 났으면 troubleshooting 이다. 여기는 아직 안 깨진 상태를 다룬다.
   다음 단계 안내는 assistant. 숙제 진행은 homework.
 ---
@@ -65,6 +66,7 @@ description: >
 |---|---|---|
 | **수업 자료 업데이트 해 줘** / 실습 폴더 업데이트 해 줘 / 맞춰 줘 | 원본이 앞섰으면 맞춘다. `CHANGELOG.md` 맨 위 칸을 카드에 적는다 | 🔄 업데이트 |
 | **실습 환경 설치해 줘** / 세팅해 줘 / 저장소 받아 | git·Python·받기·권한·`python verify.py` | 📦 설치 |
+| **2주차 실습 환경 설치해 줘** / 2주차 환경 세팅 | 기본 5/5 뒤 Docker·KIS 166·Hermes·Telegram·TS 연결 | 📦 2주차 연결 |
 | **실습 환경 준비됐는지 확인해 줘** / verify | ROOT 에서 `python verify.py` | 📦 설치 (점검만) |
 | **숙제 환경 준비됐는지 확인해 줘** / 숙제 환경 점검 | ROOT 에서 `python verify.py --숙제` | 🧪 숙제 환경 점검 |
 
@@ -166,6 +168,33 @@ description: >
 ────────────────
 ```
 
+### 📦 2주차 연결 · 준비됨
+
+```
+📦 2주차 연결
+────────────────
+✅ Telegram 실습이 준비되었습니다
+📌 기본 환경: verify 5/5
+🐳 Docker: Desktop 실행
+🔧 KIS MCP: 모의투자 166 API · Hermes 연결
+🧭 Hermes: 설치 · Nous 무료 로그인
+📱 Telegram: gateway · TS 명령 연결
+다음: 폰에서 /ts_doctor → /ts_auth → /ts_help
+────────────────
+```
+
+### 📦 2주차 연결 · 사람 확인 필요
+
+```
+📦 2주차 연결
+────────────────
+🟡 사람 확인이 필요합니다
+완료: (지금까지 끝난 것)
+다음: (브라우저 승인 또는 BotFather 행동 하나만)
+비밀값은 화면에 다시 표시하지 않습니다
+────────────────
+```
+
 ## 매번 먼저 (어떤 일이든)
 
 ROOT 에서 `git fetch` 하고 `git status -sb` 를 본다.
@@ -186,15 +215,64 @@ https://raw.githubusercontent.com/JungHoonGhae/thecamp-aitrading/main/.agents/sk
 한 번에 한 단계. 끝난 뒤에만 다음.
 
 1. **git** — 없으면 OS에 맞게 설치. ZIP 으로 우회하지 않는다.
-2. **받기** — ROOT 가 없으면 clone. 공개 주소라 GitHub 계정은 필요 없다. 로그인 창이 뜨면 취소하고 HTTPS 로 다시. 이미 있으면 그 폴더를 연다.
-3. **권한** — 학생이 이 대화에서 허락한 범위에서 네가 직접 한다. Claude 면 `~/.claude/settings.json` 의 `permissions.defaultMode: bypassPermissions` 와 `skipDangerousModePermissionPrompt: true`. Codex 면 `approval_policy = "never"`, `sandbox_mode = "workspace-write"`, `[sandbox_workspace_write] network_access = true`. 이미 맞으면 건너뛴다. 바꿨으면 앱을 한 번 끄고 켠다.
+2. **받기** — ROOT가 없고 지금 열린 폴더가 비어 있으면 원본을 **그 폴더 안에 바로** 받는다
+   (`git clone https://github.com/JungHoonGhae/thecamp-aitrading .`). 새 하위 폴더를 만들지 않는다.
+   끝나면 지금 열린 위치에 `verify.py`가 바로 보여야 한다. 빈 폴더가 아니면서 ROOT도 아니면
+   덮지 말고 사람에게 빈 폴더 하나만 선택하게 한다. 이미 ROOT가 있으면 그 폴더를 연다.
+3. **권한** — 작업마다 나눈다. 분석·조회는 읽기 전용이다. 설치·업데이트처럼 파일을
+   고쳐야 할 때만 현재 실습 폴더 안의 편집을 허용한다. Claude는 `acceptEdits`, Codex는
+   `workspace-write`를 쓴다. 계정 전체의 기본값을 `bypassPermissions`로 바꾸거나 위험 권한을
+   영구 저장하지 않는다. 셸 명령은 이번 단계에 필요한 설치·업데이트·점검 명령만 허용한다.
+   이미 맞으면 건너뛴다.
 4. **확인** — ROOT 에서 `python verify.py`. 성공 문장 「실습 환경이 준비되었습니다」. 실패 문장 「실습 환경이 아직 준비되지 않았습니다」. 실패면 강사 칸을 남기고 설치를 더 밀어붙이지 않는다.
 5. **유지** — 「매번 먼저」대로 맞춘 뒤 4번을 다시 한다.
 6. **학습** — 환경이 된 뒤에만 `lessons/` 순서로. 붙여넣을 문장은 그 문서의 `📋` 블록을 연 다음 그대로.
 
-토요일 수업 MCP(`kis-lecture-lab`)에는 Docker가 없다.
-평일 숙제의 공식 트레이딩 MCP(`kis-trade-mcp`)를 붙일 때는
-`kis-trading-mcp` 스킬과 `lessons/참고/kis-mcp-연동-가이드.md` 대로 Docker를 설치한다.
+## 2주차 한 문장 설치
+
+학생이 **「2주차 실습 환경 설치해 줘」**라고 하면 아래 순서로 끝까지 진행한다. 학생에게
+운영체제별 명령을 고르게 하지 않는다. 사람만 할 수 있는 승인 단계에서만 멈추고 위의
+`📦 2주차 연결 · 사람 확인 필요` 카드로 다음 행동 하나를 보여 준다.
+
+1. ROOT에서 `python verify.py`를 실행한다. 5/5가 아니면 이 스킬의 기본 설치 절차로 먼저 복구한다.
+2. `hermes --version`을 확인한다. 없으면 운영체제를 확인해 Hermes 공식 설치기를 직접 실행한다.
+   - Windows PowerShell: `iex (irm https://hermes-agent.nousresearch.com/install.ps1)`
+   - macOS·Linux: `curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash`
+   설치 뒤 새 터미널에서 `hermes --version`이 보이면 완료다.
+3. `hermes portal info`에서 Nous Portal 로그인을 확인한다. 없으면 `hermes setup --portal`을 실행하고
+   브라우저 승인 한 번만 학생에게 요청한다. 가입·로그인 뒤 상태를 다시 확인한다. 무료 모델은
+   별도 설치물이 아니다.
+4. **Docker Desktop을 기본 경로로 준비한다.** `docker --version`과 `docker ps`를 각각 8초 제한으로
+   확인한다. 설치 뒤 첫 엔진 시작만 최대 2분 확인한다. 이 2분은 Docker의 기술 제한이 아니라
+   수업에서 무한 대기를 막는 진행 상한이다. 이미 켜진 엔진은 8초 안에 답해야 한다. 2분이 지나도
+   안 되면 원인을 한 줄로 알리고 「KIS 공식 166개만 보류, kis-lecture-lab 5개로 본편 계속」을
+   즉시 보여 준다. Windows는 WSL 2와 Docker Desktop 앱 실행을 확인한다. 관리자 권한·재부팅이
+   필요하면 사람에게 그 한 단계만 요청한다.
+5. ROOT에서 `python hermes/setup_kis_mcp.py`를 실행한다. 이 스크립트가 공식 저장소 받기·이미지
+   빌드·모의 키 보존·127.0.0.1 컨테이너·Hermes legacy SSE 등록·연결 시험을 한 번에 한다.
+   Hermes에는 8개 분야 도구로 보이지만 그 안의 API 합계는 166개다. `kis-lecture-lab` 5개는
+   지우지 않는다. 설치가 끝나면 `hermes mcp test kis-trade-mcp`가 성공해야 한다.
+6. ROOT `.env`의 기존 KIS·투자·Telegram 값을 보존한다. Telegram 토큰과 대화 ID가 이미 있으면
+   다시 묻지 않고 7번으로 간다. 없으면 Telegram 공식 앱의 설치·로그인을 확인하고 ROOT에서
+   `python hermes/setup_course.py --managed-telegram`를 실행한다. Hermes 공식
+   Managed Bot 화면의 **Create Bot** 소유 확인만 학생에게 요청한다. 토큰·대화 ID는 스크립트가
+   `.env`와 Hermes 비밀 저장소에 직접 기록하며 답변·로그·새 문서에 다시 출력하지 않는다.
+   Managed Bot이 지원되지 않을 때만 `lessons/참고/telegram-봇-가이드.md`의 BotFather 수동 경로를 쓴다.
+7. 기존 Telegram 값이 있으면 ROOT에서
+   `python hermes/setup_course.py --from-project-env`를 실행한다. 새 Managed Bot 경로는
+   이 설정까지 이미 끝낸다. 두 경로 모두 스크립트가 gateway 설치·시작·재연결까지 끝낸다.
+   기존 `.env`, 학생 스펙, 판단 기록, 계좌 설정은 그대로 둔다.
+8. 폰에서 `/ts_doctor` → `/ts_auth` → `/ts_tools 수급` → `/ts_help`를 차례로 보내게 한다.
+   doctor에 Docker와 KIS MCP 166이 ✅이고 help가 바로 열리면 `📦 2주차 연결 · 준비됨` 카드로
+   끝낸다. Docker 불가 판정을 받은 학생만 KIS MCP가 🟡인 폴백 카드로 끝내고 본편은 계속한다.
+
+공식 링크는 재설치할 때 쓰는 보조 경로다. Hermes는
+`https://hermes-agent.nousresearch.com/docs/getting-started/installation`, Telegram 데스크톱·모바일 앱은
+`https://telegram.org/apps/download`에서 받는다.
+
+2주차 기본 경로는 공식 트레이딩 MCP(`kis-trade-mcp`)와 Docker다.
+`kis-trading-mcp` 스킬과 `lessons/참고/kis-mcp-연동-가이드.md`대로 AI가 설치·연결한다.
+Docker가 정말 불가능한 학생만 Docker 없는 `kis-lecture-lab` 다섯 개로 같은 본편을 진행한다.
 코딩도우미 MCP는 문서 334개 검색만 하고 주문을 넣지 않는다.
 
 ## 경로가 섞일 때

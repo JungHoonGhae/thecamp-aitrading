@@ -4,7 +4,7 @@ description: >
   한투 공식 도구 둘(코딩도우미 334 · 트레이딩 166)을 구분하고,
   Docker 로 트레이딩 MCP 를 붙인 뒤 조회·액션을 둘러보고 쓸 것을 고른다.
   Docker 설치·실행·연결은 **AI가 대신** 한다 — 학생은 설치 창을 누르고 앱을 한 번 켠다.
-  막히면 10분에서 멈추고 kis-lecture-lab 으로 간다. 숙제는 그래도 된다.
+  Docker 앱이 2분 안에 준비되지 않으면 멈추고 kis-lecture-lab 으로 간다. 수업은 그래도 된다.
   "트레이딩 MCP", "공식 MCP", "코딩도우미 MCP", "도커", "도커 설치",
   "조회와 액션", "카탈로그", "334", "166", "kis-trade-mcp",
   "공식 도구 붙여", "엔드포인트 둘러봐" 라고 하면 반드시 이 스킬.
@@ -26,7 +26,7 @@ description: >
 
 **Docker 가 안 되면 숙제를 못 하는 게 아니다.** `kis-lecture-lab` 다섯 개로
 모의주문·잔고·수익률까지 다 된다. 공식 도구는 **더 많은 엔드포인트를 둘러보기 위한 것**이다.
-막히면 10분에서 멈추고 랩으로 간다. 낙오가 아니라고 학생에게 말해 준다.
+Docker 앱이 2분 안에 준비되지 않으면 멈추고 랩으로 간다. 낙오가 아니라고 학생에게 말해 준다.
 `KIS_ENV=real` 이거나 `env_dv=real` 이면 멈춘다. 숙제는 모의(`demo`)만.
 키 숫자는 화면에 다시 그리지 마라. `.env` 에만 넣는다.
 한 칸이 끝나면 `../assistant/references/digest.md` 의 **🧃 한입** 을 보여 주고 멈춘다.
@@ -98,7 +98,7 @@ kis-lecture-lab 만 말하면: 「그건 토요일 다섯 개입니다. 평일 �
 학생은 비개발자다. `docker` 라는 말을 처음 듣는 사람이 대부분이다.
 **명령을 알려주지 마라. 네가 실행하고 결과만 말해 준다.**
 
-먼저 네가 확인한다.
+먼저 네가 8초 제한으로 확인한다.
 
 ```
 docker --version
@@ -118,7 +118,9 @@ docker ps
   이게 제일 흔한 막힘이다. 「고래 모양 아이콘을 한 번 눌러 실행해 주세요」라고 말한다.
 
 `docker ps` 가 `Cannot connect to the Docker daemon` 이면 — 깔렸는데 **안 켜진 것**이다.
-학생에게 앱 실행을 부탁하고, 네가 10초 간격으로 `docker ps` 를 다시 확인한다. 될 때까지 기다린다.
+학생에게 앱 실행을 부탁하고, 네가 다시 확인한다. 설치 직후 첫 시작만 **최대 2분**이다.
+2분은 Docker의 기술 제한이 아니라 수업에서 무한 대기를 막는 진행 상한이다. 평소 확인은 8초다.
+앱 강제 종료·재시작은 한 번만 하고, 그 뒤에도 안 되면 더 기다리지 않는다.
 학생에게 "됐나요?" 를 반복해 묻지 마라. **네가 확인한다.**
 
 막히는 경우와 그때 할 일:
@@ -127,7 +129,7 @@ docker ps
 | -- | -- |
 | 회사 노트북·관리자 암호 | 더 밀지 마라. 아래 「Docker 없이」로 간다 |
 | Windows Home 이라 안 된다고 나옴 | WSL 2 로 된다. 그래도 막히면 「Docker 없이」 |
-| 10분 넘게 안 됨 | 멈춘다. 「Docker 없이」 |
+| 2분 넘게 daemon이 안 뜸 | 멈춘다. 「Docker 없이」 |
 
 **Docker 없이 (막혔을 때)** — 숙제를 못 한 게 아니다.
 `kis-lecture-lab` 다섯 개로 **모의주문·잔고·수익률까지 다 된다.** 6번 고르기는 목록 문서로 하고,
@@ -139,79 +141,30 @@ docker ps
 
 ### 3 · 트레이딩 MCP 붙임 — 네가 띄운다
 
-`lessons/참고/kis-mcp-연동-가이드.md` 대로 **네가** 한다. 학생은 아무것도 치지 않는다.
-
-**⚠️ 먼저 설정 파일부터.** 이걸 건너뛰면 원인 안 보이는 에러로 한참 헤맨다.
-
-`~/KIS/config/kis_devlp.yaml` (Windows `C:\Users\<이름>\KIS\config\`) 을 확인한다.
-
-- **없으면**: `lessons/참고/kis_devlp.example.yaml` 을 복사해 두고, `.env` 의 모의 키로
-  `paper_app` · `paper_sec` · `my_paper_stock` **세 칸만** 채운다. 숫자는 화면에 그리지 마라.
-- **있으면**: 한글이 남아 있는지 본다. `"앱키"` · `"증권계좌"` 같은 글자가 하나라도 있으면
-  **그 파일을 example 로 다시 만든다.** 그대로 두면 아래 에러가 난다.
+`lessons/참고/kis-mcp-연동-가이드.md` 대로 **네가** 한다. 학생은 Docker 명령이나 토큰을
+직접 조립하지 않는다. ROOT에서 한 명령만 실행한다.
 
 ```
-UnicodeEncodeError: 'latin-1' codec can't encode characters
+python hermes/setup_kis_mcp.py
 ```
 
-이 파일이 이미 있으면 **환경변수를 무시하고 이 파일을 쓴다.** 그래서 파일이 먼저다.
+스크립트가 공식 저장소·Docker 이미지·모의 키 파일·Bearer 토큰·Hermes 등록을 안전하게
+처리한다. 주소는 `127.0.0.1`, 전송은 `transport: sse`인 legacy SSE다. Hermes가 URL을
+Streamable HTTP로 추측하게 두면 `/sse`에서 405가 나므로 전송 방식을 반드시 명시한다.
+비밀값은 출력하지 않고 기존 `.env`와 `kis-lecture-lab` 다섯 개를 보존한다.
 
-이제 띄운다.
+빌드는 처음 한 번 2~5분 걸릴 수 있다. 이 시간에는 「공식 도구를 준비 중」이라고 진행 상태를
+보여 준다. 분석 작업 제한과 Docker 빌드 시간은 서로 다른 값이다.
 
-```
-git clone https://github.com/koreainvestment/open-trading-api.git
-cd "open-trading-api/MCP/Kis Trading MCP"
-docker build -t kis-trade-mcp .
-```
-
-빌드는 2~5분, 이미지 약 920MB 다. **기다리는 중이라고 말해 준다.** 조용하면 멈춘 줄 안다.
-
-실행은 아래 그대로 한다. **셋 중 하나만 빠져도 안 된다** — 2026-08-24 실측.
+확인:
 
 ```
-docker run -d --name kis-trade-mcp -p 127.0.0.1:3000:3000 \
-  -e ENV=live -e KIS_PROD_TYPE=01 \
-  -e MCP_HOST=0.0.0.0 -e MCP_PORT=3000 \
-  -e MCP_ACCESS_TOKEN=<네가 만든 긴 문자열> \
-  -e KIS_APP_KEY=<모의 앱키> -e KIS_APP_SECRET=<모의 시크릿> \
-  -e KIS_PAPER_APP_KEY=<모의 앱키> -e KIS_PAPER_APP_SECRET=<모의 시크릿> \
-  -e KIS_PAPER_STOCK=<계좌 8자리> -e KIS_ACCT_STOCK=<계좌 8자리> \
-  kis-trade-mcp
+hermes mcp test kis-trade-mcp
 ```
 
-| 빠뜨리면 | 로그에 |
-| -- | -- |
-| `MCP_ACCESS_TOKEN` | `must be set when MCP_TYPE is 'sse'` — 컨테이너가 바로 죽는다 |
-| `MCP_HOST=0.0.0.0` | `Uvicorn running on http://127.0.0.1:3000` — 밖에서 못 닿는다 |
-| `KIS_PAPER_STOCK`·`KIS_ACCT_STOCK` | `- 계좌번호: ❌` |
-
-띄운 뒤 **로그로 확인한다.** 세 줄이 다 ✅ 여야 다음으로 간다.
-
-```
-docker logs kis-trade-mcp | grep -E "거래:|계좌번호"
-```
-
-> **고치려 들지 마라.** 예전에 필요했던 수정 3가지(FastMCP `stateless_http`, `.env.live`,
-> `KIS_PROD_TYPE`)는 **공식이 2026-07-28 에 이미 고쳤다.** 없는 문제를 고치면 오히려 깨진다.
-> 안 뜨면 먼저 `git pull` 로 최신인지 본다.
-
-> **stdio 로 붙이지 마라.** 공식 문서에 「고급」으로 적혀 있지만 **2026-08-24 확인 결과
-> 모든 API 호출이 `'tuple' object has no attribute 'my_url'` 로 죽는다.** Docker + SSE 만 쓴다.
-
-등록 (네가 실행):
-
-```
-claude mcp add --transport sse kis-trade-mcp http://localhost:3000/sse \
-  --header "Authorization: Bearer <위에서 만든 MCP_ACCESS_TOKEN>"
-```
-
-토큰 헤더를 빠뜨리면 붙기는 하는데 호출이 전부 막힌다.
-
-**앱을 한 번 끄고 켠다.** 안 그러면 새 손이 안 보인다. 이건 학생이 눌러야 한다.
-kis-lecture-lab 은 그대로 둔다. 지우거나 갈아끼우지 마라.
-
-확인: `auth` 를 `api_type: "auth_token"`, `params: {"env_dv":"demo"}` 로 한 번 부른 뒤
-삼성전자 현재가를 `domestic_stock` / `inquire_price` 로. `env_dv=demo`.
+화면에는 8개 도구가 보인다. API가 8개라는 뜻이 아니라 국내주식·해외주식·ETF/ETN 같은
+**8개 분야 안에 공식 호출 166개가 묶인 것**이다. 이어서 AI에게 모의투자(`env_dv=demo`)로
+삼성전자 현재가를 한 번 조회하게 한다. 주문은 하지 않는다.
 
 > **토큰은 앱키당 1분에 1회다.** 수업 랩과 공식 도구가 같은 키를 쓰므로 **한 번에 한 손만** 쓴다.
 > 손을 바꾸면 1분 기다린다. `EGW00133` 이 나오면 그거다. 연타하면 계속 실패한다.
@@ -292,7 +245,7 @@ npx -y @koreainvestment/kis-code-assistant-mcp
 - kis-lecture-lab 을 공식 트레이딩으로 갈아끼우기 (토요일 손은 유지)
 - 학생에게 `git` · Docker 명령을 외우게 하기. 네가 실행한다
 - 334개 전부를 한 번에 읽히기. 찾기 → 고르기다
-- 15분 넘게 Docker/WSL 에 붙잡기. 10분에서 멈추고 랩으로
+- Docker Desktop daemon을 2분 넘게 기다리기. 바로 랩으로 합류
 - **stdio 로 트레이딩 MCP 붙이기** — 2026-08-24 확인, 호출이 전부 죽는다. Docker + SSE 만
 - 없어진 패치(FastMCP `stateless_http` · `.env.live` · `KIS_PROD_TYPE`)를 고치려 들기
 - 설정 파일에 한글 자리표시자를 남긴 채 진행하기 (`latin-1` 에러)

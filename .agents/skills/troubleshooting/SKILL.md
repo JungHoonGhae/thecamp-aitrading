@@ -135,6 +135,36 @@ description: >
   없어도 실습은 된다 — 보고는 화면에 나온다.
 - **확인**: `python agent/agent.py` stderr 에 `[텔레그램으로 보고 전송 완료]`, 텔레그램에 같은 점검 보고.
 
+### 4-3-b. `/ts_analyze`가 보이지만 `Unknown command /thecamp-analyze`
+
+- **원인**: Telegram 메뉴는 등록됐지만 Hermes 설정의 `skills.external_dirs`가 실제 목록이
+  아니라 목록처럼 생긴 문자열로 저장됐다. 그래서 TS 명령이 넘길 내부 수업 스킬을 못 읽는다.
+- **수정**: 실습 폴더에서 `python hermes/setup_course.py --remove-discord`를 한 번 실행하고
+  `hermes gateway restart`로 다시 연결한다. 최신 설치 스크립트는 외부 스킬 폴더를 실제
+  YAML 목록으로 저장한다.
+- **확인**: `/ts_analyze AAPL`을 보내면 Unknown command 대신 기술적 분석·펀더멘탈 분석·
+  둘 다 분석·시장 분석 버튼이 보인다.
+
+### 4-3-c. 분석 뒤 `HTML 원문: 열기`가 눌리지 않는다
+
+- **원인**: 분석은 끝났지만 Hermes가 helper의 `MEDIA:` 파일 전송 줄을 Markdown 링크로
+  바꿨다. Telegram은 노트북의 로컬 링크를 열 수 없다.
+- **수정**: 최신 `thecamp-analyze` 스킬은 `MEDIA:` 줄을 원문 그대로 마지막 응답에 남긴다.
+  설치를 다시 맞춘 뒤 같은 `/ts_analyze 종목`을 한 번 보낸다.
+- **확인**: PNG는 Telegram 사진으로 보이고 HTML은 누를 수 있는 문서 파일로 따로 도착한다.
+
+### 4-3-d. `/ts_help`가 바로 안 나오고 `Searching files`가 뜬다 / 버튼 뒤 계속 `Working`
+
+- **원인**: Telegram은 메뉴 명령을 `/ts_help`처럼 밑줄로 보내는데, 예전 수업 플러그인은
+  즉시 실행 명령을 `/ts-help`라는 내부 이름으로만 찾았다. 그래서 AI 일반 대화로 넘어가 파일을
+  검색했다. 설정 버튼 뒤 `Working`은 주문 실행이 아니라 선택을 기다리는 상태이며, 예전 대기
+  시간은 10분이었다.
+- **수정**: 실습 폴더에서 `python hermes/setup_course.py --remove-discord`를 실행하고 연결을
+  다시 시작한다. 이미 오래 기다리는 화면이면 Telegram에서 `/stop`을 한 번 누른 뒤 다시 한다.
+  최신 설정은 버튼을 2분 안에 고르지 않으면 자동 종료한다.
+- **확인**: `/ts_help`를 보내자마자 고정 명령 목록이 나오고 `Searching files`가 뜨지 않는다.
+  `/ts_config` 버튼 안내에는 2분 제한과 기다리는 동안 주문이 실행되지 않는다는 문장이 나온다.
+
 ### 4-4. MCP 도구가 안 보인다 / `kis-lecture-lab` 연결 실패 (수업 경로)
 
 - **증상**: 등록했는데 도구 목록에 `search_api` 가 없다. 또는 서버가 바로 죽는다.
@@ -197,19 +227,29 @@ description: >
   `.kis_token.json` 에 캐시하므로, 랩만 계속 쓰면 이 문제가 안 난다.
 - **확인**: 1분 뒤 한 번만 재실행하면 된다. 연타하면 계속 실패한다.
 
-## 평일 숙제 — 공식 트레이딩 MCP · Docker
+## 2주차 기본 경로 — 공식 트레이딩 MCP · Docker
 
-> **조교/AI 안내**: 토요일 수업 경로는 `kis-lecture-lab` **하나**다.
-> 평일 숙제는 코딩도우미(334, 보기)와 트레이딩 MCP(166, 호출·주문)다.
+> **조교/AI 안내**: 2주차 기본 경로는 트레이딩 MCP(166, 호출·모의주문)다.
+> `kis-lecture-lab`은 Docker가 정말 불가능한 학생의 폴백이다.
 > 코딩도우미로 주문했다고 하면 주문이 안 나간 것이다 — `kis-trade-mcp` 로 다시.
-> Docker/WSL 이 15분 넘게 막히면 강사 칸. 수업 시간(토)에는 이 트리로 들어가지 말고
-> `kis-lecture-lab` 으로 되돌린다.
+> Docker Desktop 앱을 한 번 열고 10초 간격으로 확인하되 **2분을 넘기지 않는다.** 강제
+> 종료·재시작도 한 번만 한다. 그래도 daemon이 안 뜨면 즉시 강사 칸을 남기고
+> `kis-lecture-lab`으로 본편을 계속한다. AI가 9분씩 `Working` 상태로 기다리게 하지 않는다.
 > 상세: `.agents/skills/kis-trading-mcp/SKILL.md` · `lessons/참고/kis-mcp-연동-가이드.md`
 
 ## KIS Trading MCP 자가수리
 
 학생이 공식 Trading MCP를 직접 붙이다 막히면 아래로 안내한다.
 상세: `lessons/참고/kis-mcp-연동-가이드.md`
+
+### 4-8-a. Docker Desktop이 설치됐는데 daemon 연결이 계속 안 된다
+
+- **원인**: 앱을 아직 안 열었거나 Windows WSL2·재부팅·회사 권한이 막고 있다.
+- **수정**: Docker Desktop을 직접 한 번 열게 하고 AI가 `docker ps`를 5초 제한으로 확인한다.
+  10초 간격으로 최대 2분, 앱 강제 종료·재시작은 한 번만 한다.
+- **종료 기준**: 2분 뒤에도 실패하면 추가 프로그램을 설치시키지 않는다.
+  「Docker/KIS 166만 보류 · 수업 5개로 계속」과 강사 칸을 바로 보여 준다.
+- **확인**: 성공이면 `docker ps`가 즉시 끝나고, 실패면 학생 화면에 더 이상 `Working`이 남지 않는다.
 
 > **2026-08-24 확인 — 아래 5·6·7 은 이제 대부분 안 난다.**
 > 공식이 2026-07-28 커밋 `b093e42` 에서 고쳤다(`ctx.set_state` await, Windows stdio 호환).

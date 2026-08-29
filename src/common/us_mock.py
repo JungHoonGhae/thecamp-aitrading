@@ -72,6 +72,11 @@ class LocalMockBroker:
             },
         }
 
+    def get_orders(self) -> list[dict]:
+        """수업용 장부의 주문 기록을 읽기 전용 복사본으로 돌려준다."""
+        ledger = self._load()
+        return [dict(order) for order in (ledger.get("orders") or [])]
+
     def place_limit_order(
         self,
         ticker: str,

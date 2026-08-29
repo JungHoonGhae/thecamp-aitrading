@@ -19,112 +19,54 @@
 - KIS **모의투자** Open API: `앱키` · `시크릿` · **모의 증권계좌 8자리**
 - 공식 저장소: `koreainvestment/open-trading-api` 의 `MCP/Kis Trading MCP`
 
-## 2. 강의용(편의) — 미리 고쳐진 이미지로
-```bash
-# 강사가 배포한 이미지 로드 (예: tar 배포 시)
-docker load -i kis-trade-mcp.tar
+## 2. 수업 기본 경로 — AI가 한 명령으로 연결
 
-# 모의 키로 실행 (실전 키 없이 모의만으로 동작)
-# ⚠️ KIS_PROD_TYPE=01 이 빠지면 인증에서 KeyError: 'my_acct' 로 죽음 (아래 수정 ③)
-# ⚠️ 3000번 포트를 다른 프로그램이 쓰고 있으면 -p 13000:3000 처럼 왼쪽 숫자만 바꾸면 됨
-docker run -d --name kis-trade-mcp -p 3000:3000 \
-  -e ENV="live" \
-  -e KIS_PROD_TYPE="01" \
-  -e KIS_PAPER_APP_KEY="<모의앱키>" -e KIS_PAPER_APP_SECRET="<모의시크릿>" \
-  -e KIS_PAPER_STOCK="<모의계좌8자리>" \
-  kis-trade-mcp
-```
-그다음 **내가 쓰는 AI 도구**에 MCP 등록(SSE). 도구별로 한 줄씩:
+학생은 Docker 명령, 토큰, 주소를 직접 조립하지 않습니다. Claude Code나 Codex에
+「2주차 실습 환경 설치해 줘」라고 말하면 AI가 ROOT에서 아래 스크립트를 실행합니다.
 
-```bash
-# Claude Code
-claude mcp add --transport sse kis-trade http://localhost:3000/sse
-
-# Codex CLI (mcp-remote 브리지로 SSE 연결)
-codex mcp add kis-trade -- npx -y mcp-remote http://localhost:3000/sse
+```text
+python hermes/setup_kis_mcp.py
 ```
 
-그 밖의 도구(Cursor, Gemini CLI 등 MCP 지원 에이전트)는 설정 파일에 아래 중 하나를 넣는다:
-- SSE를 직접 지원하면: `{ "type": "sse", "url": "http://localhost:3000/sse" }`
-- stdio만 지원하면(범용): `{ "command": "npx", "args": ["-y", "mcp-remote", "http://localhost:3000/sse"] }`
+스크립트가 한 번에 하는 일:
 
-(설정 파일 예시: `lessons/1부-연결/mcp.example.json`)
+1. Docker Desktop 엔진을 8초 안에 확인합니다.
+2. 한국투자증권 공식 저장소를 받고 Trading MCP 이미지를 만듭니다.
+3. 루트 `.env`의 **모의투자 값만** 권한 600인 별도 실행 파일로 옮깁니다.
+4. 서버를 `127.0.0.1:3000`에만 열고 자동 재시작을 설정합니다.
+5. 긴 접근 토큰을 자동 생성하고 화면에는 출력하지 않습니다.
+6. Hermes에 `transport: sse`를 명시해 등록한 뒤 연결을 시험합니다.
 
-확인: AI에게 "모의투자로 삼성전자 현재가 알려줘".
+첫 이미지 빌드는 2~5분 걸릴 수 있습니다. 진행 상태를 보여 주되 학생에게 명령을 다시
+입력하게 하지 않습니다. 설치 직후 Docker 엔진이 켜지는 데 주는 2분은 기술 제한이 아니라
+수업 중 무한 대기를 막는 진행 상한입니다. 이미 켜진 엔진은 8초 안에 응답해야 합니다.
 
-> **컨테이너를 재시작했다면 AI 도구도 재연결** — 서버가 다시 뜨면 기존 MCP 세션이
-> 무효화돼 모든 도구 호출이 `Invalid request parameters`(-32602)로 즉시 실패합니다.
-> Claude Code는 `/mcp` 에서 해당 서버 reconnect, Codex 등 다른 도구는 세션 재시작.
+## 3. 연결 확인
 
-## 3. 원본으로 붙일 때 — 지금은 고칠 게 없다
-
-예전에는 세 군데를 손봐야 했다. **지금은 아니다.** (2026-08-24 공식 소스 확인)
-
-| 예전 수정 | 지금 |
-| -- | -- |
-| `server.py` 의 `stateless_http=False` 삭제 | 소스에 그 인자가 없다 |
-| `.env.live` 직접 만들기 | 저장소에 **이미 들어 있다** |
-| `KIS_PROD_TYPE=01` 누락 | 코드 기본값이 `"01"` 이다 (그래도 명시해 주면 확실하다) |
-
-그러니 순서는 이것뿐이다.
-
-```
-git clone https://github.com/koreainvestment/open-trading-api.git
-cd "open-trading-api/MCP/Kis Trading MCP"
-docker build -t kis-trade-mcp .
+```text
+hermes mcp test kis-trade-mcp
 ```
 
-빌드는 2~5분 걸리고 이미지는 **약 920MB** 다. 학생에게 기다리는 중이라고 말해 준다.
+성공하면 Hermes에는 8개 도구가 보입니다. API가 8개라는 뜻은 아닙니다. 국내주식·해외주식·
+ETF/ETN·채권 같은 **8개 분야 안에 공식 호출 166개가 묶여** 있습니다. 수업용
+`kis-lecture-lab` 5개도 폴백으로 남지만 공식 166개가 기본입니다.
 
-### 실행 — 2026-08-24 실제로 돌려서 확인한 명령
+이어 AI에게 아래처럼 말해 읽기 전용 조회를 확인합니다.
 
-```
-docker run -d --name kis-trade-mcp -p 127.0.0.1:3000:3000 \
-  -e ENV=live -e KIS_PROD_TYPE=01 \
-  -e MCP_HOST=0.0.0.0 -e MCP_PORT=3000 \
-  -e MCP_ACCESS_TOKEN=<아무 긴 문자열> \
-  -e KIS_APP_KEY=<모의 앱키> -e KIS_APP_SECRET=<모의 시크릿> \
-  -e KIS_PAPER_APP_KEY=<모의 앱키> -e KIS_PAPER_APP_SECRET=<모의 시크릿> \
-  -e KIS_PAPER_STOCK=<모의계좌 8자리> -e KIS_ACCT_STOCK=<모의계좌 8자리> \
-  kis-trade-mcp
+```text
+KIS 공식 MCP를 사용해서 모의투자(env_dv=demo)로 삼성전자 현재가를 한 번 조회해 줘.
+주문은 하지 마.
 ```
 
-**빠뜨리면 죽거나 안 붙는 것 세 개.** 셋 다 실제로 겪었다.
+Hermes에서 `/sse` 주소는 legacy SSE입니다. URL만 넣으면 Streamable HTTP로 추측해 405가
+날 수 있으므로 반드시 `transport: sse`를 명시합니다. `localhost` 대신 `127.0.0.1`을 사용합니다.
+컨테이너를 다시 만들면 스크립트를 재실행하거나 `hermes gateway restart`로 세션을 갱신합니다.
 
-| 빠뜨리면 | 증상 |
-| -- | -- |
-| `MCP_ACCESS_TOKEN` | 컨테이너가 **바로 죽는다.** 로그에 `must be set when MCP_TYPE is 'sse'` |
-| `MCP_HOST=0.0.0.0` | 컨테이너는 사는데 **밖에서 못 닿는다.** 저장소 `.env.live` 기본값이 `127.0.0.1` 이라 컨테이너 안에만 열린다. 로그의 `Uvicorn running on http://127.0.0.1:3000` 이 그 신호다 |
-| `KIS_PAPER_STOCK` · `KIS_ACCT_STOCK` | 로그 요약에 **계좌번호 ❌**. 조회가 계좌를 못 찾는다 |
+## 3-0. 수동 연결은 복구할 때만
 
-로그로 확인한다. 세 줄이 다 ✅ 여야 한다.
-
-```
-docker logs kis-trade-mcp | grep -E "거래:|계좌번호"
-  - 실제 거래: ✅   - 모의 거래: ✅   - 계좌번호: ✅
-```
-
-등록은 토큰을 헤더로 같이 준다.
-
-```
-claude mcp add --transport sse kis-trade-mcp http://localhost:3000/sse \
-  --header "Authorization: Bearer <위 MCP_ACCESS_TOKEN>"
-```
-
-확인: `auth` 를 `api_type: "auth_token"`, `params: {"env_dv":"demo"}` 로 부른 뒤
-`domestic_stock` / `inquire_price` 로 삼성전자 조회. **2026-08-24 이 순서로 성공 확인.**
-
-## 3-0. ⚠️ stdio 로 붙이지 마라
-
-공식 문서에 「대안: stdio 로컬 연동(고급)」이 있다. **쓰지 마라.**
-2026-08-24 확인 결과 서버는 뜨고 도구 목록도 보이는데, **모든 API 호출이 죽는다.**
-
-```
-AttributeError: 'tuple' object has no attribute 'my_url'
-```
-
-인증 상태가 API 를 실행하는 자식 프로세스로 넘어가지 않는다. 붙은 것처럼 보여서 더 위험하다.
-**Docker + SSE 만 쓴다.**
+수동 Docker·Bearer 헤더 등록은 강사용 복구 절차입니다. 학생에게 긴 실행 명령을 복사시키지
+않습니다. stdio 대신 Docker + legacy SSE를 사용하고, 비밀값은 명령행이나 채팅에 출력하지
+않습니다. 공식 소스를 직접 고치기 전에 먼저 최신 저장소인지 확인합니다.
 
 ## 3-1. ⚠️ 가장 잘 막히는 곳 — 설정 파일에 한글이 남는다
 

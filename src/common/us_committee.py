@@ -76,7 +76,7 @@ def load_reference_packet(fixtures: Path, market: str) -> dict:
         "initial_cash": int(quotes["initial_cash"]),
         "as_of": latest["month"],
         "fixture_notice": (
-            "고정 바스켓·비공식 조정주가를 사용한 학습용 결과입니다. "
+            "고정 바스켓·Yahoo Finance 조정주가를 사용한 학습용 결과입니다. "
             "수익 보장이나 투자 추천이 아닙니다."
         ),
     }

@@ -91,12 +91,16 @@ def main() -> None:
             r.줄(f"{이름} — {v}")
 
     if AI판단:
-        답 = judge.ask(재료=r.본문(), 질문="이 변화에서 사람이 확인할 것 하나만 짚어라.")
-        if 답:
+        ai_result = judge.ask_with_status(
+            재료=r.본문(), 질문="이 변화에서 사람이 확인할 것 하나만 짚어라."
+        )
+        if ai_result.ok:
             r.칸("AI가 짚은 것")
-            for line in 답.splitlines():
+            for line in ai_result.text.splitlines():
                 if line.strip():
                     r.줄(line.strip())
+        else:
+            r.칸("AI 검토 미실행").줄(ai_result.notice)
 
     r.보내기()
 

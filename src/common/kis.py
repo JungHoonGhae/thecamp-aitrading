@@ -103,15 +103,81 @@ class KISClient:
                  "등락률": float(r["prdy_ctrt"])} for r in rows]
 
     def get_balance(self) -> dict:
-        """계좌 잔고. {'cash', 'holdings':[{code,name,qty,eval_amt}]} 반환."""
+        """계좌 잔고와 종목별 매입·평가·손익을 공통 형식으로 반환한다."""
         data = self._balance_payload()
         summary = (data.get("output2") or [{}])[0]
-        holdings = [
-            {"code": h["pdno"], "name": h["prdt_name"],
-             "qty": int(h["hldg_qty"]), "eval_amt": int(h["evlu_amt"])}
-            for h in data.get("output1", []) if int(h["hldg_qty"]) > 0
-        ]
+        holdings = []
+        for h in data.get("output1", []):
+            qty = int(float(h.get("hldg_qty") or 0))
+            if qty <= 0:
+                continue
+            eval_amt = int(float(h.get("evlu_amt") or 0))
+            purchase_amt = int(float(h.get("pchs_amt") or 0))
+            profit_amt = int(float(h.get("evlu_pfls_amt") or (eval_amt - purchase_amt)))
+            profit_rate = float(h.get("evlu_pfls_rt") or 0)
+            if not profit_rate and purchase_amt:
+                profit_rate = profit_amt / purchase_amt * 100
+            holdings.append({
+                "code": str(h.get("pdno") or ""),
+                "name": str(h.get("prdt_name") or h.get("pdno") or ""),
+                "qty": qty,
+                "avg_price": float(h.get("pchs_avg_pric") or 0),
+                "current_price": int(float(h.get("prpr") or (eval_amt / qty if qty else 0))),
+                "purchase_amt": purchase_amt,
+                "eval_amt": eval_amt,
+                "profit_amt": profit_amt,
+                "profit_rate": profit_rate,
+            })
         return {"cash": cash_from_summary(summary), "holdings": holdings}
+
+    def get_pending_orders(self) -> list[dict]:
+        """오늘의 국내주식 미체결 주문을 읽기 쉬운 공통 형식으로 반환한다.
+
+        KIS 공식 ``주식일별주문체결조회``에서 체결구분을 미체결(02)로 제한한다.
+        수업용 mock 장부는 주문 즉시 체결되므로 항상 빈 목록이다.
+        """
+        if self.mode == "mock":
+            return []
+        today = time.strftime("%Y%m%d")
+        data = self._call(
+            "/uapi/domestic-stock/v1/trading/inquire-daily-ccld",
+            self._tr("TTC8001R"),
+            {
+                "CANO": self.account,
+                "ACNT_PRDT_CD": "01",
+                "INQR_STRT_DT": today,
+                "INQR_END_DT": today,
+                "SLL_BUY_DVSN_CD": "00",
+                "INQR_DVSN": "00",
+                "PDNO": "",
+                "CCLD_DVSN": "02",
+                "ORD_GNO_BRNO": "",
+                "ODNO": "",
+                "INQR_DVSN_3": "00",
+                "INQR_DVSN_1": "",
+                "INQR_DVSN_2": "",
+                "CTX_AREA_FK100": "",
+                "CTX_AREA_NK100": "",
+            },
+        )
+        pending: list[dict] = []
+        for row in data.get("output1") or []:
+            remaining = int(row.get("rmn_qty") or row.get("ord_qty") or 0)
+            if remaining <= 0:
+                continue
+            side_code = str(row.get("sll_buy_dvsn_cd") or "")
+            side_name = str(row.get("sll_buy_dvsn_cd_name") or "")
+            side = "buy" if side_code == "02" or "매수" in side_name else "sell"
+            pending.append({
+                "order_no": str(row.get("odno") or ""),
+                "code": str(row.get("pdno") or ""),
+                "name": str(row.get("prdt_name") or row.get("pdno") or ""),
+                "side": side,
+                "qty": remaining,
+                "price": int(float(row.get("ord_unpr") or 0)),
+                "time": str(row.get("ord_tmd") or ""),
+            })
+        return pending
 
     def place_order(self, code: str, side: str, qty: int, name: str = "") -> dict:
         """시장가 주문. side='buy'|'sell'.

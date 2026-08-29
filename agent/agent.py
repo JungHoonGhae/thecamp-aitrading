@@ -78,13 +78,18 @@ def schedule_note(schedule: str) -> str:
             "연습 삼아 지금 돌려보는 건 언제든 괜찮습니다.")
 
 
-def build_report(execute: bool) -> Report:
+def build_report(
+    execute: bool,
+    *,
+    kis: KISClient | None = None,
+    balance: dict | None = None,
+) -> Report:
     """계좌를 점검하고 (신뢰 게이트에 따라) 리밸런싱까지 실행한 뒤, 구조화된 Report 를 만든다.
 
     KIS·telegram 을 모르는 순수 계산이 아니라 여전히 I/O 를 포함하지만, 적어도 반환값이
     Report 하나라 — main() 은 같은 함수를 그대로 불러 쓸 수 있다.
     """
-    kis = KISClient()
+    kis = kis or KISClient()
     portfolio = load_portfolio()
     tolerance = load_number("rules.md", "허용 오차", 5)
     max_weight = load_number("guardrails.md", "한 종목 최대 비중", 40)
@@ -92,7 +97,7 @@ def build_report(execute: bool) -> Report:
     forbidden = load_forbidden()
     schedule = load_schedule()
 
-    bal = kis.get_balance()
+    bal = balance if balance is not None else kis.get_balance()
     held = {h["code"]: h for h in bal["holdings"]}
 
     # 총 자산 = 예수금 + 보유 종목 평가금액 합

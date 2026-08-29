@@ -1,15 +1,12 @@
 """루틴 공통 — 알림을 만들고 보내는 자리.
 
 **루틴**은 정해진 주기에 혼자 도는 작은 일이다. 결과는 **루틴 알림**으로 온다.
-카테고리는 둘뿐이고, 이 구분이 이 수업의 안전선이다.
-
-  · 맞춤알림  — 읽기만 한다. 주문이 나가지 않는다.
-  · 실전매매  — 주문이 나갈 수 있다. **승인**을 받고서만 움직인다.
-
-새 루틴을 만들 때 이 둘 중 어디인지 먼저 정한다. 애매하면 맞춤알림이다.
+이 폴더의 루틴은 모두 읽고 알리는 일만 한다. 주문은 Telegram의
+``/ts_order_plan``에서 사람이 요청하고 승인하는 별도 경로다.
 """
 from __future__ import annotations
 
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -26,15 +23,10 @@ from common.telegram import report as send  # noqa: E402
 정보수집 = "정보수집"
 스크리닝 = "스크리닝"
 매매제안 = "매매제안"
-리밸런싱 = "리밸런싱"
-카테고리들 = (정보수집, 스크리닝, 매매제안, 리밸런싱)
+카테고리들 = (정보수집, 스크리닝, 매매제안)
 
-# 이름만 봐도 위험을 알 수 있게. 주문이 나갈 수 있는 카테고리는 하나뿐이다.
-주문나감 = {리밸런싱}
-
-# 뒤로 호환 — 예전 이름을 쓰던 루틴이 안 깨지게 둔다.
+# 뒤로 호환 — 알림 루틴의 예전 이름만 유지한다.
 맞춤알림 = 정보수집
-실전매매 = 리밸런싱
 
 
 class 루틴:
@@ -79,6 +71,9 @@ class 루틴:
 
     def 보내기(self) -> None:
         """화면에 찍고, 텔레그램이 설정돼 있으면 그쪽으로도 보낸다."""
+        if os.environ.get("THECAMP_STDOUT_ONLY") == "1":
+            print(self.본문())
+            return
         send(Report(mode_label=None, notes=self.본문().splitlines(),
                     charts=[c for c in [self.차트] if c]))
 
@@ -89,6 +84,7 @@ def 목록() -> list[tuple[str, str, str]]:
     for path in sorted(ROOT.glob("routines/[!_]*.py")):
         head = path.read_text(encoding="utf-8").splitlines()
         한줄 = next((l.strip('"""').strip() for l in head[:3] if l.strip()), "")
-        카테고리 = 실전매매 if "실전매매" in "\n".join(head[:20]) else 맞춤알림
+        text = "\n".join(head[:20])
+        카테고리 = next((item for item in 카테고리들 if item in text), 맞춤알림)
         rows.append((path.stem, 카테고리, 한줄))
     return rows

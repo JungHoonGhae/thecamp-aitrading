@@ -82,13 +82,16 @@ def main() -> None:
         r.줄("위치가 낮다고 싸고 높다고 비싼 것이 아닙니다. 왜 그 자리인지가 남습니다.")
 
     if AI판단:
-        답 = judge.ask(재료=r.본문(),
-                      질문="위치만 보고 판단할 때 빠지기 쉬운 함정 하나만 짚어라.")
-        if 답:
+        ai_result = judge.ask_with_status(
+            재료=r.본문(), 질문="위치만 보고 판단할 때 빠지기 쉬운 함정 하나만 짚어라."
+        )
+        if ai_result.ok:
             r.칸("AI가 짚은 것")
-            for line in 답.splitlines():
+            for line in ai_result.text.splitlines():
                 if line.strip():
                     r.줄(line.strip())
+        else:
+            r.칸("AI 검토 미실행").줄(ai_result.notice)
 
     r.보내기()
 
